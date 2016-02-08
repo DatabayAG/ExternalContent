@@ -1,0 +1,162 @@
+//
+// Copyright (c) 2013 Institut für Lern-Innovation, Friedrich-Alexander-Universität Erlangen-Nürnberg 
+// GPLv2, see LICENSE 
+// 
+// German Language File for ExternalContent Plugin
+//
+
+<!-- language file start -->
+cat_create_xxco#:#Neuen externen Inhalt anlegen
+crs_create_xxco#:#Neuen externen Inhalt anlegen
+xxco#:#Externer Inhalt
+xxco_add#:#Hinzufügen
+xxco_copy#:#Externen Inhalt kopieren
+xxco_created#:#Der externe Inhalt wurde hinzugefügt
+xxco_delete#:#Externen Inhalt löschen
+xxco_edit_permission#:#Rechteeinstellungen ändern
+xxco_new#:#Externen Inhalt hinzufügen
+xxco_read#:#Externen Inhalt verwenden
+xxco_visible#:#Externer Inhalt ist sichtbar
+xxco_write#:#Externen Inhalt konfigurieren
+fold_create_xxco#:#Neuen externen Inhalt anlegen
+grp_create_xxco#:#Neuen externen Inhalt anlegen
+obj_xxco#:#Externer Inhalt
+objs_xxco#:#Externe Inhalte
+xxco_apply#:#Anwenden
+xxco_availability#:#Verfügbarkeit
+availability_0#:#Nicht verfügbar
+availability_1#:#Bestehende erlaubt
+availability_2#:#Neue erzeugbar
+xxco_configuration#:#Konfiguration der externen Inhalte
+create_type#:#Neuen Typ definieren
+delete_type#:#Typdefinition löschen
+xxco_description_info#:#Die Beschreibung wird in Auflistungen unter dem Titel angezeigt
+xxco_edit_type#:#Typ-Definition bearbeiten
+xxco_instructions#:#Anleitung
+xxco_instructions_info#:#Die Anleitung wird auf der Info-Seite angezeigt.
+xxco_message_type_not_available#:#Externe Inhalte dieses Typs sind leider nicht mehr verfügbar.
+xxco_online_info#:#Damit wird das Objekt sichtbar für andere Nutzer
+xxco_refresh_meta_data#:#Meta-Daten aktualisieren
+type_availability#:#Verfügbarkeit
+type_availability_info#:#Hiermit steuern Sie die Verfügbarkeit des Typs im Magazin. Alte Typen können statt gelöscht auf "Bestehende erlaubt" gesetzt werden.
+type_created#:#Die Typdefinition wurde gespeichert.
+type_definition#:#XML-Definition
+type_definition_info#:#Geben Sie hier die XML-Definition der Schnittstelle ein. Erzeugen Sie einen neuen Typ, um ein Beispiel für die Definition zu sehen.
+type_deleted#:#Die Typdefinition wurde gelöscht.
+type_failure_encoding#:#Das encoding "%s" gibt es nicht!
+type_failure_field_name#:#Jedes Feld muss einen Namen haben!
+type_failure_field_type#:#Den field_type "%s" gibt es nicht!
+type_failure_input#:#Einige Eingaben sind nicht korrekt! Bitte beachten Sie die Hinweise bei den Feldern.
+type_failure_interfaces#:#Es muss genau ein Wurzelelement &lt;interface&gt; vorhanden sein.
+type_failure_launch_type#:#Den type "%s" gibt es nicht!
+type_failure_xml#:#Die XML-Definition der Schnittstelle hat Fehler:
+type_name#:#Typ-Name
+type_name_info#:#Interner Typname zur Sortierung und besseren Unterscheidung von Versionen. Der Typname wird den Anwender nicht angezeigt.
+type_remarks#:#Bemerkungen
+type_remarks_info#:#Administrative Bemerkungen zu Version und Status des Typs. Sie sind für die Anwender nicht sichtbar.
+type_saved#:#Die Typdefinition wurde gespeichert.
+type_updated#:#Die Typdefinition wurde aktualisiert.
+types_list#:#Liste der Inhalts-Typen
+untrashed_usages#:#Anzahl Verwendungen
+xxco_edit#:#bearbeiten Externen Inhalt 
+externalcontent_plugin_configuration#:#Externen Inhalt Plugin-Konfiguration
+xxco_demo#:#DEMO
+type_title#:#Titel
+type_desc1#:#Dies ist ein Demo-Typ, um die Verwendung der Eingabefelder und Templates zu demonstrieren
+type_video_id#:#Video ID
+type_desc2#:#Beschreibungstext eingeben
+type_path_template#:#Pfad-Template
+type_desc3#:#Demonstriert dein Einbau von Feldern in Templates
+view#:#Ansehen
+type_time_to_delete#:#Ablauf-Zeit
+type_time_to_delete_info#:#Ablauf-Zeit für einen Zugriffs-Token (bei Callback-Authentifizierung)
+instructions#:#Anleitung
+online_info#:#Schalten Sie den Content online, damit er für Lernerinnen sichtbar und verwendbar wird.
+view_log#:#Log ansehen
+view_statistics#:#Statistik ansehen
+type#:#Event-Typ
+subtype#:#Untertyp
+integer#:#Zahl
+text#:#Text
+calculate#:#Berechnen
+export_excel#:#Excel-Export
+key_title#:#Schlüssel
+export#:#Export
+filter#:#Ereignisse filtern
+apply_filter#:#Filter anwenden
+filter_user#:#Nutzer-Filter
+filter_course#:#Kurs-Filter
+event_id#:#Ereignis-ID
+statistics_base_data#:#Grunddaten
+log_entries#:#Log-Einträge
+users_success#:#Erfolg bei der Schlüsselnutzung
+key_starts#:#Schlüssel-Starts
+key_results#:#Ergebnisse
+key_correct#:#Vermutlich korrekte Ergebnisse
+key_wrong#:#Vermutlich falsche Ergebnisse
+time#:#Log-Zeit
+time_parameters#:#Zeitparameter
+time_select_question#:#Zeit zur Auswahl einer Frage
+time_answer_question#:#Zeit zur Beantwortung einer Frage
+time_identify#:#Zeit zur erfolgreichen bestimmung einer Art
+time_failed#:#Zeit für eine fehlgeschlagene Identifikation
+ranking_questions#:#Rangfolge der Fragen
+most_selected_questions#:#Am häufigsten ausgewählte Fragen
+most_edited_questions#:#Am häufigsten geänderte Fragen
+no_events_found#:#Keine geloggten Ereignisse gefunden!
+no_statistics_calculated#:#Die Statistik wurde noch nicht berechnet!
+time_calculated#:#Erstellungszeit
+export_to_database#:#In Datenbank exportieren
+view_database#:#Datenbank ansenen
+database_content#:#Datenbankinhalt
+eval_id#:#Eval-ID
+key_id#:#Schlüssel-ID
+lms_id#:#LMS-ID
+key#:#Schlüssel
+any#:#beliebig
+user#:#Nutzer
+delete#:#Log-Eintrag löschen
+view_log#:#Log ansehen
+view_logs#:#Logs ansehen
+events_deleted#:#Der ausgewählte Nutzer wurde gelöscht
+less_date#:#Ereignisse vor: 
+more_date#:#Ereignisse nach: 
+type_obj#:#Objekt-Typ
+ref_id#:#Typ-ID
+session_id#:#Sitzung
+call_time#:#Aufruf-Zeit
+edit#:#Externen Inhalt bearbeiten
+log_set#:#Logging verwenden
+log_on#:#Ja
+log_off#:#Nein
+logs_info#:#Wählen Sie Sie "Ja", wenn Sie Logging-Daten vom externen Inhalt speichern möchten
+learning_progress_set#:#Lernfortschritt verwenden
+lp_on#:#Ja
+lp_off#:#Nein
+lp_info#:#Wählen Sie "Ja" wenn Sie Lernfortschrittsdaten vom externen Inhalt erhalten möchten
+time_to_delete_info#:#Lösch-Zeitraum für einen Zugriffs-Token (bei Logging)
+type_edit#:#Typ-Definition bearbeiten
+type_failure_encoding#:#Das Encoding %s wurde nicht gefunden!
+model#:#Typ-Modell
+content_types#:#Inhalts-Typen
+type_title_info#:#Dieser Titel wird zur Auswahl des Typs bei neuen Objekten angezeigt.
+type_description_info#:#Diese Beschreibung wird zur Auswahl des Typs bei neuen Objekten angezeigt.
+type_settings#:#Einstellungen
+icons#:#Icons
+icons_failure#:#Beim Hochladen der Icons ist ein Fehler aufgetreten!
+icons_saved#:#Die Icons wurden gespeichert.
+edit_instructions#:#Anleitung bearbeiten
+instructions_saved#:#Die Anleitung wurde gespeichert.
+xxco_title_info#:#Geben Sie dem Objekt einen Titel
+settings#:#Einstellungen
+lp_settings#:#Lernfortschritts-Einstellungen
+lp_mode#:#Modus
+lp_inactive#:#Inaktiv
+lp_inactive_info#:#Für dieses Objekt wird kein Lernfortschritt gespeichert.
+lp_active#:#Aktiv
+lp_active_info#:#Der Status "In Bearbeitung" wird gesetzt, sobald der Inhalt aufgerufen wird. Der Status "Bearbeitet" oder "Nicht bestanden" wird durch das Ergebnis aus einem LTI-Aufruf gesetzt.
+lp_threshold#:#Schwellwert für "Bearbeitet"
+lp_threshold_info#:#Falls das per LTI übertragene Ergebnis gleich oder höher als diser Schwellwert ist, wird der Status auf "Bearbeitet" gesetzt, andernfalls auf "Nicht bestanden".
+xxco_read_learning_progress#:#Lernforschritt ansehen
+xxco_edit_learning_progress#:#Lernfortschritt bearbeiten
+svg_icon#:#SVG Icon for All Sizes

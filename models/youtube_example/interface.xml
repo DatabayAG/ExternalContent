@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<interface type="embed">
+	
+  <title>YouTube Demo</title>  
+  <description>Demo type to demonstrate the use of input fields and their processing. Use this as a basis to create your own type.</description>
+
+  <template><![CDATA[
+  <iframe width="{WIDTH}" height="{HEIGHT}" src="{SRC}" frameborder="0" allowfullscreen></iframe>
+  ]]></template>
+
+  <fields>
+
+    <field name="URL" type="text">
+      <title>Sharing URL</title>
+      <description>Enter here the video sharing URL as provided by YouTube</description>
+    </field>
+
+    <field name="WIDTH" type="text">
+      <title>Width</title>
+      <description>Enter the width of the embedded video</description>
+    </field>
+	
+    <field name="HEIGHT" type="text">
+      <title>Height</title>
+      <description>Enter the height of the video</description>
+    </field>
+	
+    <field name="PATH" type="calculated" function="getBasename">
+      <param name="url">{URL}</param>
+    </field>
+	
+    <field name="SRC" type="template" encoding="">
+      <template><![CDATA[http://www.youtube.com/embed/{PATH}]]></template>
+    </field>
+	
+  </fields>
+</interface>

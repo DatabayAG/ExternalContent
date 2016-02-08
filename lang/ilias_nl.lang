@@ -1,0 +1,162 @@
+//
+// Copyright (c) 2013 Institut für Lern-Innovation, Friedrich-Alexander-Universität Erlangen-Nürnberg
+// GPLv2, see LICENSE
+//
+// Dutch Language File for ExternalContent Plugin
+//
+
+<!-- language file start -->
+cat_create_xxco#:#Creeër nieuw externe content
+crs_create_xxco#:#Creeër nieuw externe content
+xxco#:#Externe Content
+xxco_add#:#Toevoegen Externe Content
+xxco_copy#:#Kopieer Externe Content
+xxco_created#:#De externe content is toegevoegd
+xxco_delete#:#Verwijder Externe Content
+xxco_edit_permission#:#Wijzig rechten
+xxco_new#:#Nieuwe Externe Content
+xxco_read#:#Gebruik Externe Content
+xxco_visible#:#Externe Content is zichtbaar
+xxco_write#:#Configureer Externe Content
+fold_create_xxco#:#Creeër nieuwe Externe Content
+grp_create_xxco#:#Creeër nieuwe Externe Content
+obj_xxco#:#Externe Content
+objs_xxco#:#Externe Content
+xxco_apply#:#Toepassen
+xxco_availability#:#Beschikbaarheid
+availability_0#:#Niet beschikbaar
+availability_1#:#Bestaande objecten toestaan
+availability_2#:#Nieuwe objecten toestaan
+xxco_configuration#:#Configuratie van externe content typen
+create_type#:#Definieër een nieuw type
+delete_type#:#Verwijder de type definitie
+xxco_description_info#:#De omschrijving wordt onder de titel getoond.
+xxco_edit_type#:#Wijzig type definitie
+xxco_instructions#:#Instructies
+xxco_instructions_info#:#De instructies worden getoond op de info pagina.
+xxco_message_type_not_available#:#Dit type Externe Content is niet langer beschikbaar.
+xxco_online_info#:#Dit maakt het object zichtbaar en bruikbaar voor de gebruiker.
+xxco_refresh_meta_data#:#Ververs metadata
+type_availability#:#Beschikbaarheid
+type_availability_info#:#Beschikbaarheid van dit type in het studiecentrum. U mag uitgefaseerde typen op "bestaande objecten toestaan" zetten in plaats van ze te verwijderen.
+type_created#:#De type definitie is opgeslagen.
+type_definition#:#XML definitie
+type_definition_info#:#Voeg de XML definitie hier toe. Creeër een nieuw type om een voorbeeld te zien.
+type_deleted#:#De type definitie is verwijderd.
+type_failure_encoding#:#De codering "%s" bestaat niet.
+type_failure_field_name#:#Ieder veld moet een naam hebben.
+type_failure_field_type#:#Het veld type "%s" bestaat niet.
+type_failure_input#:#Invoer is niet correct. Controleer de foutmeldingen bij de velden.
+type_failure_interfaces#:#U moet minstens één bron element declareren &lt;interface&gt;.
+type_failure_launch_type#:#Het type "%s" bestaat niet.
+type_failure_xml#:#De XML interface definitie bevat fouten:
+type_name#:#Type naam
+type_name_info#:#Interne naam voor sorteren en onderscheiding van versies. Dit wordt niet getoond aan de gebruikers.
+type_remarks#:#Opmerkingen
+type_remarks_info#:#Administratieve opmerkingen voor dit type. Deze worden niet getoond aan de gebruikers.
+type_saved#:#De type definitie is opgeslagen.
+type_updated#:#De type definitie is aangepast.
+types_list#:#Lijst van externe content typen
+untrashed_usages#:#Aantal toepassingen
+xxco_edit#:#Wijzig externe content
+externalcontent_plugin_configuration#:#Externe Content plug-in configuratie
+xxco_demo#:#DEMO
+type_title#:#Titel
+type_desc1#:#Dit is een demo type om het gebruik te demonstreren van invoervelden en sjablonen.
+type_video_id#:#Video ID
+type_desc2#:#Invoeren omschrijving
+type_path_template#:#Pad naar sjabloon
+type_desc3#:#Dit demontstreert het nesten van velden en sjablonen.
+view#:#Beeld
+type_time_to_delete#:#Verlooptijd
+type_time_to_delete_info#:#Verlooptijd van een toegangstoken (voor callback authenticatie).
+instructions#:#Instructies
+online_info#:#Zet de content online om het zichtbaar te maken voor de deelnemers.
+view_log#:#Toon Log
+view_statistics#:#Toon statistieken
+type#:#Type
+subtype#:#Subtype
+integer#:#Nummer
+text#:#Tekst
+calculate#:#Bereken
+export_excel#:#Excel export
+key_title#:#Sleutel
+export#:#Export
+filter#:#Filter gebeurtenissen
+apply_filter#:#Toepassen filter
+filter_user#:#Filter per gebruiker
+filter_course#:#Filter cursus
+event_id#:#Gebeurtenis Id
+statistics_base_data#:#Statistieken basisdata
+log_entries#:#Logregels
+users_success#:#Gebruikers succes die de sleutel gebruiken
+key_starts#:#Sleutel starts
+key_results#:#Resultaten
+key_correct#:#Resultaten mogelijk correct
+key_wrong#:#Resultaten mogelijk fout
+time#:#Logtijd
+time_parameters#:#Tijdparameters
+time_select_question#:#Tijd voor vraag selectie
+time_answer_question#:#Tijd voor antwoord
+time_identify#:#Tijd om een soort succesvol te identificeren
+time_failed#:#Tijd voor een gefaald identificatie proces
+ranking_questions#:#Ranglijst van vragen
+most_selected_questions#:#Meest geselecteerde vragen
+most_edited_questions#:#Meest gewijzigde vragen
+no_events_found#:#Geen gelogde gebeurtenissen gevonden.
+no_statistics_calculated#:#Geen statistieken berekend.
+time_calculated#:#Berekende tijd
+export_to_database#:#Export naar database
+view_database#:#Toon database
+database_content#:#Database inhoud
+eval_id#:#Evalualtie ID
+key_id#:#Sleutel ID
+lms_id#:#LMS ID
+key#:#sleutel
+any#:#ieder
+user#:#Gebruiker
+delete#:#Verwijder logregel
+view_log#:#Toon log
+view_logs#:#Toon logs
+events_deleted#:#De geselecteerde gebeurtenissen zijn verwijderd.
+less_date#:#Gebeurtenissen opgetreden voor:
+more_date#:#Gebeurtenissen opgetreden na:
+type_obj#:#Type van object
+ref_id#:#Type ID
+session_id#:#Sessie
+call_time#:#Aanroeptijd
+edit#:#Wijzig externe content
+log_set#:#Gebruik logs
+log_on#:#Ja
+log_off#:#Nee
+logs_info#:#Kies of je de log wilt gebruiken om data op te slaan die afkomstig is van de externe content voor dit type object.
+learning_progress_set#:#Gebruik voortgang
+lp_on#:#Ja
+lp_off#:#Nee
+lp_info#:#Kies of je informatie wilt opslaan die afkomstig is van de externe content met de voortgangsfunctionaliteit van ILIAS.
+time_to_delete_info#:#Verwijder tijd van een toegangstoken (voor logging)
+type_edit#:#Wijzig type definitie
+type_failure_encoding#:#Pad Customizing/global/encodings/%s niet gevonden.
+model#:#Type model
+content_types#:#Content typen
+type_title_info#:#Deze titel wordt getoond wanneer een type is geselecteerd voor een nieuw object.
+type_description_info#:#Deze omschrijving wordt getoond wanneer een type is geselecteerd voor een nieuw object.
+type_settings#:#Instellingen
+icons#:#Iconen
+icons_failure#:#De iconen zijn niet correct geüpload.
+icons_saved#:#De iconen zijn succesvol opgeslagen.
+edit_instructions#:#Wijzig instructies
+instructions_saved#:#De instructies zijn opgeslagen.
+xxco_title_info#:#Geef het object een titel.
+settings#:#Instellingen
+lp_settings#:#Voortgangsinstellingen
+lp_mode#:#Mode
+lp_inactive#:#Inactief
+lp_inactive_info#:#De voortgang is niet opgeslagen voor dit object.
+lp_active#:#Actief
+lp_active_info#:#De 'Lopend' status wordt gezet als de inhoud is bekeken. De 'Afgerond' of 'Niet geslaagd' status wordt gezet door het resultaat van het LTI object.
+lp_threshold#:#Cesuur
+lp_threshold_info#:#Als een vertaalde LTI resultaat hoger of gelijk is aan deze cesuur dan wordt het resultaat gezet naar "Afgerond" anders naar "Niet geslaagd".
+xxco_read_learning_progress#:#Toon voortgang
+xxco_edit_learning_progress#:#Wijzig voortgang
+svg_icon#:#SVG Icon voor alle maten

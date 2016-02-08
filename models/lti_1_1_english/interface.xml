@@ -1,0 +1,344 @@
+<?xml version="1.0"?>
+<interface type="embed">
+
+  <title>LTI 1.1 (English Interface)</title>
+  <description>LTI 1.1 with Basic Outcome Service, see http://developers.imsglobal.org</description>
+
+  <template><![CDATA[
+  <form action="{LAUNCH_URL}" method="post" target="{FORM_TARGET}" encType="application/x-www-form-urlencoded">
+	  {HIDDEN_INPUTS}
+	  <input class="btn btn-default" type="submit" value = "Press to launch" />
+	  {DEBUG_EMBED}
+  </form><p></p>
+  <iframe name="basicltiLaunchFrame"  id="basicltiLaunchFrame" src=""
+  	width="{LTI_LAUNCH_WIDTH}" height="{LTI_LAUNCH_HEIGHT}" scrolling="auto" frameborder="0" transparency>
+  </iframe>
+  ]]></template>
+
+  <fields>
+
+	<!-- administrative input fields -->
+
+	<field name="HEADER_PRIVACY" level="type" type="header" encoding="">
+      <title>Privacy Settings</title>
+    </field>
+	
+	<field name="DESCRIPTION_PRIVACY" level="type" type="description" encoding="">
+      <description>Please clarify with your privacy officer which personal data are allowed to be sent to external tool providers.</description>
+    </field>
+	
+   <field name="SEND_USER_ID" level="type" type="radio" required="1" default="none" encoding="">
+      <title>User Identification</title>
+      <option value="none">
+      	<title>None</title>
+		<description>Do not send a User ID to the tool provider. Users will not be able to resume a previous call.</description>
+      </option>
+      <option value="coded">
+      	<title>Code</title>
+		<description>Send a code to the tool provider. This is identical for every call of a user, but does not directly allow to identify the original user.</description>
+      </option>
+      <option value="numeric">
+      	<title>Numeric ID</title>
+		<description>Send the internal ILIAS user ID</description>
+      </option>
+      <option value="login">
+      	<title>Login Name</title>
+		<description>Send the ILIAS login name</description>
+      </option>
+    </field>
+	
+   <field name="SEND_USER_FIRSTNAME" level="type" type="checkbox" value="1" encoding="">
+      <title>First Name</title>
+	  <description>Send the first name of the user</description>
+   </field>
+
+   <field name="SEND_USER_LASTNAME" level="type" type="checkbox" value="1" encoding="">
+      <title>Family Name</title>
+	  <description>Send the family name of the user</description>
+   </field>
+
+   <field name="SEND_USER_FULLNAME" level="type" type="checkbox" value="1" encoding="">
+      <title>Full Name</title>
+	  <description>Send the full name of the user</description>
+   </field>
+
+   <field name="SEND_USER_EMAIL" level="type" type="checkbox" value="1" encoding="">
+      <title>E-Mail</title>
+	  <description>Send the e-mail address of the user</description>
+   </field>
+
+   <field name="SEND_USER_IMAGE" level="type" type="checkbox" value="1" encoding="">
+      <title>Image</title>
+	  <description>Send a link to the user image (if user has a public profile with image)</description>
+   </field>
+
+	<!-- helping calculations for privacy settings -->
+
+	<field name="LTI_USER_ID" type="calculated" function="selectByName">
+		<param name="value">{SEND_USER_ID}</param>
+		<param name="none"></param>
+		<param name="coded">{ILIAS_USER_CODE}</param>
+		<param name="numeric">{ILIAS_USER_ID}</param>
+		<param name="login">{ILIAS_USER_LOGIN}</param>
+		<param name=""></param>
+	</field>
+
+	<field name="LTI_USER_FIRSTNAME" type="calculated" function="selectByName" encoding="singlequotes">
+		<param name="value">{SEND_USER_FIRSTNAME}</param>
+		<param name="1">{ILIAS_USER_FIRSTNAME}</param>
+		<param name=""></param>
+	</field>
+
+	<field name="LTI_USER_LASTNAME" type="calculated" function="selectByName" encoding="singlequotes">
+		<param name="value">{SEND_USER_LASTNAME}</param>
+		<param name="1">{ILIAS_USER_LASTNAME}</param>
+		<param name=""></param>
+	</field>
+	
+	<field name="LTI_USER_FULLNAME" type="calculated" function="selectByName" encoding="singlequotes">
+		<param name="value">{SEND_USER_FULLNAME}</param>
+		<param name="1">{ILIAS_USER_FULLNAME}</param>
+		<param name=""></param>
+	</field>
+
+
+	<field name="LTI_USER_EMAIL" type="calculated" function="selectByName" encoding="singlequotes">
+		<param name="value">{SEND_USER_EMAIL}</param>
+		<param name="1">{ILIAS_USER_EMAIL}</param>
+		<param name=""></param>
+	</field>
+	
+	<field name="LTI_USER_IMAGE" type="calculated" function="selectByName" encoding="">
+		<param name="value">{SEND_USER_IMAGE}</param>
+		<param name="1">{ILIAS_USER_IMAGE}</param>
+		<param name=""></param>
+	</field>
+
+
+ 	<!-- instructor input fields -->
+
+    <field name="HEADER_LINK_DATA" level="object" type="header" encoding="">
+      <title>Launch Data</title>
+    </field>
+
+    <field name="LAUNCH_URL" level="object" type="text" required="1" encoding="">
+      <title>Launch URL</title>
+      <description>URL of the LTI tool provider, e.g. http://lti.tools/test/tp.php</description>
+    </field>
+
+    <field name="KEY" level="object" type="text" required="1" encoding="">
+      <title>Launch Key</title>
+      <description>Key of the tool that should be shown, e.g. 12345</description>
+    </field>
+
+    <field name="SECRET" level="object" type="text" required="1" encoding="">
+      <title>Launch Secret</title>
+      <description>Shared secret from the tool provider, e.g. secret</description>
+    </field>
+	
+ 	<!-- instructor appearance settings -->
+
+	<field name="HEADER_APPEARANCE" level="object" type="header" encoding="">
+      <title>Appearance</title>
+    </field>
+
+   <field name="LAUNCH_TARGET" level="object" type="radio" required="1" default="top" encoding="">
+      <title>Tool Presentation</title>
+      <option value="iframe">
+      	<title>Embedded</title>
+		<description>Show the tool embedded on the content page.</description>
+      </option>
+      <option value="top">
+      	<title>Same Window</title>
+		<description>Open the tool in the same window. It can show a back link.</description>
+      </option>
+      <option value="blank">
+      	<title>New Window</title>
+		<description>Open the tool in a new browser window</description>
+      </option>
+    </field>
+  
+   <field name="LAUNCH_WIDTH" level="object" parentfield="LAUNCH_TARGET" parentvalue="iframe" type="text" default="800" encoding="">
+      <title>Width</title>
+	  <description></description>
+   </field>
+   
+   <field name="LAUNCH_HEIGHT" level="object" parentfield="LAUNCH_TARGET" parentvalue="iframe" type="text" default="600" encoding="">
+      <title>Height</title>
+   </field>
+	
+   <field name="SHOW_DEBUG" level="object" type="checkbox" value="1" encoding="">
+      <title>Debug Data</title>
+	  <description>Show a link to view the data passed to the tool provider</description>
+   </field>
+
+	<!-- helping calculations for appearance settings -->
+
+	<field name="FORM_TARGET" type="calculated" function="selectByName">
+		<param name="value">{LAUNCH_TARGET}</param>
+		<param name="iframe">basicltiLaunchFrame</param>
+		<param name="top">_top</param>
+		<param name="blank">_blank</param>
+		<param name=""></param>
+	</field>
+
+	<field name="LTI_LAUNCH_WIDTH" type="calculated" function="selectByName">
+		<param name="value">{LAUNCH_TARGET}</param>
+		<param name="iframe">{LAUNCH_WIDTH}</param>
+		<param name=""></param>
+	</field>
+
+	<field name="LTI_LAUNCH_HEIGHT" type="calculated" function="selectByName">
+		<param name="value">{LAUNCH_TARGET}</param>
+		<param name="iframe">{LAUNCH_HEIGHT}</param>
+		<param name=""></param>
+	</field>
+	
+	<field name="LTI_LAUNCH_RETURN_URL" type="calculated" function="selectByName" encoding="">
+		<param name="value">{LAUNCH_TARGET}</param>
+		<param name="top">{ILIAS_RETURN_URL}</param>
+		<param name=""></param>
+	</field>
+	
+  	<!-- helping templates and calculations for other LTI data -->
+
+	<field name="LTI_RESOURCE_LINK_TITLE" type="template" encoding="strip_tags,singlequotes,no_break,trim">
+		<template><![CDATA[{ILIAS_TITLE}]]></template>
+	</field>
+	
+	<field name="LTI_RESOURCE_LINK_DESCRIPTION" type="template" encoding="strip_tags,singlequotes,trim">
+		<template><![CDATA[{ILIAS_DESCRIPTION}]]></template>
+	</field>
+
+	<field name="LTI_CONTEXT_TYPE" type="calculated" function="selectByName">
+		<param name="value">{ILIAS_CONTEXT_TYPE}</param>
+		<param name="crs">CourseOffering</param>
+		<param name="grp">Group</param>
+	</field>
+	
+	<field name="LTI_CONTEXT_TITLE" type="template" encoding="strip_tags,singlequotes,no_break,trim">
+		<template><![CDATA[{ILIAS_CONTEXT_TITLE}]]></template>
+	</field>
+	
+	<field name="LTI_CONTEXT_LABEL" type="template" encoding="">
+		<template><![CDATA[{LTI_CONTEXT_TYPE} {ILIAS_CONTEXT_ID}]]></template>
+	</field>
+
+	<field name="LTI_TOOL_CONSUMER_INSTANCE_NAME" type="template" encoding="strip_tags,singlequotes,no_break,trim">
+		<template><![CDATA[{ILIAS_LMS_NAME}]]></template>
+	</field>
+	
+	<field name="LTI_TOOL_CONSUMER_INSTANCE_DESCRIPTION" type="template" encoding="strip_tags,singlequotes,trim">
+		<template><![CDATA[{ILIAS_LMS_DESCRIPTION}]]></template>
+	</field>
+	
+	<field name="LTI_ROLES" type="calculated" function="selectByName">
+		<param name="value">{ILIAS_USER_WRITE_ACCESS}</param>
+		<param name="1">Instructor</param>
+		<param name="0">Learner</param>
+	</field>
+	
+	
+	<!-- prepare the LTI parameters -->
+
+  	<field name="BASIC_PARAMETERS" type="calculated" function="createArray">
+	  
+		<!-- Basic LTI 1.0 Launch Data -->	
+		<param name="lti_message_type">basic-lti-launch-request</param><!-- required -->
+		<param name="lti_version">LTI-1p0</param><!-- required -->
+		
+		<param name="resource_link_id">{ILIAS_REF_ID}</param><!-- required -->
+		<param name="resource_link_title">{LTI_RESOURCE_LINK_TITLE}</param><!-- recommended, plain text! -->
+		<param name="resource_link_description">{LTI_RESOURCE_LINK_DESCRIPTION}</param><!-- optional, plain text! -->
+		
+		<param name="user_id">{LTI_USER_ID}</param><!-- recommended -->
+		<param name="user_image">{LTI_USER_IMAGE}</param><!-- optional -->
+		<param name="roles">{LTI_ROLES}</param><!-- recommended -->
+
+		<param name="lis_person_name_given">{LTI_USER_FIRSTNAME}</param><!-- recommended if allowed -->
+		<param name="lis_person_name_family">{LTI_USER_LASTNAME}</param><!-- recommended if allowed -->
+		<param name="lis_person_name_full">{LTI_USER_FULLNAME}</param><!-- recommended if allowed -->
+		<param name="lis_person_contact_email_primary">{LTI_USER_EMAIL}</param><!--recommended if allowed -->
+
+		<param name="context_id">{ILIAS_CONTEXT_ID}</param><!-- recommended -->
+		<param name="context_type">{LTI_CONTEXT_TYPE}</param><!-- optional -->
+		<param name="context_title">{LTI_CONTEXT_TITLE}</param><!-- recommended, plain text! -->
+		<param name="context_label">{LTI_CONTEXT_LABEL}</param><!-- recommended, plain text! -->
+
+		<param name="launch_presentation_locale">{ILIAS_USER_LANG}</param>
+		<param name="launch_presentation_document_target">{LAUNCH_TARGET}</param><!-- recommended -->
+		<param name="launch_presentation_width">{LTI_LAUNCH_WIDTH}</param><!-- recommended -->
+		<param name="launch_presentation_height">{LTI_LAUNCH_HEIGHT}</param><!-- recommended -->
+		<param name="launch_presentation_return_url">{LTI_LAUNCH_RETURN_URL}</param><!-- recommended -->
+
+		<param name="tool_consumer_instance_guid">{ILIAS_LMS_GUID}</param><!-- recommended -->
+		<param name="tool_consumer_instance_name">{LTI_TOOL_CONSUMER_INSTANCE_NAME}</param><!-- recommended, plain text! -->
+		<param name="tool_consumer_instance_description">{LTI_TOOL_CONSUMER_INSTANCE_DESCRIPTION}</param><!-- optional, plain text! -->
+		<param name="tool_consumer_instance_url">{ILIAS_LMS_URL}</param><!-- optional -->
+		<param name="tool_consumer_instance_contact_email">{ILIAS_CONTACT_EMAIL}</param><!-- recommended -->
+		
+		<!-- Basic LTI 1.1 Launch Data -->
+		<param name="launch_presentation_css_url"></param><!-- optional -->
+		<param name="tool_consumer_info_product_family_code">ilias</param><!-- recommended -->
+		<param name="tool_consumer_info_version">{ILIAS_VERSION}</param><!-- recommended -->
+		<param name="lis_result_sourcedid">{ILIAS_RESULT_ID}</param><!-- optional -->
+		<param name="lis_outcome_service_url">{ILIAS_RESULT_URL}</param><!-- optional -->
+
+		<!-- Basic LTI 1.1 Launch Data -->
+		<param name="role_scope_mentor"></param><!-- optional -->
+
+    </field>
+
+    <field name="SIGNED_PARAMETERS" type="calculated" function="signOAuth">
+      <param name="url">{LAUNCH_URL}</param>
+      <param name="key">{KEY}</param>
+          <param name="secret">{SECRET}</param>
+      <param name="callback">about:blank</param>
+      <param name="http_method">POST</param>
+      <param name="sign_method">HMAC_SHA1</param>
+      <param name="token"/>
+      <param name="data">{BASIC_PARAMETERS}</param>
+	</field>
+    
+	<field name="HIDDEN_INPUTS" type="calculated" function="createHtmlInputFields">
+	  	<param name="type">hidden</param>
+	  	<param name="data">{SIGNED_PARAMETERS}</param>
+	</field>
+	
+	<!-- Debugging support -->
+
+	<field name="DEBUG_DATA" type="calculated" function="showValues">
+	  	<param name="data">{SIGNED_PARAMETERS}</param>
+	</field>
+
+	<field name="DEBUG_TOGGLE" type="template">
+	 	<template><![CDATA[  	  	  
+		    <script language="javascript"> 
+				function basicltiDebugToggle() {
+				    var ele = document.getElementById("basicltiDebug");
+				    if(ele.style.display == "block") {
+				        ele.style.display = "none";
+				    } else {
+				        ele.style.display = "block";
+				    }
+				} 
+			</script>
+			<a class="small" id="displayText" href="javascript:basicltiDebugToggle();">Show Debug Data</a>
+			<div id="basicltiDebug" style="display:none">
+				<b>basiclti_endpoint</b><br/>
+				{LAUNCH_URL}<br/>
+				&nbsp;<br/>
+				<b>basiclti_parameters</b><br/>				
+				{DEBUG_DATA}
+			</div>   	  
+		]]></template>
+	</field>	
+	
+	<field name="DEBUG_EMBED" type="calculated" function="selectByName">
+		<param name="value">{SHOW_DEBUG}</param>
+		<param name="1">{DEBUG_TOGGLE}</param>
+		<param name=""></param>
+	</field>	
+
+  </fields>  
+</interface>

@@ -1,0 +1,162 @@
+//
+// Copyright (c) 2013 Institut für Lern-Innovation, Friedrich-Alexander-Universität Erlangen-Nürnberg 
+// GPLv2, see LICENSE 
+// 
+// English Language File for ExternalContent Plugin
+//
+
+<!-- language file start -->
+cat_create_xxco#:#Create new external content
+crs_create_xxco#:#Create new external content
+xxco#:#External content
+xxco_add#:#Add External Content
+xxco_copy#:#Copy External Content
+xxco_created#:#The external content has been added
+xxco_delete#:#Delete External Content
+xxco_edit_permission#:#Edit Permissions
+xxco_new#:#New External Content
+xxco_read#:#Use External Content
+xxco_visible#:#External Content is visible
+xxco_write#:#Configure External Content
+fold_create_xxco#:#Create new External Content
+grp_create_xxco#:#Create new External Content
+obj_xxco#:#External Content
+objs_xxco#:#External Content
+xxco_apply#:#Apply
+xxco_availability#:#Availability
+availability_0#:#Not available
+availability_1#:#Allow existing objects
+availability_2#:#Allow creating new objects
+xxco_configuration#:#Configuration of external content types
+create_type#:#Define a New Type
+delete_type#:#Delete the type definition
+xxco_description_info#:#The description will be shown below the title
+xxco_edit_type#:#Edit type definition
+xxco_instructions#:#Instruction
+xxco_instructions_info#:#The instruction will be shown on the info page
+xxco_message_type_not_available#:#External contents of this type are not longer avalable.
+xxco_online_info#:#This makes the object visible and usable for the users
+xxco_refresh_meta_data#:#update meta data
+type_availability#:#Availability
+type_availability_info#:#Availability of this type in the repository. You may set deprecated types to "allow existing" instead of deleting them.
+type_created#:#the type definition is saved.
+type_definition#:#XML Definition
+type_definition_info#:#Add the XML definition here. Create a new type to see an example.
+type_deleted#:#The type definition is deleted
+type_failure_encoding#:#The encoding "%s" does not exist!
+type_failure_field_name#:#Each field must have a name!
+type_failure_field_type#:#The field_type "%s" does not exist!
+type_failure_input#:#Some inputs are not correct! Please note the alerts at the fields.
+type_failure_interfaces#:#You should declare exactly one root element &lt;interface&gt;.
+type_failure_launch_type#:#the type "%s" does not exist!
+type_failure_xml#:#The XML interface definition has errors:
+type_name#:#Type name
+type_name_info#:#Internal name for sorting and distinction of versions. It will not be shown to the users.
+type_remarks#:#Remarks
+type_remarks_info#:#Administrative remarks for this type. They will not be shown to the users.
+type_saved#:#The type definition is saved.
+type_updated#:#The type definition is updated.
+types_list#:#List of external content types
+untrashed_usages#:#Number of usages
+xxco_edit#:#Edit external content
+externalcontent_plugin_configuration#:#External Content plugin configuration
+xxco_demo#:#DEMO
+type_title#:#Title
+type_desc1#:#This is a demo type to demonstrate the use of input fields and templates
+type_video_id#:#Video ID
+type_desc2#:#Enter description text
+type_path_template#:#Path template
+type_desc3#:#This demonstrates the nesting of fields and templates.
+view#:#View
+type_time_to_delete#:#Time to expire
+type_time_to_delete_info#:#Expire time of an access token (for callback authentication)
+instructions#:#Instructions
+online_info#:#Switch the content online to get it visible for the learners
+view_log#:#View Log
+view_statistics#:#View Statistics
+type#:#Type
+subtype#:#Sub type
+integer#:#Number
+text#:#Text
+calculate#:#Calculate
+export_excel#:#Excel Export
+key_title#:#Key
+export#:#Export
+filter#:#Filter events
+apply_filter#:#Apply filter
+filter_user#:#Filter by User
+filter_course#:#Filter Course
+event_id#:#Event Id
+statistics_base_data#:#Statistics base data
+log_entries#:#Log entries
+users_success#:#Users success using the key
+key_starts#:#Key starts
+key_results#:#Results
+key_correct#:#Results assumed correct
+key_wrong#:#Results assumed wrong
+time#:#Log Time
+time_parameters#:#Time parameters
+time_select_question#:#Time to select question
+time_answer_question#:#Time to answer a question
+time_identify#:#Time to successfully identify a species
+time_failed#:#Time for failed identification process
+ranking_questions#:#Ranking of questions
+most_selected_questions#:#Most selected questions
+most_edited_questions#:#Most edited questions
+no_events_found#:#No logged events found!
+no_statistics_calculated#:#No statistics calculated!
+time_calculated#:#Time calculated
+export_to_database#:#Export to Database
+view_database#:#view Database
+database_content#:#Database Content
+eval_id#:#Eval ID
+key_id#:#Key ID
+lms_id#:#LMS ID
+key#:#key
+any#:#any
+user#:#User
+delete#:#Delete log entry
+view_log#:#View log
+view_logs#:#View logs
+events_deleted#:#The selected events has been deleted
+less_date#:#Events occurred before: 
+more_date#:#Events occurred after: 
+type_obj#:#Type of object
+ref_id#:#Type ID
+session_id#:#Session
+call_time#:#Call time
+edit#:#Edit external content
+log_set#:#Use logs
+log_on#:#Yes
+log_off#:#No
+logs_info#:#Choose if you want to use logs to store data received from the external content for this type of object.
+learning_progress_set#:#Use learning progress
+lp_on#:#Yes
+lp_off#:#No
+lp_info#:#Choose if you want to store the information received from this external content with the learning progress tool of ILIAS.
+time_to_delete_info#:#Delete time of an access token (for logging)
+type_edit#:#Edit type definition
+type_failure_encoding#:#Customizing/global/encodings/%s not found!
+model#:#Type model
+content_types#:#Content Types
+type_title_info#:#This title is shown when a type is selected for a new object.
+type_description_info#:#This description is shown when a type is selected for a new object.
+type_settings#:#Settings
+icons#:#Icons
+icons_failure#:#The icons were not properly uploaded!
+icons_saved#:#Die icons were successfully saved.
+edit_instructions#:#Edit Instructions
+instructions_saved#:#The Instructions were saved.
+xxco_title_info#:#Give the object a title
+settings#:#Settings
+lp_settings#:#Learning Progress Settings
+lp_mode#:#Modus
+lp_inactive#:#Inactive
+lp_inactive_info#:#The learning progress is not stored for this object.
+lp_active#:#Active
+lp_active_info#:#The 'In Progress' status ist set when the content is viewed. The 'Completed' or 'Failed' status is set by the result of an LTI call.
+lp_threshold#:#Passing Threshold
+lp_threshold_info#:#If a transmitted LTI outcome is equal or higher than this threshold, then the status is set to 'Completed', otherwise to 'Failed'.
+xxco_read_learning_progress#:#View Learning Progress
+xxco_edit_learning_progress#:#Edit Learning Progress
+svg_icon#:#SVG Icon for All Sizes
