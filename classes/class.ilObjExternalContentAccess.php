@@ -32,9 +32,10 @@ class ilObjExternalContentAccess extends ilObjectPluginAccess
 	*
 	* @return	boolean		true, if everything is ok
 	*/
-	function _checkAccess($a_permission, $a_ref_id, $a_obj_id, $a_user_id = "")
+	function _checkAccess($a_cmd, $a_permission, $a_ref_id, $a_obj_id, $a_user_id = "")
 	{
 		global $ilUser, $lng, $rbacsystem, $ilAccess;
+
 
 		if ($a_user_id == "")
 		{
@@ -46,9 +47,8 @@ class ilObjExternalContentAccess extends ilObjectPluginAccess
 			case "visible":
 			case "read":
 				if (!self::_lookupOnline($a_obj_id) &&
-					(!$rbacsystem->checkAccessOfUser($a_user_id,'write', $a_ref_id)))
+					(!$rbacsystem->checkAccessOfUser($a_user_id,'write', "", $a_ref_id)))
 				{
-					$ilAccess->addInfoItem(IL_NO_OBJECT_ACCESS, $lng->txt("offline"));
 					return false;
 				}
 				break;

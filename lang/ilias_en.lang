@@ -34,7 +34,7 @@ xxco_description_info#:#The description will be shown below the title
 xxco_edit_type#:#Edit type definition
 xxco_instructions#:#Instruction
 xxco_instructions_info#:#The instruction will be shown on the info page
-xxco_message_type_not_available#:#External contents of this type are not longer avalable.
+xxco_message_type_not_available#:#External contents of this type are not longer available.
 xxco_online_info#:#This makes the object visible and usable for the users
 xxco_refresh_meta_data#:#update meta data
 type_availability#:#Availability

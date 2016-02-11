@@ -221,7 +221,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
      */
     public function performCommand($cmd)
     {
-    	global $ilCtrl, $ilTabs;
+    	global $ilErr, $ilCtrl, $ilTabs;
 
     	// set a return URL
 		// IMPORTANT: the last parameter prevents an encoding of & to &amp;

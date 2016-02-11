@@ -31,24 +31,29 @@ Version History
 * All versions for ILIAS 5.1 and higher are maintained in GitHub: https://github.com/ilifau/assAccountingQuestion
 * Former versions for ILIAS 5.0 and lower are maintained in ILIAS SVN: http://svn.ilias.de/svn/ilias/branches/fau/plugins
 
-Version 1.5.0 (2016-02-08)
-* Initial import to GitHub
-* set ILIAS version to 5.1.x
+Version 1.5.1 (2016-02-11)
+* stable version for ILIAS 5.1
 * added SVG for custom icon (other icons are still supported with adjusted sizes)
+* fixed mantis #16234 (ignored offline setting)
+* fixed error with unavailable types
 
-Version 1.4.1 (2015-03-12)
+Version 1.4.2 (2016-02-11)
 * http://svn.ilias.de/svn/ilias/branches/fau/plugins/ExternalContent-1.4.x
-* stable version for ILIAS 5 with learning progress and LTI 1.1
+* stable version for ILIAS 5.0 with learning progress and LTI 1.1
 * added Dutch language (thanks to Rick de Koster from L&M Software bv)
 * prettyfied content page for LTI type models
+* fixed mantis #16234 (ignored offline setting)
+* fixed error with unavailable types
 
-Version 1.2.1 (2014-08-11)
+Version 1.3.8 (2016-02-11)
 * http://svn.ilias.de/svn/ilias/branches/fau/plugins/ExternalContent-1.2.x
-* stable version for ILIAS 4.4
+* stable version for ILIAS 4.4 with learning progress and LTI 1.1
 * supported cloning of objects
 * bugfix for encoding path
 * bugfix for call of info screen
 * updated manual
+* fixed mantis #16234 (ignored offline setting)
+* fixed error with unavailable types
 
 Version 1.1.1 (2013-08-26)
 * http://svn.ilias.de/svn/ilias/branches/fau/plugins/ExternalContent-1.1.x
