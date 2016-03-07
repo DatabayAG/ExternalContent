@@ -31,6 +31,9 @@ Version History
 * All versions for ILIAS 5.1 and higher are maintained in GitHub: https://github.com/ilifau/ExternalContent
 * Former versions for ILIAS 5.0 and lower are maintained in ILIAS SVN: http://svn.ilias.de/svn/ilias/branches/fau/plugins
 
+Version 1.5.2 (2016-03-07)
+* support of timings
+
 Version 1.5.1 (2016-02-11)
 * stable version for ILIAS 5.1
 * added SVG for custom icon (other icons are still supported with adjusted sizes)

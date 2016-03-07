@@ -26,7 +26,6 @@ class ilObjExternalContentListGUI extends ilObjectPluginListGUI
     function initType() 
     {
         $this->setType("xxco");
-        $this->timings_enabled = false;
     }
 
     /**
