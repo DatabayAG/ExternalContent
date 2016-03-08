@@ -80,7 +80,12 @@ class ilExternalContentResultService
 
             // Verify the signature
             $this->readFields($this->result->obj_id);
-            $this->checkSignature($this->fields['KEY'], $this->fields['SECRET']);
+			$result = $this->checkSignature($this->fields['KEY'], $this->fields['SECRET']);
+			if ($result instanceof Exception)
+			{
+				$this->respondUnauthorized($result->getMessage());
+				return;
+			}
 
             // Dispatch the operation
             switch($this->operation)
@@ -322,6 +327,7 @@ class ilExternalContentResultService
 
     /**
      * Check the reqest signature
+	 * @return mixed	Exception or true
      */
     private function checkSignature($a_key, $a_secret)
     {
@@ -342,8 +348,8 @@ class ilExternalContentResultService
         }
         catch (Exception $e)
         {
-            $this->respondUnauthorized($e->getMessage());
-            return;
+			return $e;
         }
+		return true;
     }
 } 
