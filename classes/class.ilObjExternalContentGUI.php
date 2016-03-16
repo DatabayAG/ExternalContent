@@ -68,6 +68,26 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
 
 
 	/**
+ 	 * Extended check for being in creation mode
+	 *
+	 * Use this instead of getCreationMode() because ilRepositoryGUI sets it weakly
+	 * The creation form for external contents is extended and has different commands
+	 * In creation mode $this->object is the parent container and can't be used
+	 *
+	 * @return bool		creation mode
+	 */
+	protected function checkCreationMode()
+	{
+		global $ilCtrl;
+		$cmd = $ilCtrl->getCmd();
+		if ($cmd == "create" or $cmd == "cancelCreate" or $cmd == "save" or $cmd == "Save")
+		{
+			$this->setCreationMode(true);
+		}
+		return $this->getCreationMode();
+	}
+
+	/**
      * Perform command
      *
      * @access public
@@ -76,13 +96,16 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
     {
     	global $ilErr, $ilCtrl, $ilTabs;
 
-    	// set a return URL
-		// IMPORTANT: the last parameter prevents an encoding of & to &amp;
-		// Otherwise the OAuth signatore is calculated wrongly!
-    	$this->object->setReturnURL(ILIAS_HTTP_PATH . "/". $ilCtrl->getLinkTarget($this, "view", "", true));
-        
+		if (!$this->checkCreationMode())
+		{
+			// set a return URL
+			// IMPORTANT: the last parameter prevents an encoding of & to &amp;
+			// Otherwise the OAuth signatore is calculated wrongly!
+			$this->object->setReturnURL(ILIAS_HTTP_PATH . "/". $ilCtrl->getLinkTarget($this, "view", "", true));
+		}
+
         switch ($cmd)
-        {        	
+        {
         	case "edit":
         	case "update":
         	case "refreshMeta":
@@ -111,19 +134,26 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
             
             default:
             	
-            	$this->checkPermission("read");
-            	           	
-            	if ($this->object->typedef->getAvailability() == ilExternalContentType::AVAILABILITY_NONE)
-		        {
-		            $ilErr->raiseError($this->txt('xxco_message_type_not_available'), $ilErr->MESSAGE);
-		        }
-            	
-            	if (!$cmd)
-                {
-                    $cmd = "viewObject";
-                }
-                $cmd .= "Object";
-                $this->$cmd();
+				if ($this->checkCreationMode())
+				{
+					$this->$cmd();
+				}
+				else
+				{
+					$this->checkPermission("read");
+
+					if ($this->object->typedef->getAvailability() == ilExternalContentType::AVAILABILITY_NONE)
+					{
+						$ilErr->raiseError($this->txt('xxco_message_type_not_available'), $ilErr->MESSAGE);
+					}
+
+					if (!$cmd)
+					{
+						$cmd = "viewObject";
+					}
+					$cmd .= "Object";
+					$this->$cmd();
+				}
         }
     }
 	
@@ -134,17 +164,20 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
     function setTabs()
     {
         global $ilTabs, $ilCtrl, $lng;
-        
+
+		if ($this->checkCreationMode())
+		{
+			return;
+		}
+
         $type = new ilExternalContentType($this->object->getTypeId());
-       
-        $cmd = $ilCtrl->getCmd();
-        if (!($cmd == "create" or $cmd == "cancelCreate" or $cmd == "save" or $cmd == "Save"))
-        {
-            if ($this->object->typedef->getLaunchType() == ilExternalContentType::LAUNCH_TYPE_EMBED)
-            {
-                $ilTabs->addTab("viewEmbed", $this->lng->txt("content"), $ilCtrl->getLinkTarget($this, "viewEmbed"));
-            }
-        }
+
+		// view tab
+		if ($this->object->typedef->getLaunchType() == ilExternalContentType::LAUNCH_TYPE_EMBED)
+		{
+			$ilTabs->addTab("viewEmbed", $this->lng->txt("content"), $ilCtrl->getLinkTarget($this, "viewEmbed"));
+		}
+
         //  info screen tab
         $ilTabs->addTab("infoScreen", $this->lng->txt("info_short"), $ilCtrl->getLinkTarget($this, "infoScreen"));
 
@@ -153,18 +186,6 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
         {
             $ilTabs->addTab("edit", $this->lng->txt("edit"), $ilCtrl->getLinkTarget($this, "edit"));           
         }
-        
-
-        /*
-        //Display Log tab if logs are used
-        if($type->getUseLogs() == "ON")
-        {
-            if ($this->checkPermissionBool("write"))
-            {
-                $ilTabs->addTab("xxco_view_log", $this->txt("view_log"), $this->ctrl->getLinkTargetByClass(array(get_class($this),'ilexternalcontentloggui'), "viewLog"));
-            }
-        }
-        */
 
         include_once("Services/Tracking/classes/class.ilObjUserTracking.php");
         if (ilObjUserTracking::_enabledLearningProgress() &&
@@ -183,10 +204,13 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
             }
             elseif ($this->checkPermissionBool("edit_learning_progress"))
             {
-                $ilTabs->addTab('learning_progress',
-                    $lng->txt('learning_progress'),
-                    $ilCtrl->getLinkTarget($this,'editLPSettings'));
+                $ilTabs->addTab('learning_progress', $lng->txt('learning_progress'), $ilCtrl->getLinkTarget($this,'editLPSettings'));
             }
+
+			if (in_array($ilCtrl->getCmdClass(), array('illearningprogressgui', 'illplistofobjectsgui')))
+			{
+				$ilTabs->addSubTab("lp_settings", $this->txt('settings'), $ilCtrl->getLinkTargetByClass(array('ilObjExternalContentGUI'), 'editLPSettings'));
+			}
         }
 
         // standard permission tab
@@ -212,6 +236,10 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
 
             case "learning_progress":
                 $lng->loadLanguageModule('trac');
+				if ($this->checkPermissionBool("edit_learning_progress"))
+				{
+					$ilTabs->addSubTab("lp_settings", $this->txt('settings'), $ilCtrl->getLinkTargetByClass(array('ilObjExternalContentGUI'), 'editLPSettings'));
+				}
                 if ($this->object->getLPMode() == ilObjExternalContent::LP_ACTIVE && $this->checkPermissionBool("read_learning_progress"))
                 {
 
@@ -221,10 +249,6 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
                         $ilTabs->addSubTab("trac_objects", $lng->txt('trac_objects'), $ilCtrl->getLinkTargetByClass(array('ilObjExternalContentGUI','ilLearningProgressGUI','ilLPListOfObjectsGUI')));
                     }
                     $ilTabs->addSubTab("trac_summary", $lng->txt('trac_summary'), $ilCtrl->getLinkTargetByClass(array('ilObjExternalContentGUI','ilLearningProgressGUI', 'ilLPListOfObjectsGUI'), 'showObjectSummary'));
-                }
-                if ($this->checkPermissionBool("edit_learning_progress"))
-                {
-                    $ilTabs->addSubTab("lp_settings", $this->txt('settings'), $ilCtrl->getLinkTargetByClass(array('ilObjExternalContentGUI'), 'editLPSettings'));
                 }
                 break;
         }
@@ -359,13 +383,13 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
     {
         global $rbacsystem, $ilErr;
         
-        $this->create_mode = true;
+       $this->setCreationMode(true);
         if (!$rbacsystem->checkAccess("create", $_GET["ref_id"], $this->type))
         {
             $ilErr->raiseError($this->lng->txt("permission_denied"), $ilErr->MESSAGE);
-        }else
+        }
+		else
         {
-            $this->setCreationMode(true);
             $this->initForm("create");
             $this->tpl->setVariable('ADM_CONTENT', $this->form->getHTML());
         }
@@ -514,7 +538,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
             $this->form->addItem($item);
 
             $this->form->setTitle($this->txt('xxco_new'));
-            $this->form->addCommandButton((!$this->getCreationMode() ? 'update' : 'save'), $this->lng->txt('save'));
+            $this->form->addCommandButton((!$this->checkCreationMode() ? 'update' : 'save'), $this->lng->txt('save'));
             $this->form->addCommandButton('cancelCreate', $this->lng->txt("cancel"));
         }
         else
