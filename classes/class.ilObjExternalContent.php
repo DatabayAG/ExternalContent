@@ -514,6 +514,7 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
                 break;
 
             case "ILIAS_LMS_URL":
+                require_once ('./Services/Link/classes/class.ilLink.php');
                 $value = ilLink::_getLink(ROOT_FOLDER_ID, "root");
                 break;
 
