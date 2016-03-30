@@ -45,10 +45,10 @@ if (isset($_GET["client_id"]))
 require_once "Services/Context/classes/class.ilContext.php";
 ilContext::init(ilContext::CONTEXT_REST);
 
-require_once("Services/Init/classes/class.ilInitialisation.php");
-ilInitialisation::initILIAS();
+require_once(__DIR__."/classes/class.ilExternalContentInitialisation.php");
+ilExternalContentInitialisation::initILIAS();
 
-require_once ("Customizing/global/plugins/Services/Repository/RepositoryObject/ExternalContent/classes/class.ilExternalContentResultService.php");
+require_once (__DIR__ ."/classes/class.ilExternalContentResultService.php");
 $service = new ilExternalContentResultService;
 $service->handleRequest();
 
