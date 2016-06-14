@@ -47,7 +47,7 @@ class ilObjExternalContentAccess extends ilObjectPluginAccess
 			case "visible":
 			case "read":
 				if (!self::_lookupOnline($a_obj_id) &&
-					(!$rbacsystem->checkAccessOfUser($a_user_id,'write', "", $a_ref_id)))
+					(!$rbacsystem->checkAccessOfUser($a_user_id,'write', $a_ref_id)))
 				{
 					return false;
 				}
