@@ -31,6 +31,13 @@ Version History
 * All versions for ILIAS 5.1 and higher are maintained in GitHub: https://github.com/ilifau/ExternalContent
 * Former versions for ILIAS 5.0 and lower are maintained in ILIAS SVN: http://svn.ilias.de/svn/ilias/branches/fau/plugins
 
+Version 1.5.3 (2016-06-14)
+* fixed signature check in outcome service
+* fixed object creation
+* fixed ilLink call
+* fixed missing access handler for lp change event in result service
+* fixed mantis #18529 (wrong permission check for offline)
+
 Version 1.5.2 (2016-03-07)
 * support of timings
 
