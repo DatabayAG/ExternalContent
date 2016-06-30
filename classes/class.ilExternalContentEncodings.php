@@ -72,6 +72,20 @@ class ilExternalContentEncodings
 	 */
 	public static function _applyEncoding($a_encoding = "", $a_value = "")
 	{
+		if (is_array($a_value))
+		{
+			$values = array();
+			foreach ($a_value as $key => $value)
+			{
+				if (!is_numeric($key))
+				{
+					$key = self::_applyEncoding($a_encoding, $key);
+				}
+				$values[$key] = self::_applyEncoding($a_encoding, $value);
+			}
+			return $values;
+		}
+
 		$value = $a_value;
 		
 		foreach (explode(',', $a_encoding) as $encoding)

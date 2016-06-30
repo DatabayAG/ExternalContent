@@ -46,8 +46,14 @@ class ilExternalContentFunctions
         		return self::showValues($a_params);	  
 
         	case "selectByName":
-        		return self::selectByName($a_params);	  
-        		
+        		return self::selectByName($a_params);
+
+			case "splitToArray":
+				return self::splitToArray($a_params);
+
+			case "mergeArrays":
+				return self::mergeArrays($a_params);
+
         	default:
         		return "";
         }		
@@ -100,6 +106,8 @@ class ilExternalContentFunctions
 	
 	/**
 	 * create simple HTML input fields
+	 * @param 	array		['type' => string, 'data' => [ 'name' => 'value', ... ]]
+	 * @return	string		HTML with input fields
 	 */
 	private static function createInputs($a_params)
 	{
@@ -119,6 +127,8 @@ class ilExternalContentFunctions
 	
 	/**
 	 * show parameter values
+	 * @param 	array		['type' => string, 'data' => [ 'name' => 'value', ... ]]
+	 * @return	string		HTML with name = value texts
 	 */
 	private function showValues($a_params)
 	{
@@ -133,7 +143,7 @@ class ilExternalContentFunctions
 	/**
 	 * Select a value from a list of params by matching the parameter name
 	 * 
-	 * @param 	array		assoc array (the select value has the key "value")
+	 * @param 	array		['' => default_value, 'value' => selection_name, 'name1' => value1, name2 => value2, ...]
 	 * @return 	string		return value
 	 */
 	private function selectByName($a_params)
@@ -153,6 +163,53 @@ class ilExternalContentFunctions
 		if (isset($a_params['']))
 		{
 			return ($a_params['']);
+		}
+	}
+
+	/**
+	 * Split a string of key/value pairs to an array of keys and values
+	 * @param 	array 	['source => string, 'key_delimiter' => string, 'entry_delimiter => string ]
+	 * @return	array	[key => value, ... ]
+	 */
+	private function splitToArray($a_params)
+	{
+		$result = array();
+
+		if (!empty($a_params['entry_delimiter']))
+		{
+			$entries = explode($a_params['entry_delimiter'], $a_params['source']);
+			foreach ($entries as $entry)
+			{
+				if (!empty($a_params['key_delimiter']))
+				{
+					$pair = explode($a_params['key_delimiter'], $entry);
+					if (!empty($pair[0]))
+					{
+						$key = $pair[0];
+						$value = $pair[1];
+						$result[$key] = $value;
+					}
+				}
+			}
+		}
+		return $result;
+	}
+
+	/**
+	 * Merge to sets of key/value pairs.
+	 * Values of the second set will overwrite those of the first set with the same key.
+	 * Other values of the second set will be added.
+	 * @param array	['base_array' => array, 'merge_array' => array ]
+	 */
+	private function mergeArrays($a_params)
+	{
+		if (is_array($a_params['base_array']) && is_array($a_params['merge_array']))
+		{
+			return array_merge($a_params['base_array'], $a_params['merge_array']);
+		}
+		else
+		{
+			return (array) $a_params['base_array'];
 		}
 	}
 }

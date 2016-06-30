@@ -135,8 +135,13 @@
       <title>Geheimnis</title>
       <description>Geteiltes Geheimnis mit dem Tool-Anbieter, e.g. secret</description>
     </field>
-	
- 	<!-- instructor appearance settings -->
+
+      <field name="CUSTOM_PARAMETER_STRING" level="object" type="textarea" encoding="trim">
+          <title>Spezielle Parameter</title>
+          <description>Bitte verwenden Sie die Form param1=value1; param2=value2</description>
+      </field>
+
+      <!-- instructor appearance settings -->
 
 	<field name="HEADER_APPEARANCE" level="object" type="header" encoding="">
       <title>Erscheinungsbild</title>
@@ -290,7 +295,18 @@
 
     </field>
 
-    <field name="SIGNED_PARAMETERS" type="calculated" function="signOAuth">
+      <field name="CUSTOM_PARAMETERS" type="calculated" function="splitToArray" encoding="trim">
+          <param name="source">{CUSTOM_PARAMETER_STRING}</param>
+          <param name="key_delimiter">=</param>
+          <param name="entry_delimiter">;</param>
+      </field>
+
+      <field name="MERGED_PARAMETERS" type="calculated" function="mergeArrays">
+          <param name="base_array">{BASIC_PARAMETERS}</param>
+          <param name="merge_array">{CUSTOM_PARAMETERS}</param>
+      </field>
+
+      <field name="SIGNED_PARAMETERS" type="calculated" function="signOAuth">
       <param name="url">{LAUNCH_URL}</param>
       <param name="key">{KEY}</param>
       <param name="secret">{SECRET}</param>
@@ -298,7 +314,7 @@
       <param name="http_method">POST</param>
       <param name="sign_method">HMAC_SHA1</param>
       <param name="token"/>
-      <param name="data">{BASIC_PARAMETERS}</param>
+      <param name="data">{MERGED_PARAMETERS}</param>
 	</field>
     
 	<field name="HIDDEN_INPUTS" type="calculated" function="createHtmlInputFields">
