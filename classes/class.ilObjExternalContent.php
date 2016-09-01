@@ -502,7 +502,7 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
                 break;
 
             case "ILIAS_CONTACT_EMAIL":
-                $value = $ilSetting->get("feedback_recipient");
+                $value = $ilSetting->get("admin_email");
                 break;
 
             case "ILIAS_CLIENT_ID":
