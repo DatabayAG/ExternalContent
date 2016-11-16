@@ -60,7 +60,7 @@ class ilObjExternalContentAccess extends ilObjectPluginAccess
 	/*
 	* check wether content is online
 	*/
-	function _lookupOnline($a_obj_id)
+	static function _lookupOnline($a_obj_id)
 	{
 		$row = self::fetchSettings($a_obj_id);
  
@@ -81,7 +81,7 @@ class ilObjExternalContentAccess extends ilObjectPluginAccess
 	/**
 	* get the type
 	*/
-	function _lookupTypeId($a_obj_id)
+	static function _lookupTypeId($a_obj_id)
 	{
 		$row = self::fetchSettings($a_obj_id);
         return $row['type_id'];
@@ -121,7 +121,7 @@ class ilObjExternalContentAccess extends ilObjectPluginAccess
 	/**
 	* check whether goto script will succeed
 	*/
-	function _checkGoto($a_target)
+	static function _checkGoto($a_target)
 	{
 		global $ilAccess;
 
