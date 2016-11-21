@@ -31,6 +31,9 @@ Version History
 * All versions for ILIAS 5.1 and higher are maintained in GitHub: https://github.com/ilifau/ExternalContent
 * Former versions for ILIAS 5.0 and lower are maintained in ILIAS SVN: http://svn.ilias.de/svn/ilias/branches/fau/plugins
 
+Version 1.5.6 (2016-11-21)
+* Support for ILIAS 5.2 and PHP7 (beta). Thanks to xus for the pull request.
+
 Version 1.5.5 (2016-09-01)
 * changed variable ILIAS_CONTACT_EMAIL to the Field "E-Mail" in Administration > General Settings > Contact Information
   (The former "Feedback Recipient" ist not longer changeable in ILIAS 5.1)

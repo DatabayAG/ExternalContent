@@ -755,11 +755,13 @@ class OAuthUtil {
   public static function parse_parameters( $input ) {
     if (!isset($input) || !$input) return array();
 
-    $pairs = split('&', $input);
+// fau: fix for PHP7
+    $pairs = explode('&', $input);
 
     $parsed_parameters = array();
     foreach ($pairs as $pair) {
-      $split = split('=', $pair, 2);
+      $split = explode('=', $pair, 2);
+// fau.
       $parameter = OAuthUtil::urldecode_rfc3986($split[0]);
       $value = isset($split[1]) ? OAuthUtil::urldecode_rfc3986($split[1]) : '';
 
