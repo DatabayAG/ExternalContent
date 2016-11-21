@@ -830,7 +830,7 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
     /**
      * Do Cloning
      */
-    function doCloneObject($new_obj, $a_target_id, $a_copy_id) {
+    function doCloneObject($new_obj, $a_target_id, $a_copy_id = null) {
         global $ilDB;
         
         //Settings filling
