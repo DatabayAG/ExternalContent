@@ -32,7 +32,9 @@ Version History
 * Former versions for ILIAS 5.0 and lower are maintained in ILIAS SVN: http://svn.ilias.de/svn/ilias/branches/fau/plugins
 
 Version 1.5.6 (2016-11-21)
-* Support for ILIAS 5.2 and PHP7 (beta). Thanks to xus for the pull request.
+* Support for ILIAS 5.2 and PHP7 (beta). Thanks to 'xus' for the pull request.
+* Changed 'goto' access check of permanent links to default for plugins. Now the 'read' permission is needed instead of 'visible'.
+  This prevents the necessity of a different branch for ILIAS 5.2 due to the changed declaration of _checkGoto()
 
 Version 1.5.5 (2016-09-01)
 * changed variable ILIAS_CONTACT_EMAIL to the Field "E-Mail" in Administration > General Settings > Contact Information
