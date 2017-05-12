@@ -144,7 +144,7 @@ type_description_info#:#This description is shown when a type is selected for a 
 type_settings#:#Settings
 icons#:#Icons
 icons_failure#:#The icons were not properly uploaded!
-icons_saved#:#Die icons were successfully saved.
+icons_saved#:#The icons were successfully saved.
 edit_instructions#:#Edit Instructions
 instructions_saved#:#The Instructions were saved.
 xxco_title_info#:#Give the object a title

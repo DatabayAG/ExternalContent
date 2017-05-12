@@ -1,0 +1,161 @@
+//
+// Copyright (c) 2013 Institut für Lern-Innovation, Friedrich-Alexander-Universität Erlangen-Nürnberg 
+// GPLv2, see LICENSE 
+// 
+// Spanish Language File for ExternalContent Plugin
+// Translators: jrbalsas@ujaen.es, lina@ujaen.es, alonso@ujaen.es
+//
+<!-- language file start -->
+cat_create_xxco#:#Crear nuevo contenido externo
+crs_create_xxco#:#Crear nuevo contenido externo
+xxco#:#Contenido externo
+xxco_add#:#Añadir contenido externo
+xxco_copy#:#Copiar contenido externo
+xxco_created#:#El contenido externo se ha añadido
+xxco_delete#:#Borrar contenido externo
+xxco_edit_permission#:#Editar permisos
+xxco_new#:#Nuevo contenido externo
+xxco_read#:#Utilizar contenido externo
+xxco_visible#:#El contenido externo está visible
+xxco_write#:#Configurar contenido externo
+fold_create_xxco#:#Crear nuevo contenido externo
+grp_create_xxco#:#Crear nuevo contenido externo
+obj_xxco#:#Contenido externo
+objs_xxco#:#Contenido externo
+xxco_apply#:#Aplicar
+xxco_availability#:#Disponibilidad
+availability_0#:#No disponible
+availability_1#:#Permitir objetos existentes
+availability_2#:#Permitir crear nuevos objetos
+xxco_configuration#:#Configuración de tipos de contenidos externos
+create_type#:#Definir un nuevo tipo
+delete_type#:#borrar definición de tipo
+xxco_description_info#:#La descripción se mostrará debajo del título
+xxco_edit_type#:#Editar definición de tipo
+xxco_instructions#:#Instrucciones
+xxco_instructions_info#:#Las instrucciones se mostrarán en la pestaña Info
+xxco_message_type_not_available#:#Los contenidos externos de este tipo ya no están disponibles.
+xxco_online_info#:#Esto hace que el objeto sea visible y utilizable por los usuarios
+xxco_refresh_meta_data#:#Actualizar metadatos
+type_availability#:#Disponibilidad
+type_availability_info#:#Disponibilidad de este tipo en el repositorio. Puede que hayas definido tipos obsoletos como "permitir existencia" en vez de haberlos borrado.
+type_created#:#La definición de tipo se ha guardado
+type_definition#:#Definición XML
+type_definition_info#:#Añade la definición XML aquí. Cree un nuevo tipo para ver un ejemplo.
+type_deleted#:#La definición de tipo se ha borrado
+type_failure_encoding#:#La codificación "%s" no existe!
+type_failure_field_name#:#Cada campo debe tener un nombre!
+type_failure_field_type#:#El campo de tipo "%s" no existe!
+type_failure_input#:#Algunas entredas no son correctas!. Por favor, observe las alertas en los campos.
+type_failure_interfaces#:#Debes declarar exactamente un elemento raíz &lt;interface&gt;.
+type_failure_launch_type#:#El tipo "%s" no existe!
+type_failure_xml#:#La definición XML de la interfaz tiene errores:
+type_name#:#Nombre del tipo
+type_name_info#:#Nombre interno para ordenación y diferenciación de versiones. No se mostrará a los usuarios.
+type_remarks#:#Observaciones
+type_remarks_info#:#Observaciones administrativas para este tipo. No se mostrarán a los usuasrios.
+type_saved#:#La definición de tipo se ha guardado.
+type_updated#:#La definición de tipo se ha actualizado.
+types_list#:#Lista de tipos de contenido externo
+untrashed_usages#:#Número de usos
+xxco_edit#:#Editar contenido externo
+externalcontent_plugin_configuration#:#Configuración de plugin de Contenido Externo
+xxco_demo#:#DEMO
+type_title#:#Título
+type_desc1#:#Este es un tipo de demostración para mostrar el uso de campos de entrada y plantillas
+type_video_id#:#Video ID
+type_desc2#:#Introduzca texto descriptivo
+type_path_template#:#Ruta de plantilla
+type_desc3#:#Esto demuestra cómo anidar campos y plantillas
+view#:#Vista
+type_time_to_delete#:#Tiempo de caducidad
+type_time_to_delete_info#:#Timpo de caducidad de un token de acceso (para autenticación callback)
+instructions#:#Instrucciones
+online_info#:#Cambiar el contenido a on-line para hacerlo visible a los usuarios
+view_log#:#Registro de visitas
+view_statistics#:#Estadísticas de visitas
+type#:#Tipo
+subtype#:#Subtipo
+integer#:#Número
+text#:#Texto
+calculate#:#Calcular
+export_excel#:#Exportar a Excel
+key_title#:#Clave
+export#:#Exportar
+filter#:#Filtro de eventos
+apply_filter#:#Aplicar filtro
+filter_user#:#Filtrar por usuario
+filter_course#:#Filtrar curso
+event_id#:#Id de evento
+statistics_base_data#:#Base de datos estadísticos
+log_entries#:#Entradas de registro
+users_success#:#Los usuarios tuvieron éxito con la clave
+key_starts#:#Clave de inicio
+key_results#:#Resultados
+key_correct#:#Resultados asumidos como correctos
+key_wrong#:#Resultados asumidos como erróneos
+time#:#Registro de tiempos
+time_parameters#:#Parámetros de tiempo
+time_select_question#:#Tiempo para seleccionar una pregunta
+time_answer_question#:#Tiempo para responder una pregunta
+time_identify#:#Tiempo para identificar correctamente una especie
+time_failed#:#Tiempo para fallar un proceso de identificación
+ranking_questions#:#Ranking de preguntas
+most_selected_questions#:#Preguntas más seleccionadas
+most_edited_questions#:#Pregundas con más modificaciones
+no_events_found#:#No hay eventos registrados!
+no_statistics_calculated#:#No se han calculado estadísticas
+time_calculated#:#Tiempo calculado
+export_to_database#:#Exportar a base de datos
+view_database#:#ver base de datos
+database_content#:#Contenido de la base de datos
+eval_id#:#Eval ID
+key_id#:#Key ID
+lms_id#:#LMS ID
+key#:#key
+any#:#any
+user#:#User
+delete#:#Borrar registro de entradas
+view_log#:#Ver registro
+view_logs#:#Ver registros
+events_deleted#:#Los eventos seleccionados han sido borrados
+less_date#:#Los eventos ocurrieron antes de: 
+more_date#:#Los eventos ocurrieron después de:
+type_obj#:#Tipo de objeto
+ref_id#:#Type ID
+session_id#:#Sesión
+call_time#:#Tiempo de llamada
+edit#:#Editar contenido externo
+log_set#:#Utilizar registros
+log_on#:#Sí
+log_off#:#No
+logs_info#:#Escoger si quieres utilizar registros para almacenar datos recibidos del contenido externo para este tipo de objetos.
+learning_progress_set#:#Utilizar progreso de aprendizaje
+lp_on#:#Sí
+lp_off#:#No
+lp_info#:#Escoger si quieresalmacenar la información recibida de este contenido externo con la herramienta de progreso de aprendizaje de ILIAS.
+time_to_delete_info#:#Borrar tiempo de un token de acceso (para registros)
+type_edit#:#Editar definición de tipo
+type_failure_encoding#:#Personalización/global/codificación/%s no encontrada!
+model#:#Modelo de tipo
+content_types#:#Tipos de contenido
+type_title_info#:#Este título se muestra cuando un tipo se selecciona para un nuevo objeto.
+type_description_info#:#Esta descripción se muestra cuando un tipo se selecciona para un nuevo objeto.
+type_settings#:#Configuración
+icons#:#Iconos
+icons_failure#:#Los iconos no se enviaron correctamente!
+icons_saved#:#Los iconos se almacenaron correctamente.
+edit_instructions#:#Instrucciones de edición
+instructions_saved#:#Las instrucciones se han almacenado.
+xxco_title_info#:#Dar un título al objeto
+settings#:#Configuración
+lp_settings#:#Configuración de progeso de aprendizaje
+lp_mode#:#Modus
+lp_inactive#:#Inactivo
+lp_inactive_info#:#El progreso de aprendizaje no se ha almacenado para este objeto.
+lp_active#:#Activo
+lp_active_info#:#El estado 'En progreso" se establece cuando el contenido se visualiza. Los estados "Superado" o "No superado" se establecen por el resultado de una llamada LTI.
+lp_threshold#:#Umbral mínimo
+lp_threshold_info#:#Si un resultado LTI transmitido es igual o superior a este umbral, entonces el estado se establece a 'Superado', en otro caso a 'No superado'.
+xxco_read_learning_progress#:#Ver progreso de aprendizaje
+xxco_edit_learning_progress#:#Editar progreso de aprendizaje

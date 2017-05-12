@@ -428,8 +428,10 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
         global $ilSetting, $lng, $ilCtrl;
 
         $type_id = $this->type->getTypeId();
-        
-      	include_once("./Services/Form/classes/class.ilPropertyFormGUI.php");
+
+        $svg = ilExternalContentPlugin::_getIcon("xxco", "svg", 0, $type_id, "type");
+
+        include_once("./Services/Form/classes/class.ilPropertyFormGUI.php");
         $form = new ilPropertyFormGUI();
         $form->setFormAction($ilCtrl->getFormAction($this));
         $form->setTitle($this->txt('icons'));
@@ -437,25 +439,28 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
 		$caption = $this->txt("svg_icon");
 		$item = new ilImageFileInputGUI($caption, "svg_icon");
 		$item->setSuffixes(array("svg"));
-		$item->setImage(ilExternalContentPlugin::_getIcon("xxco", "svg", 0, $type_id, "type"));
+		$item->setImage($svg);
 		$form->addItem($item);
 
-		$caption = $lng->txt("big_icon")." (".ilExternalContentPlugin::BIG_ICON_SIZE.")";
-        $item = new ilImageFileInputGUI($caption, "big_icon");
-        $item->setImage(ilExternalContentPlugin::_getIcon("xxco", "big", 0, $type_id, "type"));
-        $form->addItem($item);
-        
-		$caption = $lng->txt("standard_icon")." (".ilExternalContentPlugin::SMALL_ICON_SIZE.")";
-        $item = new ilImageFileInputGUI($caption, "small_icon");
-        $item->setImage(ilExternalContentPlugin::_getIcon("xxco", "small", 0, $type_id, "type"));
-        $form->addItem($item);
-        
-		$caption = $lng->txt("tiny_icon")." (".ilExternalContentPlugin::TINY_ICON_SIZE.")";
-        $item = new ilImageFileInputGUI($caption, "tiny_icon");
-        $item->setImage(ilExternalContentPlugin::_getIcon("xxco", "tiny", 0, $type_id, "type"));
-        $form->addItem($item);
-                
-        $form->addCommandButton('submitFormIcons', $lng->txt('save'));  
+        if (empty($svg))
+        {
+            $caption = $lng->txt("big_icon")." (".ilExternalContentPlugin::BIG_ICON_SIZE.")";
+            $item = new ilImageFileInputGUI($caption, "big_icon");
+            $item->setImage(ilExternalContentPlugin::_getIcon("xxco", "big", 0, $type_id, "type"));
+            $form->addItem($item);
+
+            $caption = $lng->txt("standard_icon")." (".ilExternalContentPlugin::SMALL_ICON_SIZE.")";
+            $item = new ilImageFileInputGUI($caption, "small_icon");
+            $item->setImage(ilExternalContentPlugin::_getIcon("xxco", "small", 0, $type_id, "type"));
+            $form->addItem($item);
+
+            $caption = $lng->txt("tiny_icon")." (".ilExternalContentPlugin::TINY_ICON_SIZE.")";
+            $item = new ilImageFileInputGUI($caption, "tiny_icon");
+            $item->setImage(ilExternalContentPlugin::_getIcon("xxco", "tiny", 0, $type_id, "type"));
+            $form->addItem($item);
+        }
+
+        $form->addCommandButton('submitFormIcons', $lng->txt('save'));
         $this->form = $form;
     }
     

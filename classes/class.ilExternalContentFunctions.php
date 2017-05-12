@@ -130,7 +130,7 @@ class ilExternalContentFunctions
 	 * @param 	array		['type' => string, 'data' => [ 'name' => 'value', ... ]]
 	 * @return	string		HTML with name = value texts
 	 */
-	private function showValues($a_params)
+	private static function showValues($a_params)
 	{
 		$html = "";
 		foreach ($a_params["data"] as $name => $value)
@@ -146,7 +146,7 @@ class ilExternalContentFunctions
 	 * @param 	array		['' => default_value, 'value' => selection_name, 'name1' => value1, name2 => value2, ...]
 	 * @return 	string		return value
 	 */
-	private function selectByName($a_params)
+	private static function selectByName($a_params)
 	{
 		// get the value to be seleted
 		$select = $a_params["value"];
@@ -171,7 +171,7 @@ class ilExternalContentFunctions
 	 * @param 	array 	['source => string, 'key_delimiter' => string, 'entry_delimiter => string ]
 	 * @return	array	[key => value, ... ]
 	 */
-	private function splitToArray($a_params)
+	private static function splitToArray($a_params)
 	{
 		$result = array();
 
@@ -201,7 +201,7 @@ class ilExternalContentFunctions
 	 * Other values of the second set will be added.
 	 * @param array	['base_array' => array, 'merge_array' => array ]
 	 */
-	private function mergeArrays($a_params)
+	private static function mergeArrays($a_params)
 	{
 		if (is_array($a_params['base_array']) && is_array($a_params['merge_array']))
 		{

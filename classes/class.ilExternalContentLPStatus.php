@@ -68,7 +68,7 @@ class ilExternalContentLPStatus extends ilLPStatusPlugin
         if ($status == self::LP_STATUS_NOT_ATTEMPTED_NUM)
         {
             self::writeStatus($a_obj_id, $a_user_id, self::LP_STATUS_IN_PROGRESS_NUM);
-            self::raiseEvent($a_obj_id, $a_user_id, self::LP_STATUS_IN_PROGRESS_NUM,
+            self::raiseEventStatic($a_obj_id, $a_user_id, self::LP_STATUS_IN_PROGRESS_NUM,
                 self::getPercentageForUser($a_obj_id, $a_user_id));
         }
     }
@@ -84,6 +84,27 @@ class ilExternalContentLPStatus extends ilLPStatusPlugin
     public static function trackResult($a_user_id, $a_obj_id, $a_status = self::LP_STATUS_IN_PROGRESS_NUM, $a_percentage)
     {
         self::writeStatus($a_obj_id, $a_user_id, $a_status, $a_percentage, true);
-        self::raiseEvent($a_obj_id, $a_user_id, $a_status, $a_percentage);
+        self::raiseEventStatic($a_obj_id, $a_user_id, $a_status, $a_percentage);
+    }
+
+    /**
+     * Static version if ilLPStatus::raiseEvent
+     * This function is just a workaround for PHP7 until ilLPStatus::raiseEvent is declared as static
+     *
+     * @param $a_obj_id
+     * @param $a_usr_id
+     * @param $a_status
+     * @param $a_percentage
+     */
+    protected static function raiseEventStatic($a_obj_id, $a_usr_id, $a_status, $a_percentage)
+    {
+        global $ilAppEventHandler;
+
+        $ilAppEventHandler->raise("Services/Tracking", "updateStatus", array(
+            "obj_id" => $a_obj_id,
+            "usr_id" => $a_usr_id,
+            "status" => $a_status,
+            "percentage" => $a_percentage
+        ));
     }
 }
