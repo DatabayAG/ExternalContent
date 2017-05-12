@@ -715,6 +715,7 @@ class ilExternalContentType
 					$item = new ilPasswordInputGUI($field->title, 'field_' . $field->field_name);
 					$item->setInfo($field->description);
 					$item->setRequired($field->required ? true : false);
+					$item->setSkipSyntaxCheck(true);
 			    	$item->setValue($value);
 					break;
 								    	
