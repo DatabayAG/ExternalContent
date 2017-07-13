@@ -123,7 +123,7 @@
 
     <field name="LAUNCH_URL" level="object" type="text" required="1" encoding="">
       <title>Launch URL</title>
-      <description>URL of the LTI tool provider, e.g. http://lti.tools/test/tp.php</description>
+      <description>URL of the LTI tool provider, e.g. https://lti.tools/test/tp.php</description>
     </field>
 
     <field name="KEY" level="object" type="text" required="1" encoding="">
