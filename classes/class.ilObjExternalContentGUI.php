@@ -184,7 +184,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
         // add "edit" tab
         if ($this->checkPermissionBool("write"))
         {
-            $ilTabs->addTab("edit", $this->lng->txt("edit"), $ilCtrl->getLinkTarget($this, "edit"));           
+            $ilTabs->addTab("edit", $this->lng->txt("settings"), $ilCtrl->getLinkTarget($this, "edit"));
         }
 
         include_once("Services/Tracking/classes/class.ilObjUserTracking.php");
