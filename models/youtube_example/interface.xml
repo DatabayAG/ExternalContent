@@ -30,7 +30,7 @@
     </field>
 	
     <field name="SRC" type="template" encoding="">
-      <template><![CDATA[http://www.youtube.com/embed/{PATH}]]></template>
+      <template><![CDATA[https://www.youtube.com/embed/{PATH}]]></template>
     </field>
 	
   </fields>
