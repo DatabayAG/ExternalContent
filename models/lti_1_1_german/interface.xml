@@ -220,6 +220,8 @@
 		<param name="value">{ILIAS_CONTEXT_TYPE}</param>
 		<param name="crs">CourseOffering</param>
 		<param name="grp">Group</param>
+		<param name="cat">urn:lti:context-type:ilias/Category</param>
+		<param name="root">urn:lti:context-type:ilias/RootNode</param>
 	</field>
 	
 	<field name="LTI_CONTEXT_TITLE" type="template" encoding="strip_tags,singlequotes,no_break,trim">

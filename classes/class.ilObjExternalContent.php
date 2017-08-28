@@ -640,24 +640,36 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
     /**
      * get info about the context in which the link is used
      * 
-     * The deepest matching object is used
+     * The most outer matching course or group is used
+     * If not found the most inner category or root node is used
      * 
      * @param	array	list of valid types
      * @return 	array	context array ("ref_id", "title", "type")
      */
-    public function getContext($a_valid_types = array('crs', 'grp')) {
+    public function getContext($a_valid_types = array('crs', 'grp', 'cat', 'root')) {
         global $tree;
 
         if (!isset($this->context)) {
 
             $this->context = array();
 
+            // check fromm inner to outer
             $path = array_reverse($tree->getPathFull($this->getRefId()));
-            foreach ($path as $key => $row) {
-                if (in_array($row['type'], $a_valid_types)) {
-                    $this->context['id'] = $row['child'];
+            foreach ($path as $key => $row)
+            {
+                if (in_array($row['type'], $a_valid_types))
+                {
+					// take an existing inner context outside a course
+					if (in_array($row['type'], array('cat', 'root')) && !empty($this->context))
+					{
+						break;
+					}
+
+					$this->context['id'] = $row['child'];
                     $this->context['title'] = $row['title'];
                     $this->context['type'] = $row['type'];
+
+                    // don't break to get the most outer course or group
                 }
             }
         }
