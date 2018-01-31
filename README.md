@@ -31,6 +31,19 @@ Version History
 * All versions for ILIAS 5.1 and higher are maintained in GitHub: https://github.com/ilifau/ExternalContent
 * Former versions for ILIAS 5.0 and lower are maintained in ILIAS SVN: http://svn.ilias.de/svn/ilias/branches/fau/plugins
 
+Version 1.5.7 (2018-01-31)
+* fixed wrong launch_presentation_document_target in lti type models (1/2018)
+* support conteexts outside courses or groups in lti type models (8/2017)
+* changed links to https in youtube type model (8/2017)
+* changed http to https in demo urls of lti type models (7/2017)
+* changed name of settings tab (7/2017)
+* skip syntax check for password (5/2017)
+* fixed icon upload (11/2016)
+Note:
+All changes to the type models do not affect existing content types. You may create new types based on the changed models.
+To change an existing type, please copy the XML definiton of a new type to the XML definition of your existing type.
+
+
 Version 1.5.6 (2016-11-21)
 * Support for ILIAS 5.2 and PHP7 (beta). Thanks to 'xus' for the pull request.
 * Changed 'goto' access check of permanent links to default for plugins. Now the 'read' permission is needed instead of 'visible'.
