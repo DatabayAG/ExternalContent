@@ -155,11 +155,11 @@
       	<title>Ge&#239;ntegreerd</title>
 		<description>Open de content ge&#239;ntegreerd in het venster.</description>
       </option>
-      <option value="top">
+      <option value="frame">
       	<title>Zelfde venster</title>
 		<description>Open de content in hetzelfde venster. Er kan een terug link getoond worden.</description>
       </option>
-      <option value="blank">
+      <option value="window">
       	<title>Nieuw venster</title>
 		<description>Open de content in een nieuw venster.</description>
       </option>
@@ -184,8 +184,8 @@
 	<field name="FORM_TARGET" type="calculated" function="selectByName">
 		<param name="value">{LAUNCH_TARGET}</param>
 		<param name="iframe">basicltiLaunchFrame</param>
-		<param name="top">_top</param>
-		<param name="blank">_blank</param>
+		<param name="frame">_top</param>
+		<param name="window">_blank</param>
 		<param name=""></param>
 	</field>
 

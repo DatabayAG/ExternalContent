@@ -153,11 +153,11 @@
       	<title>Eingebettet</title>
 		<description>Zeigt das Tool auf der Inhaltsseite eingebettet.</description>
       </option>
-      <option value="top">
+      <option value="frame">
       	<title>Aktuelles Fenster</title>
 		<description>Öffnet das Tool im aktuellen Fenster. Es kann einen Rücksprung-Link anzeigen.</description>
       </option>
-      <option value="blank">
+      <option value="window">
       	<title>Neues Fenster</title>
 		<description>Öffnet das Tool in einem neuen Fenster</description>
       </option>
@@ -183,8 +183,8 @@
 	<field name="FORM_TARGET" type="calculated" function="selectByName">
 		<param name="value">{LAUNCH_TARGET}</param>
 		<param name="iframe">basicltiLaunchFrame</param>
-		<param name="top">_top</param>
-		<param name="blank">_blank</param>
+		<param name="frame">_top</param>
+		<param name="window">_blank</param>
 		<param name=""></param>
 	</field>
 
