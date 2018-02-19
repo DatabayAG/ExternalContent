@@ -160,3 +160,6 @@ lp_threshold_info#:#If a transmitted LTI outcome is equal or higher than this th
 xxco_read_learning_progress#:#View Learning Progress
 xxco_edit_learning_progress#:#Edit Learning Progress
 svg_icon#:#SVG Icon for All Sizes
+big_icon#:#Big Icon
+standard_icon#:#Standard Icon
+tiny_icon#:#Tiny Icon

@@ -159,4 +159,7 @@ lp_threshold#:#Schwellwert für "Bearbeitet"
 lp_threshold_info#:#Falls das per LTI übertragene Ergebnis gleich oder höher als diser Schwellwert ist, wird der Status auf "Bearbeitet" gesetzt, andernfalls auf "Nicht bestanden".
 xxco_read_learning_progress#:#Lernforschritt ansehen
 xxco_edit_learning_progress#:#Lernfortschritt bearbeiten
-svg_icon#:#SVG Icon for All Sizes
+svg_icon#:#SVG-Icon für alle Größen
+big_icon#:#Großes Icon
+standard_icon#:#Standard-Icon
+tiny_icon#:#Kleines Icon

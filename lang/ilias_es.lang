@@ -159,3 +159,7 @@ lp_threshold#:#Umbral mínimo
 lp_threshold_info#:#Si un resultado LTI transmitido es igual o superior a este umbral, entonces el estado se establece a 'Superado', en otro caso a 'No superado'.
 xxco_read_learning_progress#:#Ver progreso de aprendizaje
 xxco_edit_learning_progress#:#Editar progreso de aprendizaje
+svg_icon#:#SVG Icon for All Sizes
+big_icon#:#Big Icon
+standard_icon#:#Standard Icon
+tiny_icon#:#Tiny Icon

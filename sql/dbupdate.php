@@ -583,3 +583,11 @@ if(!$ilDB->tableExists('xxco_results'))
     }
 
 ?>
+<#27>
+<?php
+    if($ilDB->tableExists('xxco_data_log'))
+    {
+        $ilDB->dropSequence('xxco_data_log');
+        $ilDB->dropTable('xxco_data_log');
+    }
+?>

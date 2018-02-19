@@ -160,3 +160,6 @@ lp_threshold_info#:#Als een vertaalde LTI resultaat hoger of gelijk is aan deze 
 xxco_read_learning_progress#:#Toon voortgang
 xxco_edit_learning_progress#:#Wijzig voortgang
 svg_icon#:#SVG Icon voor alle maten
+big_icon#:#Big Icon
+standard_icon#:#Standard Icon
+tiny_icon#:#Tiny Icon

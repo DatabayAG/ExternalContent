@@ -147,7 +147,7 @@
       <title>Erscheinungsbild</title>
     </field>
 
-   <field name="LAUNCH_TARGET" level="object" type="radio" required="1" default="top" encoding="">
+   <field name="LAUNCH_TARGET" level="object" type="radio" required="1" default="frame" encoding="">
       <title>Darstellung</title>
       <option value="iframe">
       	<title>Eingebettet</title>
@@ -202,7 +202,7 @@
 	
 	<field name="LTI_LAUNCH_RETURN_URL" type="calculated" function="selectByName" encoding="">
 		<param name="value">{LAUNCH_TARGET}</param>
-		<param name="top">{ILIAS_RETURN_URL}</param>
+		<param name="frame">{ILIAS_RETURN_URL}</param>
 		<param name=""></param>
 	</field>
 	

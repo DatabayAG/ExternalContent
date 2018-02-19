@@ -38,7 +38,6 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
 	{
 		global $ilDB;
 
-		$ilDB->dropTable('xxco_data_log');
 		$ilDB->dropTable('xxco_data_settings');
 		$ilDB->dropTable('xxco_data_token');
 		$ilDB->dropTable('xxco_data_types');

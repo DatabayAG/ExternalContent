@@ -31,6 +31,14 @@ Version History
 * All versions for ILIAS 5.1 and higher are maintained in GitHub: https://github.com/ilifau/ExternalContent
 * Former versions for ILIAS 5.0 and lower are maintained in ILIAS SVN: http://svn.ilias.de/svn/ilias/branches/fau/plugins
 
+Version 1.5.8 (2018-02-19)
+* support for ILIAS 5.3
+* fixed default launch target and launch_presentation_return_url in type models
+* removed outdated event logging
+Note:
+Changes to the type models do not affect existing content types. You may create new types based on the changed models.
+To change an existing type, please copy the XML definiton of a new type to the XML definition of your existing type.
+
 Version 1.5.7 (2018-01-31)
 * fixed wrong launch_presentation_document_target in lti type models (1/2018)
 * support conteexts outside courses or groups in lti type models (8/2017)
@@ -40,7 +48,7 @@ Version 1.5.7 (2018-01-31)
 * skip syntax check for password (5/2017)
 * fixed icon upload (11/2016)
 Note:
-All changes to the type models do not affect existing content types. You may create new types based on the changed models.
+Changes to the type models do not affect existing content types. You may create new types based on the changed models.
 To change an existing type, please copy the XML definiton of a new type to the XML definition of your existing type.
 
 
