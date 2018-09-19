@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2013 Institut für Lern-Innovation, Friedrich-Alexander-Universität Erlangen-Nürnberg 
+ * Copyright (c) 2018 Institut für Lern-Innovation, Friedrich-Alexander-Universität Erlangen-Nürnberg
  * GPLv2, see LICENSE 
  */
 
@@ -11,8 +11,7 @@ include_once('./Services/Repository/classes/class.ilRepositoryObjectPlugin.php')
  *
  * @author Fred Neumann <fred.neumann@fim.uni-erlangen.de>
  * @author Jesus Copado <jesus.copado@fim.uni-erlangen.de>
- * @version $Id$
- */ 
+ */
 class ilExternalContentPlugin extends ilRepositoryObjectPlugin
 {
 	const BIG_ICON_SIZE = "45x45";
@@ -36,7 +35,8 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
 	 */
 	protected function uninstallCustom()
 	{
-		global $ilDB;
+		global $DIC;
+		$ilDB = $DIC->database();
 
 		$ilDB->dropTable('xxco_data_settings');
 		$ilDB->dropTable('xxco_data_token');
@@ -79,7 +79,7 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
 			case "object":
 				$plugin_dir = self::_createWebspaceDir("plugin");
 				$object_dir = $plugin_dir . "/object_". $a_id;
-				if (!is_dir($type_dir))
+				if (!is_dir($object_dir))
 				{
 					ilUtil::makeDir($object_dir);
 				}
@@ -126,7 +126,7 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
 	 * Get the file name used for a type or object specific icon
 
 	 * @param 	string		size ("big", "small", "tiny" or "svg")
-	 * @return 	steing		file name
+	 * @return 	string		file name
 	 */
 	static function _getIconName($a_size)
 	{
@@ -225,8 +225,6 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
 	*/
 	static function _saveIcon($a_upload_path, $a_size, $a_level, $a_id)
 	{
-		global $ilSetting;
-			
 		if (is_file($a_upload_path))
 		{
 			$icon_path = self::_createWebspaceDir($a_level, $a_id)
@@ -275,5 +273,16 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
 		$path = self::_getWebspaceDir($a_level, $a_id) . "/" . $name;
 		@unlink($path);				
 	}
+
+	/**
+	 * decides if this repository plugin can be copied
+	 *
+	 * @return bool
+	 */
+	public function allowCopy()
+	{
+		return true;
+	}
+
 }
 ?>

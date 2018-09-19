@@ -1,18 +1,15 @@
 <?php
 /**
- * Copyright (c) 2013 Institut für Lern-Innovation, Friedrich-Alexander-Universität Erlangen-Nürnberg 
+ * Copyright (c) 2018 Institut für Lern-Innovation, Friedrich-Alexander-Universität Erlangen-Nürnberg
  * GPLv2, see LICENSE 
  */
-
-include_once('./Services/Repository/classes/class.ilObjectPluginAccess.php');
 
 /**
  * External Content plugin: object acccess check
  *
  * @author Fred Neumann <fred.neumann@fim.uni-erlangen.de>
  * @author Jesus Copado <jesus.copado@fim.uni-erlangen.de>
- * @version $Id$
- */ 
+ */
 class ilObjExternalContentAccess extends ilObjectPluginAccess
 {
 	const ACTIVATION_OFFLINE = 0;
@@ -34,12 +31,11 @@ class ilObjExternalContentAccess extends ilObjectPluginAccess
 	*/
 	function _checkAccess($a_cmd, $a_permission, $a_ref_id, $a_obj_id, $a_user_id = "")
 	{
-		global $ilUser, $lng, $rbacsystem, $ilAccess;
+		global $DIC;
 
-
-		if ($a_user_id == "")
+		if (empty($a_user_id))
 		{
-			$a_user_id = $ilUser->getId();
+			$a_user_id = $DIC->user()->getId();
 		}
 
 		switch ($a_permission)
@@ -47,7 +43,7 @@ class ilObjExternalContentAccess extends ilObjectPluginAccess
 			case "visible":
 			case "read":
 				if (!self::_lookupOnline($a_obj_id) &&
-					(!$rbacsystem->checkAccessOfUser($a_user_id,'write', $a_ref_id)))
+					(!$DIC->access()->checkAccessOfUser($a_user_id,'write', '', $a_ref_id)))
 				{
 					return false;
 				}
@@ -77,10 +73,12 @@ class ilObjExternalContentAccess extends ilObjectPluginAccess
 		}
 	}
 
-	
+
 	/**
-	* get the type
-	*/
+	 * Get the type
+	 * @param int $a_obj_id
+	 * @return int
+	 */
 	static function _lookupTypeId($a_obj_id)
 	{
 		$row = self::fetchSettings($a_obj_id);
@@ -99,9 +97,10 @@ class ilObjExternalContentAccess extends ilObjectPluginAccess
 	{
 		if (!is_array(self::$settings_cache[$a_obj_id]))
 		{
-	       	global $ilDB;
+	       	global $DIC;
+	       	$ilDB = $DIC->database();
 	       	
-	       	// include only the colums neccessary for object listings
+	       	// include only the columns necessary for object listings
 	        $query = 'SELECT type_id, availability_type '
 	        		. ' FROM xxco_data_settings '
 	        		. ' WHERE obj_id = ' . $ilDB->quote($a_obj_id, 'integer');
