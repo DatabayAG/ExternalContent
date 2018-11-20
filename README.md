@@ -85,34 +85,3 @@ Version 1.5.1 (2016-02-11)
 * added SVG for custom icon (other icons are still supported with adjusted sizes)
 * fixed mantis #16234 (ignored offline setting)
 * fixed error with unavailable types
-
-Version 1.4.2 (2016-02-11)
-* http://svn.ilias.de/svn/ilias/branches/fau/plugins/ExternalContent-1.4.x
-* stable version for ILIAS 5.0 with learning progress and LTI 1.1
-* added Dutch language (thanks to Rick de Koster from L&M Software bv)
-* prettyfied content page for LTI type models
-* fixed mantis #16234 (ignored offline setting)
-* fixed error with unavailable types
-
-Version 1.3.8 (2016-02-11)
-* http://svn.ilias.de/svn/ilias/branches/fau/plugins/ExternalContent-1.2.x
-* stable version for ILIAS 4.4 with learning progress and LTI 1.1
-* supported cloning of objects
-* bugfix for encoding path
-* bugfix for call of info screen
-* updated manual
-* fixed mantis #16234 (ignored offline setting)
-* fixed error with unavailable types
-
-Version 1.1.1 (2013-08-26)
-* http://svn.ilias.de/svn/ilias/branches/fau/plugins/ExternalContent-1.1.x
-* stable version for ILIAS 4.3
-* fixed ignored online setting
-* LTI 1.0 support
-* Provision of type models
-* Separating Type settings and XML definition
-* Suport defined fields in type settings
-* More ILIAS fields
-* More input field types
-* Calculated fields and functions
-* Icon handling on type and object level
