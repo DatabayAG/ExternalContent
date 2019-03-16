@@ -1,7 +1,7 @@
 //
-// Copyright (c) 2013 Institut für Lern-Innovation, Friedrich-Alexander-Universität Erlangen-Nürnberg 
-// GPLv2, see LICENSE 
-// 
+// Copyright (c) 2013 Institut für Lern-Innovation, Friedrich-Alexander-Universität Erlangen-Nürnberg
+// GPLv2, see LICENSE
+//
 // Spanish Language File for ExternalContent Plugin
 // Translators: jrbalsas@ujaen.es, lina@ujaen.es, alonso@ujaen.es
 //
@@ -116,10 +116,10 @@ key#:#key
 any#:#any
 user#:#User
 delete#:#Borrar registro de entradas
-view_log#:#Ver registro
+view_log#:#Registro de visitas
 view_logs#:#Ver registros
 events_deleted#:#Los eventos seleccionados han sido borrados
-less_date#:#Los eventos ocurrieron antes de: 
+less_date#:#Los eventos ocurrieron antes de:
 more_date#:#Los eventos ocurrieron después de:
 type_obj#:#Tipo de objeto
 ref_id#:#Type ID
@@ -136,7 +136,7 @@ lp_off#:#No
 lp_info#:#Escoger si quieresalmacenar la información recibida de este contenido externo con la herramienta de progreso de aprendizaje de ILIAS.
 time_to_delete_info#:#Borrar tiempo de un token de acceso (para registros)
 type_edit#:#Editar definición de tipo
-type_failure_encoding#:#Personalización/global/codificación/%s no encontrada!
+type_failure_encoding#:#La codificación "%s" no existe!
 model#:#Modelo de tipo
 content_types#:#Tipos de contenido
 type_title_info#:#Este título se muestra cuando un tipo se selecciona para un nuevo objeto.
@@ -159,7 +159,7 @@ lp_threshold#:#Umbral mínimo
 lp_threshold_info#:#Si un resultado LTI transmitido es igual o superior a este umbral, entonces el estado se establece a 'Superado', en otro caso a 'No superado'.
 xxco_read_learning_progress#:#Ver progreso de aprendizaje
 xxco_edit_learning_progress#:#Editar progreso de aprendizaje
-svg_icon#:#SVG Icon for All Sizes
-big_icon#:#Big Icon
-standard_icon#:#Standard Icon
-tiny_icon#:#Tiny Icon
+svg_icon#:#Icono SVG  para todos los tamaños
+big_icon#:#Icono grande
+standard_icon#:#Icono estándar
+tiny_icon#:#Icono pequeño
