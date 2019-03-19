@@ -1,7 +1,7 @@
 //
-// Copyright (c) 2013 Institut für Lern-Innovation, Friedrich-Alexander-Universität Erlangen-Nürnberg
-// GPLv2, see LICENSE
-//
+// Copyright (c) 2013 Institut für Lern-Innovation, Friedrich-Alexander-Universität Erlangen-Nürnberg 
+// GPLv2, see LICENSE 
+// 
 // Spanish Language File for ExternalContent Plugin
 // Translators: jrbalsas@ujaen.es, lina@ujaen.es, alonso@ujaen.es
 //
@@ -29,7 +29,7 @@ availability_1#:#Permitir objetos existentes
 availability_2#:#Permitir crear nuevos objetos
 xxco_configuration#:#Configuración de tipos de contenidos externos
 create_type#:#Definir un nuevo tipo
-delete_type#:#borrar definición de tipo
+delete_type#:#Borrar definición de tipo
 xxco_description_info#:#La descripción se mostrará debajo del título
 xxco_edit_type#:#Editar definición de tipo
 xxco_instructions#:#Instrucciones
@@ -102,7 +102,7 @@ time_identify#:#Tiempo para identificar correctamente una especie
 time_failed#:#Tiempo para fallar un proceso de identificación
 ranking_questions#:#Ranking de preguntas
 most_selected_questions#:#Preguntas más seleccionadas
-most_edited_questions#:#Pregundas con más modificaciones
+most_edited_questions#:#Preguntas con más modificaciones
 no_events_found#:#No hay eventos registrados!
 no_statistics_calculated#:#No se han calculado estadísticas
 time_calculated#:#Tiempo calculado
@@ -119,7 +119,7 @@ delete#:#Borrar registro de entradas
 view_log#:#Registro de visitas
 view_logs#:#Ver registros
 events_deleted#:#Los eventos seleccionados han sido borrados
-less_date#:#Los eventos ocurrieron antes de:
+less_date#:#Los eventos ocurrieron antes de: 
 more_date#:#Los eventos ocurrieron después de:
 type_obj#:#Tipo de objeto
 ref_id#:#Type ID
@@ -133,7 +133,7 @@ logs_info#:#Escoger si quieres utilizar registros para almacenar datos recibidos
 learning_progress_set#:#Utilizar progreso de aprendizaje
 lp_on#:#Sí
 lp_off#:#No
-lp_info#:#Escoger si quieresalmacenar la información recibida de este contenido externo con la herramienta de progreso de aprendizaje de ILIAS.
+lp_info#:#Escoger si quieres almacenar la información recibida de este contenido externo con la herramienta de progreso de aprendizaje de ILIAS.
 time_to_delete_info#:#Borrar tiempo de un token de acceso (para registros)
 type_edit#:#Editar definición de tipo
 type_failure_encoding#:#La codificación "%s" no existe!
