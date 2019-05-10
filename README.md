@@ -30,6 +30,9 @@ Version History
 
 * All versions for ILIAS 5.1 and higher are maintained in GitHub: https://github.com/ilifau/ExternalContent
 
+Version 1.5.9 (2019-05-10)
+* Support for ILIAS 5.4
+
 Version 1.5.8 (2018-02-19)
 * support for ILIAS 5.3
 * fixed default launch target and launch_presentation_return_url in type models
