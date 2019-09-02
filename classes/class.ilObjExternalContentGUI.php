@@ -719,17 +719,17 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
 
         if (empty($svg))
         {
-            $caption = $lng->txt("big_icon")." (".ilExternalContentPlugin::BIG_ICON_SIZE.")";
+            $caption = $this->txt("big_icon")." (".ilExternalContentPlugin::BIG_ICON_SIZE.")";
             $item = new ilImageFileInputGUI($caption, "big_icon");
             $item->setImage(ilExternalContentPlugin::_getIcon("xxco", "big", $obj_id, $type_id, "object"));
             $form->addItem($item);
 
-            $caption = $lng->txt("standard_icon")." (".ilExternalContentPlugin::SMALL_ICON_SIZE.")";
+            $caption = $this->txt("standard_icon")." (".ilExternalContentPlugin::SMALL_ICON_SIZE.")";
             $item = new ilImageFileInputGUI($caption, "small_icon");
             $item->setImage(ilExternalContentPlugin::_getIcon("xxco", "small", $obj_id, $type_id, "object"));
             $form->addItem($item);
 
-            $caption = $lng->txt("tiny_icon")." (".ilExternalContentPlugin::TINY_ICON_SIZE.")";
+            $caption = $this->txt("tiny_icon")." (".ilExternalContentPlugin::TINY_ICON_SIZE.")";
             $item = new ilImageFileInputGUI($caption, "tiny_icon");
             $item->setImage(ilExternalContentPlugin::_getIcon("xxco", "tiny", $obj_id, $type_id, "object"));
             $form->addItem($item);
