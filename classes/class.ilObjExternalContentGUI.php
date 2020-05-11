@@ -267,9 +267,11 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
 
         include_once("./Services/InfoScreen/classes/class.ilInfoScreenGUI.php");
         $info = new ilInfoScreenGUI($this);
-        
-        $info->addSection($this->txt('xxco_instructions'));
-        $info->addProperty("", $this->object->getInstructions());
+
+        if (!empty( $this->object->getInstructions())) {
+            $info->addSection($this->txt('xxco_instructions'));
+            $info->addProperty("", $this->object->getInstructions());
+        }
         
         // meta data
         $xml_obj = $this->object->fetchMetaData(self::META_TIMEOUT_INFO);
