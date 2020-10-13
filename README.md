@@ -20,6 +20,14 @@ When you download the Plugin as ZIP file from GitHub, please rename the extracte
 3. Choose action  "Update" for the ExternalContent plugin
 4. Choose action  "Activate" for the ExternalContent plugin
 
+Server Configuration Notes
+--------------------------
+
+If you want to use the LTI outcome service with PHP-FPM behind an Apache web server, please add the following configuration
+to your virtual host or directory configuration in Apache:
+
+`SetEnvIfNoCase ^Authorization$ "(.+)" HTTP_AUTHORIZATION=$1`
+
 Usage
 -----
 
