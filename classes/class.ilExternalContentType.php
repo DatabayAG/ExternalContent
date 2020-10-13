@@ -863,7 +863,7 @@ class ilExternalContentType
      * @param	mixed		required availability or null
      * @return	array		array of assoc data arrays
      */
-    static function _getTypesData($a_extended = false, $a_availability = null) 
+    static function _getTypesData($a_extended = false, $a_availability = null)
     {
         global $ilDB;
 
@@ -903,6 +903,40 @@ class ilExternalContentType
         $res = $ilDB->query($query);
         $row = $ilDB->fetchObject($res);
         return $row->untrashed;
+    }
+
+    /**
+     * Get the active object references for a certain type and field value
+     * @param $a_type_id
+     * @param $a_field_name
+     * @param $a_field_value
+     * @return int[]   ref_ids
+     */
+    static function _getRefIdsByTypeAndField($a_type_id, $a_field_name, $a_field_value)
+    {
+        global $DIC;
+
+        $query = "
+            SELECT r.ref_id
+            FROM xxco_data_settings s 
+            INNER JOIN xxco_data_values v ON s.obj_id = v.obj_id 
+            INNER JOIN object_reference r ON s.obj_id = r.obj_id 
+            WHERE s.type_id = %s
+            AND v.field_name = %s 
+            AND v.field_value = %s
+            AND r.deleted IS NULL
+        ";
+
+        $result = $DIC->database()->queryF($query,
+            ['integer','text','text'],
+            [$a_type_id, $a_field_name, $a_field_value]
+        );
+
+        $ref_ids = [];
+        while ($row = $DIC->database()->fetchAssoc($result)) {
+            $ref_ids[] = $row['ref_id'];
+        }
+        return $ref_ids;
     }
 }
 
