@@ -483,6 +483,10 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
                 $value = $ilUser->getEmail();
                 break;
 
+            case "ILIAS_USER_MATRICULATION":
+                $value = $ilUser->getMatriculation();
+                break;
+
             case "ILIAS_USER_IMAGE":
                 $value = ILIAS_HTTP_PATH . "/" . $ilUser->getPersonalPicturePath("small");
                 break;
@@ -590,6 +594,7 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
             'ILIAS_USER_LASTNAME',
             'ILIAS_USER_FULLNAME',
             'ILIAS_USER_EMAIL',
+            'ILIAS_USER_MATRICULATION',
             'ILIAS_USER_IMAGE',
             'ILIAS_USER_LANG',
             'ILIAS_USER_WRITE_ACCESS',
