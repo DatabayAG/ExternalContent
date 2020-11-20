@@ -48,6 +48,10 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
      */
     protected $return_url;
 
+
+    /** @var ilExternalContentUserData */
+    protected $userData;
+
     /**
      * Constructor
      *
@@ -61,6 +65,9 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
 
         $this->db = $ilDB;
         $this->typedef = new ilExternalContentType();
+
+        $this->plugin->includeClass('class.ilExternalContentUserData.php');
+        $this->userData = ilExternalContentUserData::factory($this->plugin);
     }
 
     /**
@@ -469,110 +476,6 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
                 $value = $ilUser->getLogin();
                 break;
 
-            case "ILIAS_USER_GENDER":
-                $value = $ilUser->getGender();
-                break;
-
-            case "ILIAS_USER_FIRSTNAME":
-                $value = $ilUser->getFirstname();
-                break;
-
-            case "ILIAS_USER_LASTNAME":
-                $value = $ilUser->getLastname();
-                break;
-
-            case "ILIAS_USER_TITLE":
-                $value = $ilUser->getTitle();
-                break;
-
-            case "ILIAS_USER_FULLNAME":
-                $value = $ilUser->getFullname();
-                break;
-
-            case "ILAS_USER_BIRTHDAY":
-                $value = $ilUser->getBirthday();
-                break;
-
-            case "ILIAS_USER_INSTITUTION":
-                $value = $ilUser->getInstitution();
-                break;
-
-            case "ILIAS_USER_DEPARTMENT":
-                $value = $ilUser->getDepartment();
-                break;
-
-            case "ILIAS_USER_STREET":
-                $value = $ilUser->getStreet();
-                break;
-
-            case "ILIAS_USER_CITY":
-                $value = $ilUser->getCity();
-                break;
-
-            case "ILIAS_USER_ZIPCODE":
-                $value = $ilUser->getZipcode();
-                break;
-
-            case "ILIAS_USER_COUNTRY":
-                $value = $ilUser->getCountry();
-                break;
-
-            case "ILIAS_USER_COUNTRY_SELECT":
-                $value = $ilUser->getSelectedCountry();
-                break;
-
-            case "ILIAS_USER_PHONE_OFFICE":
-                $value = $ilUser->getPhoneOffice();
-                break;
-
-            case "ILIAS_USER_PHONE_HOME":
-                $value = $ilUser->getPhoneHome();
-                break;
-
-            case "ILIAS_USER_PHONE_MOBILE":
-                $value = $ilUser->getPhoneMobile();
-                break;
-
-            case "ILIAS_USER_FAX":
-                $value = $ilUser->getFax();
-                break;
-
-            case "ILIAS_USER_EMAIL":
-                $value = $ilUser->getEmail();
-                break;
-
-            case "ILIAS_USER_EMAIL_SECOND":
-                $value = $ilUser->getEmail();
-                break;
-
-            case "ILIAS_USER_HOBBY":
-                $value = $ilUser->getHobby();
-                break;
-
-            case "ILIAS_USER_REFERRAL_COMMENT":
-                $value = $ilUser->getComment();
-                break;
-
-            case "ILIAS_USER_MATRICULATION":
-                $value = $ilUser->getMatriculation();
-                break;
-
-            case "ILIAS_USER_LATITUDE":
-                $value = '';
-                break;
-
-            case "ILIAS_USER_LONGITUDE":
-                $value = '';
-                break;
-
-            case "ILIAS_USER_IMAGE":
-                $value = ILIAS_HTTP_PATH . "/" . $ilUser->getPersonalPicturePath("small");
-                break;
-
-            case "ILIAS_USER_LANG":
-                $value = $this->lng->getLangKey();
-                break;
-
             case "ILIAS_USER_WRITE_ACCESS":
                 $value = $ilAccess->checkAccess('write', '', $this->getRefId()) ? "1" : "0";
                 break;
@@ -620,10 +523,10 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
 
             default:
 
-                // fill user defined field
-                foreach ($this->getUdfFields() as $udf_name => $udf_value) {
-                    if ($udf_name == $a_field['field_name']) {
-                        $value = $udf_value;
+                // fill additional user fields
+                foreach ($this->userData->getElementValues() as $field_name => $field_value) {
+                    if ($field_name == $a_field['field_name']) {
+                        $value = $field_value;
                     }
                 }
         }
@@ -673,32 +576,6 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
             'ILIAS_USER_ID',
             'ILIAS_USER_CODE',
             'ILIAS_USER_LOGIN',
-            'ILIAS_USER_GENDER',
-            'ILIAS_USER_FIRSTNAME',
-            'ILIAS_USER_LASTNAME',
-            'ILIAS_USER_TITLE',
-            'ILIAS_USER_FULLNAME',
-            'ILIAS_USER_BIRTHDAY',
-            'ILIAS_USER_INSTITUTION',
-            'ILIAS_USER_DEPARTMENT',
-            'ILIAS_USER_STREET',
-            'ILIAS_USER_CITY',
-            'ILIAS_USER_ZIPCODE',
-            'ILIAS_USER_COUNTRY',
-            'ILIAS_USER_COUNTRY_SELECT',
-            'ILIAS_USER_PHONE_OFFICE',
-            'ILIAS_USER_PHONE_HOME',
-            'ILIAS_USER_PHONE_MOBILE',
-            'ILIAS_USER_FAX',
-            'ILIAS_USER_EMAIL',
-            'ILIAS_USER_EMAIL_SECOND',
-            'ILIAS_USER_HOBBY',
-            'ILIAS_USER_REFERRAL_COMMENT',
-            'ILIAS_USER_MATRICULATION',
-            'ILIAS_USER_LATITUDE',
-            'ILIAS_USER_LONGITUDE',
-            'ILIAS_USER_IMAGE',
-            'ILIAS_USER_LANG',
             'ILIAS_USER_WRITE_ACCESS',
             // platform information
             'ILIAS_VERSION',
@@ -712,7 +589,7 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
         );
 
         // add user defined fields
-        $ilias_names = array_merge($ilias_names, array_keys($this->getUdfFields()));
+        $ilias_names = array_merge($ilias_names, array_keys($this->userData->getElements()));
 
         foreach ($ilias_names as $name) {
             $field = array();
@@ -748,20 +625,6 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
         }
     }
 
-    /**
-     * Get the user defined fields
-     * @return array ILIAS_UDF_FIELDNAME => value
-     */
-    private function getUdfFields() {
-        /** @var ilObjUser */
-        global $ilUser;
-
-        $udf = array();
-        foreach ($ilUser->getUserDefinedData() as $field => $value) {
-            $udf['ILIAS_UDF_' . strtoupper(ilUtil::getASCIIFilename($field))] = $value;
-        }
-        return $udf;
-    }
 
     /**
      * get info about the context in which the link is used

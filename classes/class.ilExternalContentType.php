@@ -21,6 +21,7 @@ class ilExternalContentType
     const FIELDTYPE_ILIAS = "ilias";
     const FIELDTYPE_TEMPLATE = "template";
     const FIELDTYPE_CALCULATED = "calculated";
+    const FIELDTYPE_SPECIAL = "special";
     
     const FIELDTYPE_TEXT = "text";
     const FIELDTYPE_TEXTAREA = "textarea";
@@ -743,6 +744,19 @@ class ilExternalContentType
 						$this->addFormElements($ropt, $a_values, $a_level, $field->field_name, $option->value, $a_maxdepth - 1);
 					}
 					break;
+
+                case self::FIELDTYPE_SPECIAL:
+                    switch ($field->field_name) {
+                        case 'LTI_USER_DATA':
+                            $this->plugin_object->includeClass('class.ilExternalContentUserData');
+                            $data = ilExternalContentUserData::factory($this->plugin_object);
+                            $item = $data->getFormItem($value);
+                            break;
+
+                        default:
+                            continue 3;
+                    }
+                    break;
 				
 			    default:
 			    	continue 2;	
@@ -767,6 +781,36 @@ class ilExternalContentType
 		} 	
     }
     
+
+    /**
+     * Get the values
+     * @param ilPropertyFormGUI $a_form
+     * @param string $a_level
+     * @return array    field_name => field_value
+     */
+    public function getFormValues($a_form, $a_level = "object") {
+
+        $values = array();
+        foreach ($this->getInputFields($a_level) as $field)
+        {
+            if ($field->field_type == self::FIELDTYPE_SPECIAL) {
+                switch ($field->field_name) {
+                    case 'LTI_USER_DATA':
+                        $this->plugin_object->includeClass('class.ilExternalContentUserData');
+                        $values[$field->field_name] =
+                            ilExternalContentUserData::factory($this->plugin_object)->getFormValue($a_form);
+                        break;
+                }
+            }
+            else {
+                $value = trim($a_form->getInput("field_" . $field->field_name));
+                $values[$field->field_name] = ( $value ? $value : $field->default);
+            }
+        }
+        return $values;
+    }
+
+
 
     /**
      * Get array of input fields for the type

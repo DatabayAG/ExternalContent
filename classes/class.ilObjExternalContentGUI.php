@@ -27,6 +27,9 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
      */
     var $meta_groups = array('General', 'LifeCycle', 'Technical', 'Rights');
 
+    /** @var ilPropertyFormGUI */
+    protected $form;
+
     /**
      * Initialisation
      *
@@ -611,11 +614,11 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
         }
         $this->object->setAvailabilityType($this->form->getInput('online') ? ilObjExternalContent::ACTIVATION_UNLIMITED : ilObjExternalContent::ACTIVATION_OFFLINE);
         $this->object->update();
-        
-        foreach ($this->object->typedef->getInputFields("object") as $field)
+
+
+        foreach ($this->object->typedef->getFormValues($this->form, 'object') as $field_name => $field_value)
         {
-        	$value = trim($this->form->getInput("field_" . $field->field_name));
-            $this->object->saveFieldValue($field->field_name, $value ? $value : $field->default);
+            $this->object->saveFieldValue($field_name, $field_value);
         }
     }
     
