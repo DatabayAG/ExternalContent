@@ -6,6 +6,7 @@
 require_once('./Services/Repository/classes/class.ilObjectPlugin.php');
 require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/ExternalContent/classes/class.ilExternalContentType.php');
 require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/ExternalContent/classes/class.ilExternalContentEncodings.php');
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/ExternalContent/classes/class.ilExternalContentUserData.php');
 
 require_once 'Services/Tracking/interfaces/interface.ilLPStatusPlugin.php';
 
@@ -65,9 +66,7 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
 
         $this->db = $ilDB;
         $this->typedef = new ilExternalContentType();
-
-        $this->plugin->includeClass('class.ilExternalContentUserData.php');
-        $this->userData = ilExternalContentUserData::factory($this->plugin);
+        $this->userData = ilExternalContentUserData::create($this->plugin);
     }
 
     /**
@@ -300,7 +299,7 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
      * 
      * @param $a_field
      * @param $a_maxdepth
-     * @return unknown_type
+     * @return mixed
      */
     private function fillCalculatedField($a_field, $a_maxdepth) {
         // process the function parameters
@@ -524,7 +523,7 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
             default:
 
                 // fill additional user fields
-                foreach ($this->userData->getElementValues() as $field_name => $field_value) {
+                foreach ($this->userData->getFieldValues() as $field_name => $field_value) {
                     if ($field_name == $a_field['field_name']) {
                         $value = $field_value;
                     }
@@ -538,7 +537,6 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
      * initialize the fields for template processing
      */
     private function initFields() {
-        global $ilUser, $ilias, $ilSetting;
 
         if (is_array($this->fields)) {
             return;
@@ -588,8 +586,8 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
             'ILIAS_LMS_DESCRIPTION',
         );
 
-        // add user defined fields
-        $ilias_names = array_merge($ilias_names, array_keys($this->userData->getElements()));
+        // add user data fields
+        $ilias_names = array_merge($ilias_names, $this->userData->getFieldNames());
 
         foreach ($ilias_names as $name) {
             $field = array();
@@ -605,8 +603,10 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
         //
         $type_fields = $this->typedef->getFieldsAssoc();
         $type_values = $this->typedef->getInputValues();
-        $input_values = $this->getInputValues();
+        $object_values = $this->getInputValues();
+
         foreach ($type_fields as $field) {
+
             // set value to user input
             if ($field['field_type'] != ilExternalContentType::FIELDTYPE_TEMPLATE and $field['field_type'] != ilExternalContentType::FIELDTYPE_CALCULATED) {
                 switch ($field['level']) {
@@ -616,7 +616,16 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
 
                     case "object":
                     default:
-                        $field['field_value'] = $input_values[$field['field_name']];
+                        $field['field_value'] = $object_values[$field['field_name']];
+                        break;
+                }
+            }
+
+            // special input fields: process user input to a new value
+            if ($field['field_type'] == ilExternalContentType::FIELDTYPE_SPECIAL) {
+                switch ($field['field_name']) {
+                    case ilExternalContentType::FIELD_LTI_USER_DATA:
+                        $field['field_value'] = $this->userData->getLtiParams($field['field_value']);
                         break;
                 }
             }

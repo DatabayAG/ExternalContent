@@ -402,7 +402,7 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
 
             foreach ($this->type->getFormValues($this->form, 'type') as $field_name => $field_value)
 	        {
-	            $this->type->saveFieldValue($field_name->field_name, $field_value);
+	            $this->type->saveFieldValue($field_name, $field_value);
 	        }
             
             ilUtil::sendSuccess($this->txt('type_saved'), true);

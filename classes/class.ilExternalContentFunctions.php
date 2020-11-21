@@ -196,20 +196,21 @@ class ilExternalContentFunctions
 	}
 
 	/**
-	 * Merge to sets of key/value pairs.
-	 * Values of the second set will overwrite those of the first set with the same key.
-	 * Other values of the second set will be added.
-	 * @param array	['base_array' => array, 'merge_array' => array ]
+	 * Merge key/value arrays.
+	 * Values of following array set will overwrite those of previous array with the same key.
+	 * Other values will be added.
+     * Params that are not arrays will be ignored
+	 * @param array	['name1' => array, 'name2' => array, ... ]
+     * @return array
 	 */
 	private static function mergeArrays($a_params)
 	{
-		if (is_array($a_params['base_array']) && is_array($a_params['merge_array']))
-		{
-			return array_merge($a_params['base_array'], $a_params['merge_array']);
-		}
-		else
-		{
-			return (array) $a_params['base_array'];
-		}
+	    $merged = array();
+	    foreach ($a_params as $param) {
+	        if (is_array($param)) {
+                $merged = array_merge($merged, $param);
+            }
+        }
+	    return $merged;
 	}
 }
