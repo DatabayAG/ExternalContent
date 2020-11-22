@@ -5,10 +5,11 @@
   <description>LTI 1.1 met Basic Outcome Service, zie http://developers.imsglobal.org</description>
 
   <template><![CDATA[
-  <form action="{LAUNCH_URL}" method="post" target="{FORM_TARGET}" encType="application/x-www-form-urlencoded">
+  <form name="basicltiLaunchForm" action="{LAUNCH_URL}" method="post" target="{FORM_TARGET}" encType="application/x-www-form-urlencoded">
 	  {HIDDEN_INPUTS}
 	  <input class="btn btn-default" type="submit" value = "Start" />
 	  {DEBUG_EMBED}
+	  {AUTOSTART_EMBED}
   </form><p></p>
   <iframe name="basicltiLaunchFrame"  id="basicltiLaunchFrame" src=""
   	width="{LTI_LAUNCH_WIDTH}" height="{LTI_LAUNCH_HEIGHT}" scrolling="auto" frameborder="0" transparency>
@@ -99,35 +100,51 @@
       <title>Presentatie</title>
     </field>
 
-   <field name="LAUNCH_TARGET" level="object" type="radio" required="1" default="frame" encoding="">
-      <title>Content presentatie</title>
-      <option value="iframe">
-      	<title>Ge&#239;ntegreerd</title>
+	<field name="LAUNCH_TARGET" level="object" type="radio" required="1" default="frame" encoding="">
+	  <title>Content presentatie</title>
+	  <option value="iframe">
+		<title>Ge&#239;ntegreerd</title>
 		<description>Open de content ge&#239;ntegreerd in het venster.</description>
-      </option>
-      <option value="frame">
-      	<title>Zelfde venster</title>
+	  </option>
+	  <option value="frame">
+		<title>Zelfde venster</title>
 		<description>Open de content in hetzelfde venster. Er kan een terug link getoond worden.</description>
-      </option>
-      <option value="window">
-      	<title>Nieuw venster</title>
+	  </option>
+	  <option value="window">
+		<title>Nieuw venster</title>
 		<description>Open de content in een nieuw venster.</description>
-      </option>
-    </field>
-  
-   <field name="LAUNCH_WIDTH" level="object" parentfield="LAUNCH_TARGET" parentvalue="iframe" type="text" default="800" encoding="">
-      <title>Breedte</title>
+	  </option>
+	</field>
+
+	<field name="LAUNCH_WIDTH" level="object" parentfield="LAUNCH_TARGET" parentvalue="iframe" type="text" default="800" encoding="">
+	  <title>Breedte</title>
 	  <description></description>
-   </field>
-   
-   <field name="LAUNCH_HEIGHT" level="object" parentfield="LAUNCH_TARGET" parentvalue="iframe" type="text" default="600" encoding="">
-      <title>Hoogte</title>
-   </field>
-	
-   <field name="SHOW_DEBUG" level="object" type="checkbox" value="1" encoding="">
-      <title>Debug Data</title>
+	</field>
+
+	<field name="LAUNCH_HEIGHT" level="object" parentfield="LAUNCH_TARGET" parentvalue="iframe" type="text" default="600" encoding="">
+	  <title>Hoogte</title>
+	</field>
+
+	<field name="AUTOSTART_OPTION" level="object" type="radio" required="1" default="frame" encoding="">
+	  <title>Start</title>
+	  <option value="manual">
+		  <title>Handleiding</title>
+		  <description>De tool wordt aangeroepen door te klikken op "Start".</description>
+	  </option>
+	  <option value="always">
+		  <title>Automatisch</title>
+		  <description>De tool wordt automatisch opgeroepen.</description>
+	  </option>
+	  <option value="goto">
+		  <title>Automatisch bij Link</title>
+		  <description>Start de tool automatisch als de goto link het achtervoegsel "autostart" bevat, bijv. goto.php?target=xxco_123_autostart</description>
+	  </option>
+	</field>
+
+	  <field name="SHOW_DEBUG" level="object" type="checkbox" value="1" encoding="">
+	  <title>Debug Data</title>
 	  <description>Toont een link waarmee de te verzenden gegevens naar de content provider bekeken kunnen worden.</description>
-   </field>
+	</field>
 
 	<!-- helping calculations for appearance settings -->
 
@@ -303,7 +320,33 @@
 		<param name="value">{SHOW_DEBUG}</param>
 		<param name="1">{DEBUG_TOGGLE}</param>
 		<param name=""></param>
-	</field>	
+	</field>
+
+	<!-- Autostart support -->
+
+	<field name="AUTOSTART_SCRIPT" type="template">
+	  <template><![CDATA[
+		<script type="text/javascript">
+			$(document).ready(function() {
+				window.document.forms["basicltiLaunchForm"].submit();
+			});
+		</script>
+		]]></template>
+	</field>
+
+	<field name="AUTOSTART" type="calculated" function="selectByName">
+	  <param name="value">{AUTOSTART_OPTION}</param>
+	  <param name="manual">0</param>
+	  <param name="always">1</param>
+	  <param name="goto">{ILIAS_GOTO_AUTOSTART}</param>
+	  <param name=""></param>
+	</field>
+
+	<field name="AUTOSTART_EMBED" type="calculated" function="selectByName">
+	  <param name="value">{AUTOSTART}</param>
+	  <param name="1">{AUTOSTART_SCRIPT}</param>
+	  <param name=""></param>
+	</field>
 
   </fields>  
 </interface>

@@ -38,6 +38,13 @@ Version History
 
 * All versions for ILIAS 5.1 and higher are maintained in GitHub: https://github.com/ilifau/ExternalContent
 
+Version 1.5.10 (2020-11-22)
+* Added user profile data and user defined profile data
+* Added selector for provision of profile data via LIT
+* Added autostart options to LTI
+* Added recognition of goto link suffixes
+* Updated the manual
+
 Version 1.5.9 (2019-05-10)
 * Support for ILIAS 5.4
 
@@ -51,7 +58,7 @@ To change an existing type, please copy the XML definiton of a new type to the X
 
 Version 1.5.7 (2018-01-31)
 * fixed wrong launch_presentation_document_target in lti type models (1/2018)
-* support conteexts outside courses or groups in lti type models (8/2017)
+* support contexts outside courses or groups in lti type models (8/2017)
 * changed links to https in youtube type model (8/2017)
 * changed http to https in demo urls of lti type models (7/2017)
 * changed name of settings tab (7/2017)

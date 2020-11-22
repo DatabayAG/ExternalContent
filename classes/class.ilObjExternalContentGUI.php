@@ -30,6 +30,37 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
     /** @var ilPropertyFormGUI */
     protected $form;
 
+    /** @var ilObjExternalContent */
+    var $object;
+
+    /**
+     * Goto redirection
+     * Overridden to provide the goto suffix
+     */
+    public static function _goto($a_target)
+    {
+        global $ilCtrl, $ilAccess, $lng;
+
+        $t = explode("_", $a_target[0]);
+        $ref_id = (int) $t[0];
+        $class_name = $a_target[1];
+        $goto_suffix = (string) $t[1];
+
+        if ($ilAccess->checkAccess("read", "", $ref_id))
+        {
+            $ilCtrl->initBaseClass("ilObjPluginDispatchGUI");
+            $ilCtrl->setTargetScript("ilias.php");
+            $ilCtrl->getCallStructure(strtolower("ilObjPluginDispatchGUI"));
+            $ilCtrl->setParameterByClass($class_name, "ref_id", $ref_id);
+            $ilCtrl->setParameterByClass($class_name, "goto_suffix", $goto_suffix);
+            $ilCtrl->redirectByClass(array("ilobjplugindispatchgui", $class_name), "");
+        }
+        else {
+            parent::_goto($a_target);
+        }
+    }
+
+
     /**
      * Initialisation
      *
@@ -105,6 +136,9 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
 			// IMPORTANT: the last parameter prevents an encoding of & to &amp;
 			// Otherwise the OAuth signatore is calculated wrongly!
 			$this->object->setReturnURL(ILIAS_HTTP_PATH . "/". $ilCtrl->getLinkTarget($this, "view", "", true));
+
+			// set the goto suffix, e.g. autostart
+            $this->object->setGotoSuffix($_GET['goto_suffix']);
 		}
 
         switch ($cmd)
@@ -321,6 +355,8 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
     function viewObject() 
     {
         global $ilErr;
+
+        $this->ctrl->saveParameter($this, 'goto_suffix');
 
         switch ($this->object->typedef->getLaunchType())
         {

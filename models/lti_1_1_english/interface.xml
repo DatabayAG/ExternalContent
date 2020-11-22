@@ -5,10 +5,11 @@
   <description>LTI 1.1 with Basic Outcome Service, see http://developers.imsglobal.org</description>
 
   <template><![CDATA[
-  <form action="{LAUNCH_URL}" method="post" target="{FORM_TARGET}" encType="application/x-www-form-urlencoded">
+  <form name="basicltiLaunchForm" action="{LAUNCH_URL}" method="post" target="{FORM_TARGET}" encType="application/x-www-form-urlencoded">
 	  {HIDDEN_INPUTS}
 	  <input class="btn btn-default" type="submit" value = "Press to launch" />
 	  {DEBUG_EMBED}
+	  {AUTOSTART_EMBED}
   </form><p></p>
   <iframe name="basicltiLaunchFrame"  id="basicltiLaunchFrame" src=""
   	width="{LTI_LAUNCH_WIDTH}" height="{LTI_LAUNCH_HEIGHT}" scrolling="auto" frameborder="0" transparency>
@@ -97,35 +98,51 @@
       <title>Appearance</title>
     </field>
 
-   <field name="LAUNCH_TARGET" level="object" type="radio" required="1" default="frame" encoding="">
-      <title>Tool Presentation</title>
-      <option value="iframe">
-      	<title>Embedded</title>
+	<field name="LAUNCH_TARGET" level="object" type="radio" required="1" default="frame" encoding="">
+	  <title>Tool Presentation</title>
+	  <option value="iframe">
+		<title>Embedded</title>
 		<description>Show the tool embedded on the content page.</description>
-      </option>
-      <option value="frame">
-      	<title>Same Window</title>
+	  </option>
+	  <option value="frame">
+		<title>Same Window</title>
 		<description>Open the tool in the same window. It can show a back link.</description>
-      </option>
-      <option value="window">
-      	<title>New Window</title>
+	  </option>
+	  <option value="window">
+		<title>New Window</title>
 		<description>Open the tool in a new browser window</description>
-      </option>
-    </field>
-  
-   <field name="LAUNCH_WIDTH" level="object" parentfield="LAUNCH_TARGET" parentvalue="iframe" type="text" default="800" encoding="">
-      <title>Width</title>
+	  </option>
+	</field>
+
+	<field name="LAUNCH_WIDTH" level="object" parentfield="LAUNCH_TARGET" parentvalue="iframe" type="text" default="800" encoding="">
+	  <title>Width</title>
 	  <description></description>
-   </field>
-   
-   <field name="LAUNCH_HEIGHT" level="object" parentfield="LAUNCH_TARGET" parentvalue="iframe" type="text" default="600" encoding="">
-      <title>Height</title>
-   </field>
-	
-   <field name="SHOW_DEBUG" level="object" type="checkbox" value="1" encoding="">
-      <title>Debug Data</title>
+	</field>
+
+	<field name="LAUNCH_HEIGHT" level="object" parentfield="LAUNCH_TARGET" parentvalue="iframe" type="text" default="600" encoding="">
+	  <title>Height</title>
+	</field>
+
+	  <field name="AUTOSTART_OPTION" level="object" type="radio" required="1" default="frame" encoding="">
+		  <title>Tool Call</title>
+		  <option value="manual">
+			  <title>Manual</title>
+			  <description>The tool is called by 'Press to launch'.</description>
+		  </option>
+		  <option value="always">
+			  <title>Automatically</title>
+			  <description>The tool is called automatically.</description>
+		  </option>
+		  <option value="goto">
+			  <title>Auto by Link</title>
+			  <description>The tool is called automatically when the goto link includes an 'autostart' suffix, e.g. goto.php?target=xxco_123_autostart</description>
+		  </option>
+	  </field>
+
+	<field name="SHOW_DEBUG" level="object" type="checkbox" value="1" encoding="">
+	  <title>Debug Data</title>
 	  <description>Show a link to view the data passed to the tool provider</description>
-   </field>
+	</field>
 
     <!-- helping calculations for appearance settings -->
 
@@ -301,7 +318,34 @@
 		<param name="value">{SHOW_DEBUG}</param>
 		<param name="1">{DEBUG_TOGGLE}</param>
 		<param name=""></param>
-	</field>	
+	</field>
+
+
+	<!-- Autostart support -->
+
+	<field name="AUTOSTART_SCRIPT" type="template">
+	  <template><![CDATA[
+		<script type="text/javascript">
+			$(document).ready(function() {
+				window.document.forms["basicltiLaunchForm"].submit();
+			});
+		</script>
+		]]></template>
+	</field>
+
+	<field name="AUTOSTART" type="calculated" function="selectByName">
+	  <param name="value">{AUTOSTART_OPTION}</param>
+	  <param name="manual">0</param>
+	  <param name="always">1</param>
+	  <param name="goto">{ILIAS_GOTO_AUTOSTART}</param>
+	  <param name=""></param>
+	</field>
+
+	<field name="AUTOSTART_EMBED" type="calculated" function="selectByName">
+	  <param name="value">{AUTOSTART}</param>
+	  <param name="1">{AUTOSTART_SCRIPT}</param>
+	  <param name=""></param>
+	</field>
 
   </fields>  
 </interface>

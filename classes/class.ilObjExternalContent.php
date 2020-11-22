@@ -49,6 +49,13 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
      */
     protected $return_url;
 
+    /**
+     * Goto Suffix:  This is a run-time variable set by the GUI and not stored
+     * @var string
+     */
+    protected $goto_suffix;
+
+
 
     /** @var ilExternalContentUserData */
     protected $userData;
@@ -196,6 +203,26 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
     public function getReturnUrl() {
         return $this->return_url;
     }
+
+
+    /**
+     * set a suffix provided by the goto link
+     *
+     * @param string	goto suffix
+     */
+    public function setGotoSuffix($a_goto_suffix) {
+        $this->goto_suffix = (string) $a_goto_suffix;
+    }
+
+    /**
+     * get the suffix provided by the goto link
+     *
+     * @return string	goto suffix
+     */
+    public function getGotoSufix() {
+        return (string) $this->goto_suffix;
+    }
+
 
     /**
      * get the URL to lauch the assessment
@@ -436,6 +463,14 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
                 }
                 break;
 
+            case "ILIAS_GOTO_SUFFIX":
+                $value = $this->getGotoSufix();
+                break;
+
+            case "ILIAS_GOTO_AUTOSTART":
+                $value = ($this->getGotoSufix() == 'autostart' ?  1 : 0);
+                break;
+
             // service urls
             case "ILIAS_CALLBACK_URL":
                 $value = ILIAS_HTTP_PATH . "/Customizing/global/plugins/Services/Repository/RepositoryObject/ExternalContent/callback.php";
@@ -565,6 +600,8 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
             'ILIAS_SESSION_ID',
             'ILIAS_TOKEN',
             'ILIAS_RESULT_ID',
+            'ILIAS_GOTO_SUFFIX',
+            'ILIAS_GOTO_AUTOSTART',
             // service urls
             'ILIAS_CALLBACK_URL',
             'ILIAS_EVENT_LOG_URL',
