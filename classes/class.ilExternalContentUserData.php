@@ -191,7 +191,7 @@ class ilExternalContentUserData
                 'ILIAS_USER_IMAGE' => array(
                     'user_image',
                     $this->lng->txt('personal_picture'),
-                    ILIAS_HTTP_PATH . "/" . $this->user->getPersonalPicturePath("small")
+                    $this->getUserImageUrl()
                 ),
                 'ILIAS_USER_LANG' => array(
                     'launch_presentation_locale',
@@ -327,5 +327,20 @@ class ilExternalContentUserData
             }
         }
         return $params;
+    }
+
+    /**
+     * Get the url of a personal picture
+     * @return mixed|string
+     */
+    protected function getUserImageUrl() {
+
+        $path =  $this->user->getPersonalPicturePath("small");
+
+        if (substr($path, 0,5) == 'data:') {
+            return $path;
+        }
+
+        return ILIAS_HTTP_PATH . '/'. $path;
     }
 }
