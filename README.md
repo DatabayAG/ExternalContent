@@ -40,6 +40,13 @@ Version History
 * Versions up to 1.5.x are in the 'master' branch
 * Version 1.6 for ILIAS 5.3 and ILIAS 5.4 is in the 'master-ilias53' branch
 
+Version 1.6.2 (2020-11-22)
+* Added user profile data and user defined profile data
+* Added selector for provision of profile data via LIT
+* Added autostart options to LTI
+* Added recognition of goto link suffixes
+* Updated the manual
+
 Version 1.6.1 (2019-05-10)
 * Support for ILIAS 5.4
 
@@ -57,7 +64,7 @@ To change an existing type, please copy the XML definiton of a new type to the X
 
 Version 1.5.7 (2018-01-31)
 * fixed wrong launch_presentation_document_target in lti type models (1/2018)
-* support conteexts outside courses or groups in lti type models (8/2017)
+* support contexts outside courses or groups in lti type models (8/2017)
 * changed links to https in youtube type model (8/2017)
 * changed http to https in demo urls of lti type models (7/2017)
 * changed name of settings tab (7/2017)
@@ -96,3 +103,4 @@ Version 1.5.1 (2016-02-11)
 * added SVG for custom icon (other icons are still supported with adjusted sizes)
 * fixed mantis #16234 (ignored offline setting)
 * fixed error with unavailable types
+

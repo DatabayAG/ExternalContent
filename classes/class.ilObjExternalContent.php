@@ -6,6 +6,7 @@
 require_once('./Services/Repository/classes/class.ilObjectPlugin.php');
 require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/ExternalContent/classes/class.ilExternalContentType.php');
 require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/ExternalContent/classes/class.ilExternalContentEncodings.php');
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/ExternalContent/classes/class.ilExternalContentUserData.php');
 
 require_once 'Services/Tracking/interfaces/interface.ilLPStatusPlugin.php';
 
@@ -49,6 +50,17 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
     protected $return_url;
 
     /**
+     * Goto Suffix:  This is a run-time variable set by the GUI and not stored
+     * @var string
+     */
+    protected $goto_suffix;
+
+
+
+    /** @var ilExternalContentUserData */
+    protected $userData;
+
+    /**
      * Constructor
      *
      * @access public
@@ -61,6 +73,7 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
 
         $this->db = $ilDB;
         $this->typedef = new ilExternalContentType();
+        $this->userData = ilExternalContentUserData::create($this->plugin);
     }
 
     /**
@@ -191,6 +204,26 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
         return $this->return_url;
     }
 
+
+    /**
+     * set a suffix provided by the goto link
+     *
+     * @param string	goto suffix
+     */
+    public function setGotoSuffix($a_goto_suffix) {
+        $this->goto_suffix = (string) $a_goto_suffix;
+    }
+
+    /**
+     * get the suffix provided by the goto link
+     *
+     * @return string	goto suffix
+     */
+    public function getGotoSufix() {
+        return (string) $this->goto_suffix;
+    }
+
+
     /**
      * get the URL to lauch the assessment
      *
@@ -293,7 +326,7 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
      * 
      * @param $a_field
      * @param $a_maxdepth
-     * @return unknown_type
+     * @return mixed
      */
     private function fillCalculatedField($a_field, $a_maxdepth) {
         // process the function parameters
@@ -353,6 +386,8 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
     private function fillIliasField($a_field) {
         global $ilias, $ilUser, $ilSetting, $ilAccess, $ilClientIniFile;
 
+
+        $value = "";
         switch ($a_field['field_name']) {
             // object information
 
@@ -428,6 +463,14 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
                 }
                 break;
 
+            case "ILIAS_GOTO_SUFFIX":
+                $value = $this->getGotoSufix();
+                break;
+
+            case "ILIAS_GOTO_AUTOSTART":
+                $value = ($this->getGotoSufix() == 'autostart' ?  1 : 0);
+                break;
+
             // service urls
             case "ILIAS_CALLBACK_URL":
                 $value = ILIAS_HTTP_PATH . "/Customizing/global/plugins/Services/Repository/RepositoryObject/ExternalContent/callback.php";
@@ -465,34 +508,6 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
 
             case "ILIAS_USER_LOGIN":
                 $value = $ilUser->getLogin();
-                break;
-
-            case "ILIAS_USER_FIRSTNAME":
-                $value = $ilUser->getFirstname();
-                break;
-
-            case "ILIAS_USER_LASTNAME":
-                $value = $ilUser->getLastname();
-                break;
-
-            case "ILIAS_USER_FULLNAME":
-                $value = $ilUser->getFullname();
-                break;
-
-            case "ILIAS_USER_EMAIL":
-                $value = $ilUser->getEmail();
-                break;
-
-            case "ILIAS_USER_MATRICULATION":
-                $value = $ilUser->getMatriculation();
-                break;
-
-            case "ILIAS_USER_IMAGE":
-                $value = ILIAS_HTTP_PATH . "/" . $ilUser->getPersonalPicturePath("small");
-                break;
-
-            case "ILIAS_USER_LANG":
-                $value = $this->lng->getLangKey();
                 break;
 
             case "ILIAS_USER_WRITE_ACCESS":
@@ -541,8 +556,13 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
                 break;
 
             default:
-                $value = "";
-                break;
+
+                // fill additional user fields
+                foreach ($this->userData->getFieldValues() as $field_name => $field_value) {
+                    if ($field_name == $a_field['field_name']) {
+                        $value = $field_value;
+                    }
+                }
         }
 
         return $value;
@@ -552,7 +572,6 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
      * initialize the fields for template processing
      */
     private function initFields() {
-        global $ilUser, $ilias, $ilSetting;
 
         if (is_array($this->fields)) {
             return;
@@ -581,6 +600,8 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
             'ILIAS_SESSION_ID',
             'ILIAS_TOKEN',
             'ILIAS_RESULT_ID',
+            'ILIAS_GOTO_SUFFIX',
+            'ILIAS_GOTO_AUTOSTART',
             // service urls
             'ILIAS_CALLBACK_URL',
             'ILIAS_EVENT_LOG_URL',
@@ -590,13 +611,6 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
             'ILIAS_USER_ID',
             'ILIAS_USER_CODE',
             'ILIAS_USER_LOGIN',
-            'ILIAS_USER_FIRSTNAME',
-            'ILIAS_USER_LASTNAME',
-            'ILIAS_USER_FULLNAME',
-            'ILIAS_USER_EMAIL',
-            'ILIAS_USER_MATRICULATION',
-            'ILIAS_USER_IMAGE',
-            'ILIAS_USER_LANG',
             'ILIAS_USER_WRITE_ACCESS',
             // platform information
             'ILIAS_VERSION',
@@ -608,6 +622,10 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
             'ILIAS_LMS_NAME',
             'ILIAS_LMS_DESCRIPTION',
         );
+
+        // add user data fields
+        $ilias_names = array_merge($ilias_names, $this->userData->getFieldNames());
+
         foreach ($ilias_names as $name) {
             $field = array();
             $field['field_name'] = $name;
@@ -622,8 +640,10 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
         //
         $type_fields = $this->typedef->getFieldsAssoc();
         $type_values = $this->typedef->getInputValues();
-        $input_values = $this->getInputValues();
+        $object_values = $this->getInputValues();
+
         foreach ($type_fields as $field) {
+
             // set value to user input
             if ($field['field_type'] != ilExternalContentType::FIELDTYPE_TEMPLATE and $field['field_type'] != ilExternalContentType::FIELDTYPE_CALCULATED) {
                 switch ($field['level']) {
@@ -633,7 +653,16 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
 
                     case "object":
                     default:
-                        $field['field_value'] = $input_values[$field['field_name']];
+                        $field['field_value'] = $object_values[$field['field_name']];
+                        break;
+                }
+            }
+
+            // special input fields: process user input to a new value
+            if ($field['field_type'] == ilExternalContentType::FIELDTYPE_SPECIAL) {
+                switch ($field['field_name']) {
+                    case ilExternalContentType::FIELD_LTI_USER_DATA:
+                        $field['field_value'] = $this->userData->getLtiParams($field['field_value']);
                         break;
                 }
             }
@@ -641,6 +670,7 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
             $this->fields[$field['field_name']] = $field;
         }
     }
+
 
     /**
      * get info about the context in which the link is used

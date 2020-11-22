@@ -15,6 +15,12 @@ include_once("./Services/Component/classes/class.ilPluginConfigGUI.php");
  */ 
 class ilExternalContentConfigGUI extends ilPluginConfigGUI
 {
+    /** @var ilExternalContentType */
+    protected $type;
+
+    /** @var ilPropertyFormGUI */
+    protected $form;
+
     /**
      * perform command
      */
@@ -393,11 +399,10 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
             $this->type->setUseLearningProgress($this->form->getInput("use_learning_progress"));
             */
             $this->type->update();
-            
-            foreach ($this->type->getInputFields("type") as $field)
+
+            foreach ($this->type->getFormValues($this->form, 'type') as $field_name => $field_value)
 	        {
-	        	$value = trim($this->form->getInput("field_" . $field->field_name));
-	            $this->type->saveFieldValue($field->field_name, $value ? $value : $field->default);
+	            $this->type->saveFieldValue($field_name, $field_value);
 	        }
             
             ilUtil::sendSuccess($this->txt('type_saved'), true);

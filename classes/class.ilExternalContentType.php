@@ -14,14 +14,16 @@
 class ilExternalContentType
 {
 
-    const AVAILABILITY_NONE = 0;  // Type is not longer available (error message)
-    const AVAILABILITY_EXISTING = 1; // Existing objects of the can be used, but no new created
-    const AVAILABILITY_CREATE = 2;  // New objects of this type can be created
-    
-    const FIELDTYPE_ILIAS = "ilias";
-    const FIELDTYPE_TEMPLATE = "template";
-    const FIELDTYPE_CALCULATED = "calculated";
-    
+    const AVAILABILITY_NONE = 0;        // Type is not longer available (error message)
+    const AVAILABILITY_EXISTING = 1;    // Existing objects of the can be used, but no new created
+    const AVAILABILITY_CREATE = 2;      // New objects of this type can be created
+
+    // processing field types
+    const FIELDTYPE_ILIAS = "ilias";            // ilias fields have pre-defined values
+    const FIELDTYPE_TEMPLATE = "template";      // templates with placeholders for other fields
+    const FIELDTYPE_CALCULATED = "calculated";  // values are calculated based on other values
+
+    // input field types
     const FIELDTYPE_TEXT = "text";
     const FIELDTYPE_TEXTAREA = "textarea";
     const FIELDTYPE_PASSWORD = "password";
@@ -29,7 +31,10 @@ class ilExternalContentType
     const FIELDTYPE_RADIO = "radio";
     const FIELDTYPE_HEADER = "header";
     const FIELDTYPE_DESCRIPTION = "description";
-    
+    const FIELDTYPE_SPECIAL = "special";        // special treatment by the field name
+
+    // names of special fields
+    const FIELD_LTI_USER_DATA = 'LTI_USER_DATA';
     
     const LAUNCH_TYPE_PAGE = "page";
     const LAUNCH_TYPE_LINK = "link";
@@ -472,6 +477,7 @@ class ilExternalContentType
                 case self::FIELDTYPE_RADIO:
                 case self::FIELDTYPE_HEADER:
                 case self::FIELDTYPE_DESCRIPTION:
+                case self::FIELDTYPE_SPECIAL:
                 	break;
 
                 default:
@@ -743,6 +749,19 @@ class ilExternalContentType
 						$this->addFormElements($ropt, $a_values, $a_level, $field->field_name, $option->value, $a_maxdepth - 1);
 					}
 					break;
+
+                case self::FIELDTYPE_SPECIAL:
+                    switch ($field->field_name) {
+                        case self::FIELD_LTI_USER_DATA:
+                            $this->plugin_object->includeClass('class.ilExternalContentUserData.php');
+                            $data = ilExternalContentUserData::create($this->plugin_object);
+                            $item = $data->getFormItem($field->title, $field->description, $value);
+                            break;
+
+                        default:
+                            continue 3;
+                    }
+                    break;
 				
 			    default:
 			    	continue 2;	
@@ -767,6 +786,36 @@ class ilExternalContentType
 		} 	
     }
     
+
+    /**
+     * Get the values
+     * @param ilPropertyFormGUI $a_form
+     * @param string $a_level
+     * @return array    field_name => field_value
+     */
+    public function getFormValues($a_form, $a_level = "object") {
+
+        $values = array();
+        foreach ($this->getInputFields($a_level) as $field)
+        {
+            if ($field->field_type == self::FIELDTYPE_SPECIAL) {
+                switch ($field->field_name) {
+                    case self::FIELD_LTI_USER_DATA:
+                        $this->plugin_object->includeClass('class.ilExternalContentUserData.php');
+                        $value = ilExternalContentUserData::create($this->plugin_object)->getFormValue($a_form);
+                        $values[$field->field_name] = ($value ? $value : $field->default);
+                        break;
+                }
+            }
+            else {
+                $value = trim($a_form->getInput("field_" . $field->field_name));
+                $values[$field->field_name] = ( $value ? $value : $field->default);
+            }
+        }
+        return $values;
+    }
+
+
 
     /**
      * Get array of input fields for the type

@@ -51,6 +51,15 @@ class ilExternalContentModel
 
 							array_push($models, $model);
 						}
+						else {
+                            $model = array (
+                                'name' => $file,
+                                'title' => $file,
+                                'description' => $message
+                            );
+
+                            array_push($models, $model);
+                        }
 					}
 				}
 			} 
