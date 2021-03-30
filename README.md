@@ -40,7 +40,7 @@ Version History
 * Versions up to 1.5.x are in the 'master' branch
 * Version 1.6 for ILIAS 5.3 and ILIAS 5.4 is in the 'master-ilias53' branch
 
-Version 1.6.1 (2021-03-30)
+Version 1.6.3 (2021-03-30)
 * Support for ILIAS 6
 
 Version 1.6.2 (2020-11-22)
