@@ -85,7 +85,7 @@ class ilExternalContentResultService
             }
 
             // Verify the signature
-            $this->readFields($this->result->obj_id);
+            $this->readFields($this->properties['settings_id']);
 			$result = $this->checkSignature($this->fields['KEY'], $this->fields['SECRET']);
 			if ($result instanceof Exception)
 			{
@@ -315,11 +315,11 @@ class ilExternalContentResultService
     /**
      * Read the external content object fields
      *
-     * @param integer $a_obj_id
+     * @param integer $a_settings_id
      */
-    private function readFields($a_obj_id)
+    private function readFields($a_settings_id)
     {
-        $query = "SELECT * FROM xxco_data_values WHERE obj_id =" . $this->db->quote($a_obj_id, 'integer');
+        $query = "SELECT * FROM xxco_data_values WHERE settings_id =" . $this->db->quote($a_settings_id, 'integer');
         $res = $this->db->query($query);
         while ($row = $this->db->fetchAssoc($res))
         {

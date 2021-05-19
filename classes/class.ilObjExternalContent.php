@@ -54,11 +54,26 @@ class ilObjExternalContent extends ilObjectPlugin implements ilExternalContent, 
 
 
     /**
-     * Get the settings object
+     * Get the content settings object
      * @return ilExternalContentSettings
      */
-    public function getSettings() {
+    public function getSettings()
+    {
+        if (!isset($this->settings)) {
+            $this->settings = new ilExternalContentSettings();
+            $this->settings->readByObjId($this->getId());
+        }
         return $this->settings;
+    }
+
+
+    /**
+     * Get the content type definition
+     * @return ilExternalContentType
+     */
+    public function getTypeDef()
+    {
+        return $this->getSettings()->getTypeDef();
     }
 
     /**
@@ -73,7 +88,7 @@ class ilObjExternalContent extends ilObjectPlugin implements ilExternalContent, 
      * Get online status
      */
     public function getOnline() {
-        switch ($this->settings->getAvailabilityType()) {
+        switch ($this->getSettings()->getAvailabilityType()) {
             case ilExternalContentSettings::ACTIVATION_UNLIMITED:
                 return true;
 
@@ -139,8 +154,10 @@ class ilObjExternalContent extends ilObjectPlugin implements ilExternalContent, 
      * @param	array	list of valid types
      * @return 	array	context array ("ref_id", "title", "type")
      */
-    public function getContext($a_valid_types = array('crs', 'grp', 'cat', 'root')) {
-        global $tree;
+    public function getContext($a_valid_types = array('crs', 'grp', 'cat', 'root'))
+    {
+        global $DIC;
+        $tree  = $DIC->repositoryTree();
 
         if (!isset($this->context)) {
 
@@ -175,9 +192,8 @@ class ilObjExternalContent extends ilObjectPlugin implements ilExternalContent, 
      */
     public function doCreate()
     {
-        $this->settings = new ilExternalContentSettings();
-        $this->settings->setObjId($this->getId());
-        $this->settings->save();
+        $this->getSettings()->setObjId($this->getId());
+        $this->getSettings()->save();
     }
 
     /**
@@ -185,8 +201,7 @@ class ilObjExternalContent extends ilObjectPlugin implements ilExternalContent, 
      */
     public function doRead()
     {
-        $this->settings = new ilExternalContentSettings();
-        $this->settings->readByObjId($this->getId());
+        // nothing special
     }
 
     /**
@@ -194,7 +209,7 @@ class ilObjExternalContent extends ilObjectPlugin implements ilExternalContent, 
      */
     public function doUpdate()
     {
-        $this->settings->save();
+        $this->getSettings()->save();
     }
 
     /**
@@ -202,16 +217,19 @@ class ilObjExternalContent extends ilObjectPlugin implements ilExternalContent, 
      */
     public function doDelete()
     {
-        $this->settings->delete();
+        $this->getSettings()->delete();
     }
     
 
     /**
      * Do Cloning
+     * @param self $new_obj
+     * @param int $a_target_id
+     * @param int $a_copy_id
      */
     function doCloneObject($new_obj, $a_target_id, $a_copy_id = null)
     {
-        $this->settings->clone($new_obj->getId());
+        $this->getSettings()->clone($new_obj->getSettings());
     }
 
 

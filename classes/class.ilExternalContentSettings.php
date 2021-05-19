@@ -234,6 +234,7 @@ class ilExternalContentSettings
      */
     protected function setData($row)
     {
+        $this->setSettingsId($row['settings_id']);
         $this->setObjId($row['obj_id']);
         $this->setTypeId($row['type_id']);
         $this->setInstructions($row['instructions']);
@@ -282,18 +283,18 @@ class ilExternalContentSettings
 
     /**
      * Clone the settings
-     * @param int $new_obj_id
+     * @param self $newSettings
      */
-    public function clone($new_obj_id)
+    public function clone($newSettings)
     {
-        $newSettings = clone $this;
-        $newSettings->setSettingsId(null);
-        $newSettings->setObjId($new_obj_id);
+        $newSettings->setTypeId($this->getTypeId());
+        $newSettings->setAvailabilityType($this->getAvailabilityType());
+        $newSettings->setInstructions($this->getInstructions());
+        $newSettings->setLPMode($this->getLPMode());
+        $newSettings->setLPThreshold($this->getLPThreshold());
         $newSettings->save();
 
-        $values = $this->getInputValues();
-
-        foreach($values as $name => $value){
+        foreach($this->getInputValues() as $name => $value){
             $this->db->insert('xxco_data_values', array(
                     'settings_id' => array('integer', $newSettings->getSettingsId()),
                     'field_name' => array('text', $name),

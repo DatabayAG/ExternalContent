@@ -40,7 +40,8 @@ class ilExternalContentResult
      */
     public static function getById($a_id)
     {
-        global $ilDB;
+        global $DIC;
+        $ilDB = $DIC->database();
 
         $query = 'SELECT * FROM xxco_results'
             .' WHERE id = '. $ilDB->quote($a_id,'integer');
@@ -68,7 +69,8 @@ class ilExternalContentResult
      */
     public static function getByKeys($a_obj_id, $a_usr_id, $a_create = false)
     {
-        global $ilDB;
+        global $DIC;
+        $ilDB = $DIC->database();
 
         $query = 'SELECT * FROM xxco_results'
             .' WHERE obj_id = '. $ilDB->quote($a_obj_id,'integer')
@@ -113,7 +115,8 @@ class ilExternalContentResult
      */
     public function save()
     {
-        global $ilDB;
+        global $DIC;
+        $ilDB = $DIC->database();
 
         if (!isset($this->usr_id) or !isset($this->obj_id))
         {

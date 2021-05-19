@@ -49,6 +49,7 @@ class ilExternalContentRenderer
     public function __construct(ilExternalContent $content)
     {
         $this->plugin = ilExternalContentPlugin::getInstance();
+        $this->content = $content;
         $this->settings = $content->getSettings();
         $this->typedef = $this->settings->getTypeDef();
         $this->userData = ilExternalContentUserData::create($this->plugin);
@@ -274,9 +275,14 @@ class ilExternalContentRenderer
      * @param $a_field
      * @return mixed
      */
-    private function fillIliasField($a_field) {
-        global $ilias, $ilUser, $ilSetting, $ilAccess, $ilClientIniFile;
+    private function fillIliasField($a_field)
+    {
+        global $DIC;
 
+        $ilUser = $DIC->user();
+        $ilSetting = $DIC->settings();
+        $ilAccess = $DIC->access();
+        $ilClientIniFile = $DIC->clientIni();
 
         $value = "";
         switch ($a_field['field_name']) {
@@ -391,7 +397,7 @@ class ilExternalContentRenderer
             // platform information
 
             case "ILIAS_VERSION":
-                $value = $ilias->getSetting("ilias_version");
+                $value = $ilSetting->get("ilias_version");
                 break;
 
             case "ILIAS_CONTACT_EMAIL":
