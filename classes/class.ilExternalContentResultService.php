@@ -9,6 +9,9 @@
  */
 class ilExternalContentResultService
 {
+    /** @var ilDBInterface */
+    protected $db;
+
     /**
      * @var string  path of the plugin's base directory
      */
@@ -20,12 +23,12 @@ class ilExternalContentResultService
     protected $result = null;
 
     /**
-     * @var  Array properties: name => value
+     * @var  array properties: name => value
      */
     protected $properties = array();
 
     /**
-     * @var Array fields: name => value
+     * @var array fields: name => value
      */
     protected $fields = array();
 
@@ -44,6 +47,9 @@ class ilExternalContentResultService
      */
     public function __construct()
     {
+        global $DIC;
+
+        $this->db = $DIC->database();
         $this->plugin_path = realpath(dirname(__FILE__).'/..');
     }
 
@@ -61,7 +67,7 @@ class ilExternalContentResultService
             $this->operation = str_replace('Request','', $request->getName());
             $result_id = $request->resultRecord->sourcedGUID->sourcedId;
 
-            require_once ($this->plugin_path.'/classes/class.ilExternalContentResult.php');
+            require_once (__DIR__ .'/class.ilExternalContentResult.php');
             $this->result = ilExternalContentResult::getById($result_id);
             if (empty($this->result))
             {
@@ -153,7 +159,7 @@ class ilExternalContentResultService
             $this->result->result = (float) $result;
             $this->result->save();
 
-            require_once($this->plugin_path.'/classes/class.ilExternalContentLPStatus.php');
+            require_once(__DIR__ .'/class.ilExternalContentLPStatus.php');
             if ($result >= $this->properties['lp_threshold'])
             {
                 $lp_status = ilExternalContentLPStatus::LP_STATUS_COMPLETED_NUM;
@@ -191,7 +197,7 @@ class ilExternalContentResultService
         $this->result->result = null;
         $this->result->save();
 
-        require_once($this->plugin_path.'/classes/class.ilExternalContentLPStatus.php');
+        require_once(__DIR__ .'/class.ilExternalContentLPStatus.php');
         $lp_status = ilExternalContentLPStatus::LP_STATUS_IN_PROGRESS_NUM;
         $lp_percentage = 0;
         ilExternalContentLPStatus::trackResult($this->result->usr_id, $this->result->obj_id, $lp_status, $lp_percentage);
@@ -298,11 +304,9 @@ class ilExternalContentResultService
      */
     private function readProperties($a_obj_id)
     {
-        global $ilDB;
-
-        $query = "SELECT * FROM xxco_data_settings WHERE obj_id =" . $ilDB->quote($a_obj_id);
-        $res = $ilDB->query($query);
-        if ($row = $ilDB->fetchAssoc($res))
+        $query = "SELECT * FROM xxco_data_settings WHERE obj_id =" . $this->db->quote($a_obj_id, 'integer');
+        $res = $this->db->query($query);
+        if ($row = $this->db->fetchAssoc($res))
         {
             $this->properties = $row;
         }
@@ -315,11 +319,9 @@ class ilExternalContentResultService
      */
     private function readFields($a_obj_id)
     {
-        global $ilDB;
-
-        $query = "SELECT * FROM xxco_data_values WHERE obj_id =" . $ilDB->quote($a_obj_id);
-        $res = $ilDB->query($query);
-        while ($row = $ilDB->fetchAssoc($res))
+        $query = "SELECT * FROM xxco_data_values WHERE obj_id =" . $this->db->quote($a_obj_id, 'integer');
+        $res = $this->db->query($query);
+        while ($row = $this->db->fetchAssoc($res))
         {
             $this->fields[$row['field_name']] = $row['field_value'];
         }

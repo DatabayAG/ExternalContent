@@ -4,6 +4,8 @@
  * GPLv2, see LICENSE 
  */
 
+require_once(__DIR__ . '/class.ilExternalContentPlugin.php');
+
 /**
  * External Content plugin: type definition
  *
@@ -54,7 +56,6 @@ class ilExternalContentType
     private $description;
     private $template;
     private $launch_type = self::LAUNCH_TYPE_LINK;
-    private $meta_data_url;
     
     /**
      * These data are set separately from the interface XML
@@ -63,9 +64,12 @@ class ilExternalContentType
     private $remarks;
     private $placeholder_start = "{";
     private $placeholder_end = "}";
-    private $time_to_delete;
-    private $use_logs;
-    private $use_learning_progress;
+
+    /** @var ilDBInterface */
+    private $db;
+    
+    /** @var ilExternalContentPlugin */
+    private $plugin;
 
     /**
      * Array of fields
@@ -76,13 +80,14 @@ class ilExternalContentType
 
     /**
      * Constructor
-     *
-     * @access public
+     * @param int $a_type_id
      */
     public function __construct($a_type_id = 0)
     {
-    	// this uses the cached plugin object
-		$this->plugin_object = ilPlugin::getPluginObject(IL_COMP_SERVICE, 'Repository', 'robj', 'ExternalContent');
+        global $DIC;
+        
+        $this->db = $DIC->database();
+		$this->plugin = ilExternalContentPlugin::getInstance();
 
         if ($a_type_id)
         {
@@ -93,7 +98,7 @@ class ilExternalContentType
 
     /**
      * Set Type Id
-     * @param int id
+     * @param int $a_type_id
      */
     public function setTypeId($a_type_id)
     {
@@ -102,7 +107,7 @@ class ilExternalContentType
 
     /**
      * Get Type Id
-     * @return int id
+     * @return int
      */
     public function getTypeId()
     {
@@ -111,7 +116,7 @@ class ilExternalContentType
 
     /**
      * Set Name
-     * @param string name
+     * @param string $a_name
      */
     public function setName($a_name)
     {
@@ -129,7 +134,7 @@ class ilExternalContentType
 
     /**
      * Set Title
-     * @param string title
+     * @param string $a_title
      */
     public function setTitle($a_title)
     {
@@ -138,7 +143,7 @@ class ilExternalContentType
 
     /**
      * Get Title
-     * @return string title
+     * @return string
      */
     public function getTitle()
     {
@@ -147,7 +152,7 @@ class ilExternalContentType
 
     /**
      * Set Description
-     * @param string description
+     * @param string $a_description
      */
     public function setDescription($a_description)
     {
@@ -156,7 +161,7 @@ class ilExternalContentType
 
     /**
      * Get Description
-     * @return string description
+     * @return string
      */
     public function getDescription()
     {
@@ -166,7 +171,7 @@ class ilExternalContentType
 
     /**
      * Get Template
-     * @return string template
+     * @return string
      */
     public function getTemplate()
     {
@@ -176,27 +181,18 @@ class ilExternalContentType
 
     /**
      * Get Launch Tape
-     * @return string launch_type
+     * @return string
      */
     public function getLaunchType()
     {
         return $this->launch_type;
     }
 
-    /**
-     * get Mata DataURL
-     * 
-     * @param string url
-     */
-    public function getMetaDataUrl()
-    {
-        return $this->meta_data_url;
-    }
 
     /**
      * Set Availability
      *
-     * @param integer availability
+     * @param integer $a_availability
      */
     public function setAvailability($a_availability)
     {
@@ -205,8 +201,7 @@ class ilExternalContentType
 
     /**
      * get Availability
-     *
-     * @return integer availability
+     * @return integer
      */
     public function getAvailability()
     {
@@ -215,8 +210,7 @@ class ilExternalContentType
 
     /**
      * Set Remarks
-     *
-     * @param string remarks
+     * @param string $a_remarks
      */
     public function setRemarks($a_remarks)
     {
@@ -225,8 +219,7 @@ class ilExternalContentType
 
     /**
      * Get Remarks
-     *
-     * @return string remarks
+     * @return string
      */
     public function getRemarks()
     {
@@ -234,70 +227,8 @@ class ilExternalContentType
     }
     
     /**
-     * Set time to delete
-     *
-     * @param string time_to_delete
-     */
-    public function setTimeToDelete($a_time_to_delete)
-    {
-        $this->time_to_delete = $a_time_to_delete;
-    }
-
-    /**
-     * Get time to time_to_delete
-     *
-     * @return string time_to_delete
-     */
-    public function getTimeToDelete()
-    {
-        return $this->time_to_delete;
-    }
-    
-    /**
-     * Set use logs
-     *
-     * @param string $a_option
-     */
-    public function setUseLogs($a_option)
-    {
-        $this->use_logs = $a_option;
-    }
-
-    /**
-     * Get use logs
-     *
-     * @return string use_logs
-     */
-    public function getUseLogs()
-    {
-        return $this->use_logs;
-    }
-    
-    /**
-     * Set use lm
-     *
-     * @param string $a_option
-     */
-    public function setUseLearningProgress($a_option)
-    {
-        $this->use_learning_progress = $a_option;
-    }
-
-    /**
-     * Get use lm
-     *
-     * @return string use_learning_progress
-     */
-    public function getUseLearningProgress()
-    {
-        return $this->use_learning_progress;
-    }
-    
-    
-    /**
      * get the type definition as an XML structure
-     * (refreshes the title and description) 
-     * 
+     * (refreshes the title and description)
      * @return	string	xml definition
      */
     public function getXML()
@@ -333,8 +264,6 @@ class ilExternalContentType
         {
         	$interface->appendChild($doc->createElement('description', $this->getDescription()));
         }
-        
-        // TODO: save field values according to the type configuration
 
         $this->xml = $doc->saveXML();
         
@@ -350,9 +279,7 @@ class ilExternalContentType
      */
     public function setXML($a_xml, &$a_failure_message)
     {
-        global $lng;
-
-        $this->plugin_object->includeClass('class.ilExternalContentEncodings.php');
+        $this->plugin->includeClass('class.ilExternalContentEncodings.php');
         
         $doc = new DOMDocument('1.0');
         $doc->formatOutput = true;
@@ -360,7 +287,7 @@ class ilExternalContentType
         if (!@$doc->loadXML($a_xml))
         {
             $err = error_get_last();
-            $a_failure_message = $err[message];
+            $a_failure_message = $err['message'];
             return false;
         }
 
@@ -394,11 +321,7 @@ class ilExternalContentType
         {
             $template = $template_element->textContent;
         }
-        if ($metasource_element = $this->getDomChildByName($interface, 'metasource'))
-        {
-            $metasource = $metasource_element->textContent;
-        }
-        
+
         $tmp_fields = array();
         $fields = $interface->getElementsByTagName('field');
         foreach ($fields as $field)
@@ -502,7 +425,6 @@ class ilExternalContentType
         $this->description = $description;
         $this->launch_type = $launch_type;
         $this->template = $template;
-        $this->meta_data_url = $metasource;
         $this->fields = $tmp_fields;
         
         return true;
@@ -537,30 +459,24 @@ class ilExternalContentType
      */
     public function read()
     {
-        global $ilDB, $ilErr;
-
         $query = 'SELECT * FROM xxco_data_types WHERE type_id = '
-                . $ilDB->quote($this->getTypeId(), 'integer');
+                . $this->db->quote($this->getTypeId(), 'integer');
 
-        $res = $ilDB->query($query);
-        $row = $ilDB->fetchObject($res);
-        if ($row) 
+        $res = $this->db->query($query);
+        $row = $this->db->fetchAssoc($res);
+        if ($row)
         {
-            $this->type_id = $row->type_id;
-            $this->name= $row->type_name;
-            $this->title = $row->title;
-            $this->description = $row->description;
-                        
-            $this->availability = $row->availability;
-            $this->remarks = $row->remarks;
-            $this->time_to_delete = $row->time_to_delete;
-            $this->use_logs = $row->use_logs;
-            $this->use_learning_progress = $row->use_learning_progress;
+            $this->type_id = $row['type_id'];
+            $this->name= $row['type_name'];
+            $this->title = $row['title'];
+            $this->description = $row['description'];
+            $this->availability = $row['availability'];
+            $this->remarks = $row['remarks'];
 
-           	if ($this->setXML($row->interface_xml, $void))
+           	if ($this->setXML($row['interface_xml'], $void))
            	{
-           		return $this->xml; 	
-           	}            
+           		return $this->xml;
+           	}
         }
         return false;
     }
@@ -570,38 +486,30 @@ class ilExternalContentType
      *
      * @access public
      */
-    public function create() {
-        global $ilDB;
-
-        $this->type_id = $ilDB->nextId('xxco_data_types');
+    public function create()
+    {
+        $this->type_id = $this->db->nextId('xxco_data_types');
         $this->update();
     }
 
     /**
      * Update function
-     *
-     * @access public
      */
-    public function update() {
-        global $ilDB;
-
-        $ilDB->replace('xxco_data_types', 
+    public function update()
+    {
+        $this->db->replace('xxco_data_types',
         	 array(
             	'type_id' => array('integer', $this->getTypeId())
-             ), 
+             ),
              array(
 	            'type_name' => array('text', $this->getName()),
 	            'title' => array('text', $this->getTitle()),
 	            'description' => array('clob', $this->getDescription()),
 	            'availability' => array('integer', $this->getAvailability()),
 	            'remarks' => array('clob', $this->getRemarks()),
-	            'time_to_delete' => array('integer', $this->getTimeToDelete()),
-	            'use_logs' => array('text', $this->getUseLogs()),
-	            'use_learning_progress' => array('text', $this->getUseLearningProgress()),
              	'interface_xml' => array('clob', $this->getXML())
              )
         );
-        return true;
     }
 
     /**
@@ -609,62 +517,55 @@ class ilExternalContentType
      *
      * @access public
      */
-    public function delete() {
-        global $ilDB;
-
+    public function delete()
+    {
         ilExternalContentPlugin::_deleteWebspaceDir("type", $this->getTypeId());
-        
+
         $query = "DELETE FROM xxco_data_types " .
-                "WHERE type_id = " . $ilDB->quote($this->getTypeId(), 'integer');
-        $ilDB->manipulate($query);
+                "WHERE type_id = " . $this->db->quote($this->getTypeId(), 'integer');
+        $this->db->manipulate($query);
 
         return true;
     }
 
-    
-    /**
-     * Save field values
-     *
-     * @access public
-     */
-    public function saveFieldValue($a_field_name, $a_field_value) 
-    {
-        global $ilDB;
 
-        $ilDB->replace('xxco_type_values', array(
+    /**
+     * Save an input value directly
+     * @param string $a_field_name
+     * @param string $a_field_value
+     */
+    public function saveInputValue($a_field_name, $a_field_value)
+    {
+        $this->db->replace('xxco_type_values', array(
             'type_id' => array('integer', $this->getTypeId()),
             'field_name' => array('text', $a_field_name)
                 ), array(
             'field_value' => array('text', $a_field_value)
                 )
         );
-
-        return true;
     }
 
     /**
      * Get array of input values
      */
-    function getInputValues() 
+    function getInputValues()
     {
-        global $ilDB;
-
         $query = 'SELECT * FROM xxco_type_values WHERE type_id = '
-                . $ilDB->quote($this->getTypeId(), 'integer');
-        $res = $ilDB->query($query);
+                . $this->db->quote($this->getTypeId(), 'integer');
+        $res = $this->db->query($query);
 
         $values = array();
-        while ($row = $ilDB->fetchObject($res)) 
+        while ($row = $this->db->fetchAssoc($res))
         {
-            $values[$row->field_name] = $row->field_value;
+            $values[$row['field_name']] = $row['field_value'];
         }
         return $values;
     }
-    
-    
+
+
     /**
-     * add type specific input fields to a form  
-     * 
+     * add type specific input fields to a form
+     *
      * @param object	form, property or radio option
      * @param array		(assoc) input values
      * @param string	configuration level ("type" or "object")
@@ -672,33 +573,33 @@ class ilExternalContentType
      * @param string	parent option value
      * @param int		maximum recursion depth
      */
-    function addFormElements($a_object, $a_values = array(), 
-    	$a_level = "object", $a_parentfield = '', $a_parentvalue = '', 
-    	$a_maxdepth = "3")
+    public function addFormElements($a_object, $a_values = array(),
+    	$a_level = "object", $a_parentfield = '', $a_parentvalue = '',
+    	$a_maxdepth = 3)
     {
     	// recursion end
     	if ($a_maxdepth == 0)
     	{
     		return;
-    	}   	
+    	}
 
 		foreach ($this->getInputFields($a_level, $a_parentfield, $a_parentvalue) as $field)
 		{
 			$value = $a_values['field_' . $field->field_name];
 			$value = $value ? $value : $field->default;
-			 
+
 			switch($field->field_type)
 			{
 			    case self::FIELDTYPE_HEADER:
 			    	$item = new ilFormSectionHeaderGUI();
 			    	$item->setTitle($field->title);
 			    	break;
-			    	
-			    case self::FIELDTYPE_DESCRIPTION:			    	
+
+			    case self::FIELDTYPE_DESCRIPTION:
 		    		$item = new ilCustomInputGUI($field->title);
 		    		$item->setHtml(nl2br($field->description));
 			    	break;
-			    	
+
 				case self::FIELDTYPE_TEXT:
 					$item = new ilTextInputGUI($field->title, 'field_' . $field->field_name);
 					$item->setInfo($field->description);
@@ -706,7 +607,7 @@ class ilExternalContentType
 					$item->setSize($field->size);
 			    	$item->setValue($value);
 					break;
-					
+
 				case self::FIELDTYPE_TEXTAREA:
 					$item = new ilTextAreaInputGUI($field->title, 'field_' . $field->field_name);
 					$item->setInfo($field->description);
@@ -716,7 +617,7 @@ class ilExternalContentType
 					$item->setCols($field->cols);
 			    	$item->setValue($value);
 					break;
-				
+
 				case self::FIELDTYPE_PASSWORD:
 					$item = new ilPasswordInputGUI($field->title, 'field_' . $field->field_name);
 					$item->setInfo($field->description);
@@ -724,7 +625,7 @@ class ilExternalContentType
 					$item->setSkipSyntaxCheck(true);
 			    	$item->setValue($value);
 					break;
-								    	
+
 			    case self::FIELDTYPE_CHECKBOX:
 					$item = new ilCheckboxInputGUI($field->title, 'field_' . $field->field_name);
 					$item->setInfo($field->description);
@@ -733,12 +634,12 @@ class ilExternalContentType
 						$item->setChecked(true);
 					}
 					break;
-			    				    	
+
 			    case self::FIELDTYPE_RADIO:
 					$item = new ilRadioGroupInputGUI($field->title, 'field_' . $field->field_name);
 					$item->setInfo($field->description);
 			    	$item->setValue($value);
-					
+
 					foreach ($field->options as $option)
 					{
 						$ropt = new ilRadioOption($option->title, $option->value);
@@ -753,8 +654,8 @@ class ilExternalContentType
                 case self::FIELDTYPE_SPECIAL:
                     switch ($field->field_name) {
                         case self::FIELD_LTI_USER_DATA:
-                            $this->plugin_object->includeClass('class.ilExternalContentUserData.php');
-                            $data = ilExternalContentUserData::create($this->plugin_object);
+                            $this->plugin->includeClass('class.ilExternalContentUserData.php');
+                            $data = ilExternalContentUserData::create($this->plugin);
                             $item = $data->getFormItem($field->title, $field->description, $value);
                             break;
 
@@ -762,9 +663,9 @@ class ilExternalContentType
                             continue 3;
                     }
                     break;
-				
+
 			    default:
-			    	continue 2;	
+			    	continue 2;
 			}
 
 			// add the item to the form or to the parent item
@@ -776,16 +677,16 @@ class ilExternalContentType
 	    	{
 				$a_object->addSubItem($item);
 	    	}
-			
+
 			// add the sub items to the item
 			if (is_a($item, 'ilSubEnabledFormPropertyGUI'))
 			{
 				$this->addFormElements($item, $a_level, $a_values, $field->field_name, '', $a_maxdepth - 1);
 			}
-			
-		} 	
+
+		}
     }
-    
+
 
     /**
      * Get the values
@@ -801,8 +702,8 @@ class ilExternalContentType
             if ($field->field_type == self::FIELDTYPE_SPECIAL) {
                 switch ($field->field_name) {
                     case self::FIELD_LTI_USER_DATA:
-                        $this->plugin_object->includeClass('class.ilExternalContentUserData.php');
-                        $value = ilExternalContentUserData::create($this->plugin_object)->getFormValue($a_form);
+                        $this->plugin->includeClass('class.ilExternalContentUserData.php');
+                        $value = ilExternalContentUserData::create($this->plugin)->getFormValue($a_form);
                         $values[$field->field_name] = ($value ? $value : $field->default);
                         break;
                 }
@@ -819,41 +720,41 @@ class ilExternalContentType
 
     /**
      * Get array of input fields for the type
-     * 
+     *
      * @var		mixed	level ("type" or "object")
      * @var		mixed	parent field name or null
      * @var		mixed	parent field option or null
      * @return	array	list of field objects
      */
-    function getInputFields($a_level = 'object', $a_parentfield = null, $a_parentvalue = null) 
+    public function getInputFields($a_level = 'object', $a_parentfield = null, $a_parentvalue = null)
     {
         $fields = array();
-        foreach ($this->fields as $field) 
+        foreach ($this->fields as $field)
         {
             if (		$field->field_type != self::FIELDTYPE_TEMPLATE
-                    and $field->field_type != self::FIELDTYPE_ILIAS 
+                    and $field->field_type != self::FIELDTYPE_ILIAS
                     and $field->field_type != self::FIELDTYPE_CALCULATED
                     and (!isset($a_level) or $field->level == $a_level)
             		and (!isset($a_parentfield) or $field->parentfield == $a_parentfield)
             		and (!isset($a_parentvalue) or $field->parentvalue == $a_parentvalue)
-            ) 
+            )
             {
-            	$fields[] = $field;    
-            }                        
+            	$fields[] = $field;
+            }
         }
         return $fields;
     }
-    
-    
+
+
     /**
      * Get the field definitions of the type
-     * 
+     *
      * @return array	list of assoc field definitions
      */
-    function getFieldsAssoc() 
+    public function getFieldsAssoc()
     {
         $fields = array();
-        foreach ($this->fields as $field) 
+        foreach ($this->fields as $field)
         {
             $fields[] = (array) $field;
         }
@@ -862,10 +763,10 @@ class ilExternalContentType
 
     /**
      * get the placeholder in a template according to a field name
-     * 
+     *
      * @param string $a_name
      */
-    function getPlaceholder($a_name) 
+    public function getPlaceholder($a_name)
     {
         return $this->placeholder_start . $a_name . $this->placeholder_end;
     }
@@ -876,20 +777,21 @@ class ilExternalContentType
      * @param 	string		language variable
      * @return 	string		interface text
      */
-    function txt($a_langvar)
+    public function txt($a_langvar)
     {
-    	return $this->plugin_object->txt($a_langvar);
+    	return $this->plugin->txt($a_langvar);
     }
-    
+
     /**
      * Get array of options for selecting the type
-     * 
+     *
      * @param	mixed		required availability or null
      * @return	array		id => title
      */
-    static function _getTypeOptions($a_availability = null) 
+    static function _getTypeOptions($a_availability = null)
     {
-        global $ilDB;
+        global $DIC;
+        $ilDB = $DIC->database();
 
         $query = "SELECT * FROM xxco_data_types";
         if (isset($a_availability)) {
@@ -898,23 +800,24 @@ class ilExternalContentType
         $res = $ilDB->query($query);
 
         $options = array();
-        while ($row = $ilDB->fetchObject($res)) 
+        while ($row = $ilDB->fetchAssoc($res))
         {
-            $options[$row->type_id] = $row->title;
+            $options[$row['type_id']] = $row['title'];
         }
         return $options;
     }
 
     /**
      * Get basic data array of all types (without field definitions)
-     * 
+     *
      * @param	boolean		get extended data ('usages')
      * @param	mixed		required availability or null
      * @return	array		array of assoc data arrays
      */
     static function _getTypesData($a_extended = false, $a_availability = null)
     {
-        global $ilDB;
+        global $DIC;
+        $ilDB = $DIC->database();
 
         $query = "SELECT * FROM xxco_data_types";
         if (isset($a_availability)) {
@@ -924,9 +827,9 @@ class ilExternalContentType
         $res = $ilDB->query($query);
 
         $data = array();
-        while ($row = $ilDB->fetchAssoc($res)) 
+        while ($row = $ilDB->fetchAssoc($res))
         {
-            if ($a_extended) 
+            if ($a_extended)
             {
                 $row['usages'] = self::_countUntrashedUsages($row['type_id']);
             }
@@ -937,12 +840,14 @@ class ilExternalContentType
 
     /**
      * Count the number of untrashed usages of a type
-     * 
+     *
      * @var		integer		type_id
      * @return	integer		number of references
      */
-    static function _countUntrashedUsages($a_type_id) {
-        global $ilDB;
+    static function _countUntrashedUsages($a_type_id)
+    {
+        global $DIC;
+        $ilDB = $DIC->database();
 
         $query = "SELECT COUNT(*) untrashed FROM xxco_data_settings s"
                 . " INNER JOIN object_reference r ON s.obj_id = r.obj_id"
@@ -950,8 +855,8 @@ class ilExternalContentType
                 . " AND s.type_id = " . $ilDB->quote($a_type_id, 'integer');
 
         $res = $ilDB->query($query);
-        $row = $ilDB->fetchObject($res);
-        return $row->untrashed;
+        $row = $ilDB->fetchAssoc($res);
+        return $row['untrashed'];
     }
 
     /**
@@ -964,6 +869,7 @@ class ilExternalContentType
     static function _getRefIdsByTypeAndField($a_type_id, $a_field_name, $a_field_value)
     {
         global $DIC;
+        $ilDB = $DIC->database();
 
         $query = "
             SELECT r.ref_id
@@ -976,17 +882,15 @@ class ilExternalContentType
             AND r.deleted IS NULL
         ";
 
-        $result = $DIC->database()->queryF($query,
+        $result = $ilDB->queryF($query,
             ['integer','text','text'],
             [$a_type_id, $a_field_name, $a_field_value]
         );
 
         $ref_ids = [];
-        while ($row = $DIC->database()->fetchAssoc($result)) {
+        while ($row = $ilDB->fetchAssoc($result)) {
             $ref_ids[] = $row['ref_id'];
         }
         return $ref_ids;
     }
 }
-
-?>

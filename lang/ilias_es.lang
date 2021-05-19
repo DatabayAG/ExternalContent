@@ -36,7 +36,6 @@ xxco_instructions#:#Instrucciones
 xxco_instructions_info#:#Las instrucciones se mostrarán en la pestaña Info
 xxco_message_type_not_available#:#Los contenidos externos de este tipo ya no están disponibles.
 xxco_online_info#:#Esto hace que el objeto sea visible y utilizable por los usuarios
-xxco_refresh_meta_data#:#Actualizar metadatos
 type_availability#:#Disponibilidad
 type_availability_info#:#Disponibilidad de este tipo en el repositorio. Puede que hayas definido tipos obsoletos como "permitir existencia" en vez de haberlos borrado.
 type_created#:#La definición de tipo se ha guardado
@@ -68,8 +67,6 @@ type_desc2#:#Introduzca texto descriptivo
 type_path_template#:#Ruta de plantilla
 type_desc3#:#Esto demuestra cómo anidar campos y plantillas
 view#:#Vista
-type_time_to_delete#:#Tiempo de caducidad
-type_time_to_delete_info#:#Timpo de caducidad de un token de acceso (para autenticación callback)
 instructions#:#Instrucciones
 online_info#:#Cambiar el contenido a on-line para hacerlo visible a los usuarios
 view_log#:#Registro de visitas
@@ -134,7 +131,6 @@ learning_progress_set#:#Utilizar progreso de aprendizaje
 lp_on#:#Sí
 lp_off#:#No
 lp_info#:#Escoger si quieres almacenar la información recibida de este contenido externo con la herramienta de progreso de aprendizaje de ILIAS.
-time_to_delete_info#:#Borrar tiempo de un token de acceso (para registros)
 type_edit#:#Editar definición de tipo
 type_failure_encoding#:#La codificación "%s" no existe!
 model#:#Modelo de tipo

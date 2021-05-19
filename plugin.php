@@ -15,12 +15,12 @@
 $id = "xxco";
  
 // code version; must be changed for all code changes
-define('xxco_version', '1.6.3');
+define('xxco_version', '1.7.0');
 $version = xxco_version;
  
 // ilias min and max version; must always reflect the versions that should
 // run with the plugin
-$ilias_min_version = "5.3.0";
+$ilias_min_version = "5.4.0";
 $ilias_max_version = "6.999";
  
 // optional, but useful: Add one or more responsible persons and a contact email

@@ -4,7 +4,11 @@
  * GPLv2, see LICENSE 
  */
 
-include_once("./Services/Component/classes/class.ilPluginConfigGUI.php");
+require_once(__DIR__ . '/trait.ilExternalContentGUIBase.php');
+require_once(__DIR__ . '/class.ilExternalContentType.php');
+require_once(__DIR__ . '/class.ilObjExternalContent.php');
+require_once(__DIR__ . '/class.ilExternalContentTypesTableGUI.php');
+require_once(__DIR__ . '/class.ilExternalContentModel.php');
 
 /**
  * ExternalContent plugin: configuration GUI
@@ -15,6 +19,8 @@ include_once("./Services/Component/classes/class.ilPluginConfigGUI.php");
  */ 
 class ilExternalContentConfigGUI extends ilPluginConfigGUI
 {
+    use ilExternalContentGUIBase;
+
     /** @var ilExternalContentType */
     protected $type;
 
@@ -22,17 +28,21 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
     protected $form;
 
     /**
+     * constructor
+     */
+    public function __construct()
+    {
+        $this->initGlobals();
+    }
+
+    /**
      * perform command
+     * @param string $cmd
      */
     public function performCommand($cmd)
     {
-		global $tree, $rbacsystem, $ilErr, $lng, $ilCtrl, $tpl;
-		
-		$this->plugin_object->includeClass('class.ilExternalContentType.php');
-		$this->plugin_object->includeClass('class.ilObjExternalContent.php');
-		
         // control flow
-        $cmd = $ilCtrl->getCmd($this);
+        $cmd = $this->ctrl->getCmd($this);
         switch ($cmd)
         {
             case 'editType':
@@ -44,9 +54,9 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
             case 'deleteType':
             case 'deleteTypeConfirmed':
             	$this->type = new ilExternalContentType($_GET['type_id']);
-            	$tpl->setDescription($this->type->getName());
+            	$this->tpl->setDescription($this->type->getName());
             	
-            	$ilCtrl->saveParameter($this, 'type_id');
+            	$this->ctrl->saveParameter($this, 'type_id');
             	$this->initTabs('edit_type');
            		$this->$cmd();
             	break;
@@ -64,10 +74,10 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
     
     /**
      * Get a plugin specific language text
-     * 
-     * @param 	string	language var
+     * @param string $a_var language var
+     * @return string
      */
-    function txt($a_var)
+    protected function txt($a_var)
     {
     	return $this->plugin_object->txt($a_var);
     }
@@ -75,55 +85,46 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
     /**
      * Init Tabs
      * 
-     * @param string	mode ('edit_type' or '')
+     * @param string $a_mode	mode ('edit_type' or '')
      */
-    function initTabs($a_mode = "")
+    protected function initTabs($a_mode = "")
     {
-    	global $ilCtrl, $ilTabs, $lng;
-
     	switch ($a_mode)
     	{
     		case "edit_type":
-    			$ilTabs->clearTargets();
-    			
-    			/*
-				$ilTabs->setBack2Target(
-					$lng->txt("cmps_plugin_slot"),
-					$ilCtrl->getLinkTargetByClass("ilobjcomponentsettingsgui", "showPluginSlot")
-				);
-				*/
+    			$this->tabs->clearTargets();
 
-				$ilTabs->setBackTarget(
+                $this->tabs->setBackTarget(
 					$this->plugin_object->txt('content_types'),
-					$ilCtrl->getLinkTarget($this, 'listTypes')
+					$this->ctrl->getLinkTarget($this, 'listTypes')
 				);
 
-				$ilTabs->addTab("edit_type", 
-    				$this->plugin_object->txt('xxco_edit_type'), 
-    				$ilCtrl->getLinkTarget($this, 'editType')
-    			);
-    			
-    			$ilTabs->addSubTab("type_settings", 
-    				$this->plugin_object->txt('type_settings'), 
-    				$ilCtrl->getLinkTarget($this, 'editType')
-    			);
-    			
-    			$ilTabs->addSubTab("type_icons", 
-    				$this->plugin_object->txt('icons'), 
-    				$ilCtrl->getLinkTarget($this, 'editIcons')
+                $this->tabs->addTab("edit_type",
+    				$this->plugin_object->txt('xxco_edit_type'),
+                    $this->ctrl->getLinkTarget($this, 'editType')
     			);
 
-    		 	$ilTabs->addSubTab("type_definition", 
-    				$this->plugin_object->txt('type_definition'), 
-    				$ilCtrl->getLinkTarget($this, 'editDefinition')
+                $this->tabs->addSubTab("type_settings",
+    				$this->plugin_object->txt('type_settings'),
+                    $this->ctrl->getLinkTarget($this, 'editType')
+    			);
+
+                $this->tabs->addSubTab("type_icons",
+    				$this->plugin_object->txt('icons'),
+                    $this->ctrl->getLinkTarget($this, 'editIcons')
+    			);
+
+                $this->tabs->addSubTab("type_definition",
+    				$this->plugin_object->txt('type_definition'),
+                    $this->ctrl->getLinkTarget($this, 'editDefinition')
     			);
     			
     			break;
     			
     		default:
-    			$ilTabs->addTab("types", 
-    				$this->plugin_object->txt('content_types'), 
-    				$ilCtrl->getLinkTarget($this, 'listTypes')
+                $this->tabs->addTab("types",
+    				$this->plugin_object->txt('content_types'),
+                    $this->ctrl->getLinkTarget($this, 'listTypes')
     			);
 				break;	
     	}
@@ -132,7 +133,7 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
     /**
      * Entry point for configuring the module
      */
-    function configure()
+    protected function configure()
     {
         $this->listTypes();
     }
@@ -140,41 +141,29 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
     /**
      * Show a list of the xxco types
      */
-    function listTypes()
+    protected function listTypes()
     {
-        global $tpl;
-
-        require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/ExternalContent/classes/class.ilExternalContentTypesTableGUI.php');
         $table_gui = new ilExternalContentTypesTableGUI($this, 'listTypes');
         $table_gui->init($this);
-        $tpl->setContent($table_gui->getHTML());
+        $this->tpl->setContent($table_gui->getHTML());
     }
 
     /**
      * Show the form to add a new type
      */
-    function createType()
+    protected function createType()
     {
-        global $tpl;
         $this->initCreateForm();
-        $tpl->setContent($this->form->getHTML());
+        $this->tpl->setContent($this->form->getHTML());
     }
     
     /**
-     * 
-     * 
-     * @return unknown_type
+     * Init the type creation form
      */
-    private function initCreateForm()
+    protected function initCreateForm()
     {
-    	global $ilCtrl, $lng;
-    	
-        include_once("./Services/Form/classes/class.ilPropertyFormGUI.php");
-        
-        $this->plugin_object->includeClass('class.ilExternalContentModel.php');
-    	
         $form = new ilPropertyFormGUI();
-        $form->setFormAction($ilCtrl->getFormAction($this));
+        $form->setFormAction($this->ctrl->getFormAction($this));
         $form->setTitle($this->txt('create_type'));
         
         $item1 = new ilTextInputGUI($this->txt('type_name'), 'name');
@@ -186,6 +175,7 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
         $item = new ilRadioGroupInputGUI($this->txt('model'), 'model');
         $item->setRequired(true);
         $models = ilExternalContentModel::_getModelsList();
+        $value = '';
         foreach ($models as $model)
         {
         	$value = $value ? $value : $model['name'];
@@ -195,27 +185,22 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
         $item->setValue($value);
         $form->addItem($item);
         
-        $form->addCommandButton('submitNewType', $lng->txt('save'));
-        $form->addCommandButton('listTypes', $lng->txt('cancel'));
+        $form->addCommandButton('submitNewType', $this->lng->txt('save'));
+        $form->addCommandButton('listTypes', $this->lng->txt('cancel'));
         
         $this->form = $form;
     }
     
     /**
      * Submit a new type
-     * 
-     * @return unknown_type
      */
-    private function submitNewType()
+    protected function submitNewType()
     {
-    	global $lng, $ilCtrl, $tpl;
-    	
         $this->initCreateForm();
     	if (!$this->form->checkInput())
         {
             $this->form->setValuesByPost();
-            $tpl->setContent($this->form->getHTML());
-            return;
+            $this->tpl->setContent($this->form->getHTML());
         } 
         else
         {
@@ -223,8 +208,8 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
         		$this->form->getInput("model"),
         		$this->form->getInput("name")
         		);
-            $ilCtrl->setParameter($this, 'type_id', $type_id);
-            $ilCtrl->redirect($this, 'editType');	
+            $this->ctrl->setParameter($this, 'type_id', $type_id);
+            $this->ctrl->redirect($this, 'editType');
         }
     	
     }
@@ -232,13 +217,11 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
     /**
      * Show the form to edit an existing type
      */
-    function editType()
+    protected function editType()
     {
-        global $ilCtrl, $ilTabs, $tpl;
-
-        $ilTabs->activateSubTab('type_settings');
+        $this->tabs->activateSubTab('type_settings');
         $this->initFormSettings($this->loadTypeSettings());
-        $tpl->setContent($this->form->getHTML());
+        $this->tpl->setContent($this->form->getHTML());
     }
     
 
@@ -247,15 +230,11 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
      * 
      * @param	array	values to set
      */
-    private function initFormSettings($a_values = array())
+    protected function initFormSettings($a_values = array())
     {
-        global $lng, $ilCtrl;
-
-        include_once("./Services/Form/classes/class.ilPropertyFormGUI.php");
-
         $form = new ilPropertyFormGUI();
-        $form->setFormAction($ilCtrl->getFormAction($this));
-        $form->setTitle($lng->txt('settings'));
+        $form->setFormAction($this->ctrl->getFormAction($this));
+        $form->setTitle($this->lng->txt('settings'));
 
         $item = new ilTextInputGUI($this->txt('type_name'), 'name');
         $item->setValue($a_values['name']);
@@ -264,14 +243,14 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
         $item->setMaxLength(32);
         $form->addItem($item);
 
-        $item = new ilTextInputGUI($lng->txt('title'), 'title');
+        $item = new ilTextInputGUI($this->lng->txt('title'), 'title');
         $item->setValue($a_values['title']);
         $item->setInfo($this->txt('type_title_info'));
         $item->setRequired(true);
         $item->setMaxLength(255);
         $form->addItem($item);
 
-        $item = new ilTextInputGUI($lng->txt('description'), 'description');
+        $item = new ilTextInputGUI($this->lng->txt('description'), 'description');
         $item->setValue($a_values['description']);
         $item->setInfo($this->txt('type_description_info'));
         $form->addItem($item);
@@ -293,57 +272,12 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
         $item->setInfo($this->txt('type_remarks_info'));
         $item->setValue($a_values['remarks']);
         $item->setRows(5);
-        $item->setCols(80);
         $form->addItem($item);
 
         // add the type specific fields
         $this->type->addFormElements($form, $a_values, "type");
-        
-        /* 
-		
-		// TOKEN MANAGEMENT
-        $item5 = new ilTextInputGUI($this->txt('type_time_to_delete'), 'time_to_delete');
-        $item5->setInfo($this->txt('type_time_to_delete_info'));
-        if(!$type->getTimeToDelete()){
-            $item5->setValue(10);
-        }else{
-            $item5->setValue($this->type->getTimeToDelete());
-        }
-        $item5->setRequired(true);
-        $item5->setMaxLength(32);
-        $form->addItem($item5);
-        
-        
-       //LOG MANAGEMENT
-        $item9 = new ilSelectInputGUI($this->txt('log_set'), 'use_logs');
-        $item9->setOptions(
-                array(
-                    "ON" => $this->txt('log_on'),
-                    "OFF" => $this->txt('log_off')
-                )
-        );
-        $item9->setInfo($this->txt('logs_info'));
-        $item9->setRequired(true);
-        $item9->setValue($this->type->getUseLogs());
-        $form->addItem($item9);
-        
-        
-        //LEARNING PROGRESS MANAGEMENT
-        $item10 = new ilSelectInputGUI($this->txt('learning_progress_set'), 'use_learning_progress');
-        $item10->setOptions(
-                array(
-                    "ON" => $this->txt('lp_on'),
-                    "OFF" => $this->txt('lp_off')
-                )
-        );
-        $item10->setInfo($this->txt('lp_info'));
-        $item10->setRequired(true);
-        $item10->setValue($this->type->getUseLearningProgress());
-        $form->addItem($item10);
 
-        */
-        
-        $form->addCommandButton('submitFormSettings', $lng->txt('save'));  
+        $form->addCommandButton('submitFormSettings', $this->lng->txt('save'));
         $this->form = $form;
     }
     
@@ -372,17 +306,15 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
     /**
      * Submit the form to save or update
      */
-    function submitFormSettings()
+    protected function submitFormSettings()
     {
-        global $ilCtrl, $ilTabs, $lng, $tpl;
-
-        $ilTabs->activateSubTab('type_settings');
+        $this->tabs->activateSubTab('type_settings');
         
         $this->initFormSettings();
         if (!$this->form->checkInput())
         {
             $this->form->setValuesByPost();
-            $tpl->setContent($this->form->getHTML());
+            $this->tpl->setContent($this->form->getHTML());
             return;
         } 
         else
@@ -392,35 +324,27 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
             $this->type->setDescription($this->form->getInput("description"));
             $this->type->setAvailability($this->form->getInput("availability"));
             $this->type->setRemarks($this->form->getInput("remarks"));
-            
-            /*
-            $this->type->setTimeToDelete($this->form->getInput("time_to_delete"));
-            $this->type->setUseLogs($this->form->getInput("use_logs"));
-            $this->type->setUseLearningProgress($this->form->getInput("use_learning_progress"));
-            */
             $this->type->update();
 
             foreach ($this->type->getFormValues($this->form, 'type') as $field_name => $field_value)
 	        {
-	            $this->type->saveFieldValue($field_name, $field_value);
+	            $this->type->saveInputValue($field_name, $field_value);
 	        }
             
             ilUtil::sendSuccess($this->txt('type_saved'), true);
         }
 
-        $ilCtrl->redirect($this, 'editType');
+        $this->ctrl->redirect($this, 'editType');
     }
     
     /**
      * Show the form to edit an existing type
      */
-    function editIcons()
+    protected function editIcons()
     {
-        global $ilCtrl, $ilTabs, $tpl;
-
-        $ilTabs->activateSubTab('type_icons');
+        $this->tabs->activateSubTab('type_icons');
         $this->initFormIcons();
-        $tpl->setContent($this->form->getHTML());
+        $this->tpl->setContent($this->form->getHTML());
     }
     
     /**
@@ -428,17 +352,14 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
      * 
      * @param	integer		type id 
      */
-    private function initFormIcons()
+    protected function initFormIcons()
     {
-        global $ilSetting, $lng, $ilCtrl;
-
         $type_id = $this->type->getTypeId();
 
         $svg = ilExternalContentPlugin::_getIcon("xxco", "svg", 0, $type_id, "type");
-
-        include_once("./Services/Form/classes/class.ilPropertyFormGUI.php");
+        
         $form = new ilPropertyFormGUI();
-        $form->setFormAction($ilCtrl->getFormAction($this));
+        $form->setFormAction($this->ctrl->getFormAction($this));
         $form->setTitle($this->txt('icons'));
 
 		$caption = $this->txt("svg_icon");
@@ -465,7 +386,7 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
             $form->addItem($item);
         }
 
-        $form->addCommandButton('submitFormIcons', $lng->txt('save'));
+        $form->addCommandButton('submitFormIcons', $this->lng->txt('save'));
         $this->form = $form;
     }
     
@@ -473,34 +394,32 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
     /**
      * Submit the icons form
      */
-    function submitFormIcons()
+    protected function submitFormIcons()
     {
-        global $ilCtrl, $ilTabs, $lng, $tpl;
-
-        $ilTabs->activateSubTab('type_icons');
+        $this->tabs->activateSubTab('type_icons');
         
         $type_id = $this->type->getTypeId();
         $this->initFormIcons();
         if (!$this->form->checkInput())
         {
             $this->form->setValuesByPost();
-            $tpl->setContent($this->form->getHTML());
+            $this->tpl->setContent($this->form->getHTML());
             return;
         }
 
-		if($_POST["svg_icon_delete"])
+		if ($_POST["svg_icon_delete"])
 		{
 			ilExternalContentPlugin::_removeIcon("svg", "type", $type_id);
 		}
-  		if($_POST["big_icon_delete"])
+  		if ($_POST["big_icon_delete"])
 		{
 			ilExternalContentPlugin::_removeIcon("big", "type", $type_id);
 		}
-		if($_POST["small_icon_delete"])
+		if ($_POST["small_icon_delete"])
 		{
 			ilExternalContentPlugin::_removeIcon("small", "type", $type_id);
 		}
-		if($_POST["tiny_icon_delete"])
+		if ($_POST["tiny_icon_delete"])
 		{
 			ilExternalContentPlugin::_removeIcon("tiny", "type", $type_id);
 		}
@@ -511,7 +430,7 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
 		ilExternalContentPlugin::_saveIcon($_FILES["tiny_icon"]['tmp_name'], "tiny", "type", $type_id);
 
 		ilUtil::sendSuccess($this->plugin_object->txt('icons_saved'), true);
-        $ilCtrl->redirect($this, 'editIcons');
+        $this->ctrl->redirect($this, 'editIcons');
     }
     
     
@@ -520,34 +439,27 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
      */
     function editDefinition()
     {
-        global $ilCtrl, $ilTabs, $tpl;
-
-        $ilTabs->activateSubTab('type_definition');
+        $this->tabs->activateSubTab('type_definition');
         $this->initFormDefinition();
         $style="<style>#form_edit_xml label, div.ilFormOption {display:none;}</style>";
-        $tpl->setContent($style. $this->form->getHTML());
+        $this->tpl->setContent($style. $this->form->getHTML());
     }
     
     
     /**
      * Init the form to add or edit a type
-     * 
-     * @param	string		xml data of input		
+     * @param	string	$a_xml	xml data of input
      */
-    private function initFormDefinition($a_xml = null)
+    protected function initFormDefinition($a_xml = null)
     {
-        global $lng, $ilCtrl;
-
-        include_once("./Services/Form/classes/class.ilPropertyFormGUI.php");
-
-       if (!isset($a_xml))
+        if (!isset($a_xml))
         {
             $a_xml = $this->type->getXML();
         }
         
         $form = new ilPropertyFormGUI();
         $form->setId('edit_xml');
-        $form->setFormAction($ilCtrl->getFormAction($this));
+        $form->setFormAction($this->ctrl->getFormAction($this));
         $form->setTitle($this->txt('type_definition'));
 
         $item = new ilCustomInputGUI('');
@@ -557,7 +469,7 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
         $item->setInfo($this->txt('type_definition_info'));
         $form->addItem($item);
 
-        $form->addCommandButton('submitFormDefinition', $lng->txt('save'));
+        $form->addCommandButton('submitFormDefinition', $this->lng->txt('save'));
         
         $this->form = $form;
     }
@@ -566,12 +478,10 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
     /**
      * Submit the definition form
      */
-    function submitFormDefinition()
+    protected function submitFormDefinition()
     {
-        global $ilCtrl, $ilTabs, $lng, $tpl;
-
-        $ilCtrl->saveParameter($this, 'type_id');
-        $ilTabs->activateSubTab('type_definition');
+        $this->ctrl->saveParameter($this, 'type_id');
+        $this->tabs->activateSubTab('type_definition');
         
         $xml = ilUtil::stripOnlySlashes($_POST['xml']);
         $this->initFormDefinition($xml);
@@ -583,13 +493,13 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
             $this->form->setValuesByPost();
             ilUtil::sendFailure($this->txt('type_failure_xml') . '<br />' . $message, false);
         	$style="<style>#il_prop_cont_ {display:none;}</style>";
-            $tpl->setContent($style.$this->form->getHTML());
+            $this->tpl->setContent($style.$this->form->getHTML());
             return;
         } 
                 
         $this->type->update();
         ilUtil::sendSuccess($this->txt('type_updated'), true);
-        $ilCtrl->redirect($this, 'editDefinition');
+        $this->ctrl->redirect($this, 'editDefinition');
     }
     
     
@@ -597,32 +507,25 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
     /**
      * Show a confirmation screen to delete a type
      */
-    function deleteType()
+    protected function deleteType()
     {
-        global $ilCtrl, $lng, $tpl;
-
-        require_once('./Services/Utilities/classes/class.ilConfirmationGUI.php');
-
         $gui = new ilConfirmationGUI();
-        $gui->setFormAction($ilCtrl->getFormAction($this));
+        $gui->setFormAction($this->ctrl->getFormAction($this));
         $gui->setHeaderText($this->txt('delete_type'));
         $gui->addItem('type_id', $this->type->getTypeId(), $this->type->getName());
-        $gui->setConfirm($lng->txt('delete'), 'deleteTypeConfirmed');
-        $gui->setCancel($lng->txt('cancel'), 'listTypes');
+        $gui->setConfirm($this->lng->txt('delete'), 'deleteTypeConfirmed');
+        $gui->setCancel($this->lng->txt('cancel'), 'listTypes');
 
-        $tpl->setContent($gui->getHTML());
+        $this->tpl->setContent($gui->getHTML());
     }
 
     /**
      * Delete a type after confirmation
      */
-    function deleteTypeConfirmed()
+    protected function deleteTypeConfirmed()
     {
-        global $ilCtrl, $lng;
-
         $this->type->delete();
         ilUtil::sendSuccess($this->txt('type_deleted'), true);
-        $ilCtrl->redirect($this, 'listTypes');
+        $this->ctrl->redirect($this, 'listTypes');
     }
 }
-?>

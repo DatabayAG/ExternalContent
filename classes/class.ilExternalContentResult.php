@@ -36,7 +36,7 @@ class ilExternalContentResult
     /**
      * Get a result by id
      * @param integer id
-     * @return ExternalContentResult of null if not exists
+     * @return ilExternalContentResult|null
      */
     public static function getById($a_id)
     {
@@ -64,8 +64,7 @@ class ilExternalContentResult
      * @param integer   object id
      * @param integer   user id
      * @param boolean   save a new result object result if not exists
-     *
-     * @return ExternalContentResult
+     * @return ilExternalContentResult|null
      */
     public static function getByKeys($a_obj_id, $a_usr_id, $a_create = false)
     {

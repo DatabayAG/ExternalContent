@@ -64,7 +64,8 @@ class ilObjExternalContentListGUI extends ilObjectPluginListGUI
      */
     public function getProperties() 
     {
-        global $lng;
+        global $DIC;
+        $lng = $DIC->language();
 
         $this->plugin->includeClass("class.ilObjExternalContentAccess.php");
         if (!ilObjExternalContentAccess::_lookupOnline($this->obj_id)) 

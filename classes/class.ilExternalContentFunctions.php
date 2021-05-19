@@ -90,7 +90,7 @@ class ilExternalContentFunctions
 				break;
 				
 			default:
-				return "ERROR: unsupported signature method!";
+				return ["ERROR: unsupported signature method!"];
 		}
 		
 		$consumer = new OAuthConsumer($a_params["key"], $a_params["secret"], $a_params["callback"]);
@@ -164,6 +164,7 @@ class ilExternalContentFunctions
 		{
 			return ($a_params['']);
 		}
+		return '';
 	}
 
 	/**

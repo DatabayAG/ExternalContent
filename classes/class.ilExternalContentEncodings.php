@@ -67,8 +67,8 @@ class ilExternalContentEncodings
 	 * apply an encoding to a value
 	 * 
 	 * @param 	string	encoding (may also be comma separated list of encodings)
-	 * @param 	string	value
-	 * @return	string	encoded value
+	 * @param 	string|array 	value
+	 * @return	string|array 	encoded value
 	 */
 	public static function _applyEncoding($a_encoding = "", $a_value = "")
 	{
@@ -160,11 +160,12 @@ class ilExternalContentEncodings
 	            default:
 	              	// security: allow only characters and numbers
 	               	$classname = preg_replace('/[^A-Za-z0-9]/', '', trim($encoding));
-	                  	
-		            if (file_exists('./Customizing/global/encodings/class.'. $classname.'.php'))
+
+                    // use an encoding class with that name
+                    $path = './Customizing/global/encodings/class.'.$classname.'.php';
+		            if (file_exists($path))
 		            {
-		               	// use an encoding class with that name
-		               	require_once('./Customizing/global/encodings/class.'.$classname.'.php');	
+		               	require_once($path);
 		              	$value = call_user_func(array($classname,'encode'), $value);
 		            }
 	              	break;

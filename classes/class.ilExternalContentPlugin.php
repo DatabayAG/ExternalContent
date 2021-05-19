@@ -4,8 +4,6 @@
  * GPLv2, see LICENSE 
  */
 
-include_once('./Services/Repository/classes/class.ilRepositoryObjectPlugin.php');
-
 /**
  * External Content plugin
  *
@@ -18,19 +16,31 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
 	const SMALL_ICON_SIZE = "35x35";
 	const TINY_ICON_SIZE = "22x22";
 
+    /** @var self */
+    protected static $instance;
 
 	/**
 	 * Returns name of the plugin
-	 *
-	 * @return <string
-	 * @access public
+	 * @return string
 	 */
 	public function getPluginName()
 	{
 		return 'ExternalContent';
 	}
 
-	/**
+    /**
+     * Get the plugin instance
+     * @return self
+     */
+    public static function getInstance() {
+        if (!isset(self::$instance)) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
+
+    /**
 	 * Remove all custom tables when plugin is uninstalled
 	 */
 	protected function uninstallCustom()
@@ -39,7 +49,6 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
 		$ilDB = $DIC->database();
 
 		$ilDB->dropTable('xxco_data_settings');
-		$ilDB->dropTable('xxco_data_token');
 		$ilDB->dropTable('xxco_data_types');
 		$ilDB->dropTable('xxco_data_values');
 		$ilDB->dropTable('xxco_results');
@@ -50,8 +59,8 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
 	/**
 	* Create webspace directory for the plugin
 	* 
-	* @param	string		level ("plugin", "type" or "object")
-	* @param	integer		type id or object id 
+	* @param	string	$a_level	level ("plugin", "type" or "object")
+	* @param	integer	$a_id	    type id or object id
 	* 
 	* @return	string		webspace directory
 	*/
@@ -59,14 +68,6 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
 	{
 		switch($a_level)
 		{
-			case "plugin":
-				$plugin_dir = self::_getWebspaceDir('plugin');
-				if (!is_dir($plugin_dir))
-				{
-					ilUtil::makeDir($plugin_dir);
-				}
-				return $plugin_dir;
-								
 			case "type":
 				$plugin_dir = self::_createWebspaceDir("plugin");
 				$type_dir = $plugin_dir . "/type_". $a_id;
@@ -84,14 +85,23 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
 					ilUtil::makeDir($object_dir);
 				}
 				return $object_dir;
-		}
+
+            case "plugin":
+            default:
+                $plugin_dir = self::_getWebspaceDir('plugin');
+                if (!is_dir($plugin_dir))
+                {
+                    ilUtil::makeDir($plugin_dir);
+                }
+                return $plugin_dir;
+        }
 	}	
 	
 	/**
 	* Get a webspace directory
 	*
-	* @param	string		level ("plugin", "type" or "object")
-	* @param	integer		type id or object id 
+	* @param	string	$a_level	level ("plugin", "type" or "object")
+	* @param	integer	$a_id	type id or object id
 	* 
 	* @return	string		webspace directory
 	*/
@@ -99,34 +109,35 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
 	{
 		switch($a_level)
 		{
-			case "plugin":
-				return ilUtil::getWebspaceDir()."/xxco";
-				
 			case "type":
 				return ilUtil::getWebspaceDir()."/xxco/type_".$a_id;
 				
 			case "object":
 				return ilUtil::getWebspaceDir()."/xxco/object_".$a_id;
-		}
+
+            case "plugin":
+            default:
+                return ilUtil::getWebspaceDir()."/xxco";
+        }
 	}	
 	
 	/**
 	* Delete a webspace directory
 	*
-	* @param	string		level ("plugin", "type" or "object")
-	* @param	integer		type id or object id 
+	* @param	string	$a_level	level ("plugin", "type" or "object")
+	* @param	integer	$a_id	type id or object id
 	*/
 	static function _deleteWebspaceDir($a_level = "plugin", $a_id = 0)
 	{
-		return ilUtil::delDir(self::_getWebspaceDir($a_level, $a_id));
+		ilUtil::delDir(self::_getWebspaceDir($a_level, $a_id));
 	}	
 	
 	
 	/**
 	 * Get the file name used for a type or object specific icon
 
-	 * @param 	string		size ("big", "small", "tiny" or "svg")
-	 * @return 	string		file name
+	 * @param 	string	$a_size	size ("big", "small", "tiny" or "svg")
+	 * @return 	string		    file name
 	 */
 	static function _getIconName($a_size)
 	{
@@ -145,12 +156,11 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
 	* Get Icon (object, type or plugin specific)
 	* (this function should be called wherever an icon has to be displyed)
 	* 
-	* @param 	string		object type ("xxco")
-	* @param 	string		size ("big", "small", "tiny" or "svg")
-	* @param	int			object id (optional)
-	* @param	int			content type id (optional)
-	* @param	string		get icon of a specific level ("plugin", "type" or "object")
-	* 
+	* @param 	string		$a_type     object type ("xxco")
+	* @param 	string		$a_size     size ("big", "small", "tiny" or "svg")
+	* @param	int			$a_obj_id   object id (optional)
+	* @param	int			$a_type_id  content type id (optional)
+	* @param	string		$a_level    get icon of a specific level ("plugin", "type" or "object")
 	* @return	string		icon path
 	*/	
 	static function _getIcon($a_type, $a_size, $a_obj_id = 0, $a_type_id = 0, $a_level = "")
@@ -183,7 +193,7 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
 		{				
 			if ($a_obj_id and !$a_type_id)
 			{
-				require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/ExternalContent/classes/class.ilObjExternalContentAccess.php');
+				require_once(__DIR__ . '/class.ilObjExternalContentAccess.php');
 				$a_type_id = ilObjExternalContentAccess::_lookupTypeId($a_obj_id);	
 			}
 			
@@ -208,20 +218,17 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
 		}
 		
 		// finally get the plugin icon
-		if ($a_level == "plugin" or $a_level == "")
-		{				
-			return parent::_getIcon($a_type, $a_size);
-		}
+        return parent::_getIcon($a_type, $a_size);
 	}
 
 	
 	/**
 	* Save an icon
 	* 
-	* @param 	string		path to the uploaded file
-	* @param 	string		size ("big", "small", "tiny" or "svg")
-	* @param	string		level ("type" or "object")
-	* @param	integer		type id or object id 
+	* @param 	string		$a_upload_path  path to the uploaded file
+	* @param 	string		$a_size         size ("big", "small", "tiny" or "svg")
+	* @param	string		$a_level        level ("type" or "object")
+	* @param	integer		$a_id           type id or object id
 	*/
 	static function _saveIcon($a_upload_path, $a_size, $a_level, $a_id)
 	{
@@ -263,9 +270,9 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
 	/**
 	* Remove an icon
 	* 
-	* @param 	string		size ("big", "small", "tiny" or "svg")
-	* @param	string		level ("type" or "object")
-	* @param	integer		type id or object id 
+	* @param 	string		$a_size     size ("big", "small", "tiny" or "svg")
+	* @param	string		$a_level    level ("type" or "object")
+	* @param	integer		$a_id       type id or object id
 	*/ 
 	static function _removeIcon($a_size, $a_level, $a_id)
 	{
@@ -285,4 +292,3 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
 	}
 
 }
-?>

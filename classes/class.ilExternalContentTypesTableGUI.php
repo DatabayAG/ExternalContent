@@ -4,7 +4,9 @@
  * GPLv2, see LICENSE 
  */
 
-include_once('./Services/Table/classes/class.ilTable2GUI.php');
+require_once(__DIR__ . '/trait.ilExternalContentGUIBase.php');
+require_once(__DIR__ . '/class.ilExternalContentPlugin.php');
+require_once(__DIR__ . '/class.ilExternalContentType.php');
 
 /**
  * External Content plugin: content types table GUI
@@ -15,6 +17,11 @@ include_once('./Services/Table/classes/class.ilTable2GUI.php');
  */ 
 class ilExternalContentTypesTableGUI extends ilTable2GUI {
 
+    use ilExternalContentGUIBase;
+
+    /** @var ilExternalContentPlugin  */
+    protected $plugin;
+
     /**
      * Constructor
      * 
@@ -24,7 +31,7 @@ class ilExternalContentTypesTableGUI extends ilTable2GUI {
     function __construct($a_parent_obj, $a_parent_cmd = '', $a_template_context = '') 
     {
     	// this uses the cached plugin object
-		$this->plugin_object = ilPlugin::getPluginObject(IL_COMP_SERVICE, 'Repository', 'robj', 'ExternalContent');
+		$this->plugin = ilExternalContentPlugin::getInstance();
 
 		parent::__construct($a_parent_obj, $a_parent_cmd, $a_template_context);
     }
@@ -37,19 +44,15 @@ class ilExternalContentTypesTableGUI extends ilTable2GUI {
      */
     public function init($a_parent_obj) 
     {
-        global $ilCtrl, $lng;
-
-        $this->addColumn($lng->txt('id'), 'type_id', '10%');
-        $this->addColumn($lng->txt('name'), 'type_name', '10%');
-        $this->addColumn($lng->txt('title'), 'title', '30%');
-        $this->addColumn($lng->txt('rep_robj_xxco_type_availability'), 'availability', '20%');
-        $this->addColumn($lng->txt('rep_robj_xxco_untrashed_usages'), 'usages', '10%');
-        $this->addColumn($lng->txt('actions'), '', '20%');
+        $this->addColumn($this->lng->txt('id'), 'type_id', '10%');
+        $this->addColumn($this->lng->txt('name'), 'type_name', '10%');
+        $this->addColumn($this->lng->txt('title'), 'title', '30%');
+        $this->addColumn($this->lng->txt('rep_robj_xxco_type_availability'), 'availability', '20%');
+        $this->addColumn($this->lng->txt('rep_robj_xxco_untrashed_usages'), 'usages', '10%');
+        $this->addColumn($this->lng->txt('actions'), '', '20%');
         $this->setEnableHeader(true);
-        $this->setFormAction($ilCtrl->getFormAction($a_parent_obj));
-        $this->addCommandButton('createType', $lng->txt('rep_robj_xxco_create_type'));
-		// ToDo: check
-        // $this->addCommandButton('viewLogs', $lng->txt('rep_robj_xxco_view_logs'));
+        $this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
+        $this->addCommandButton('createType', $this->lng->txt('rep_robj_xxco_create_type'));
 
         $this->setRowTemplate('tpl.types_row.html', 'Customizing/global/plugins/Services/Repository/RepositoryObject/ExternalContent');
         $this->getMyDataFromDb();
@@ -60,7 +63,6 @@ class ilExternalContentTypesTableGUI extends ilTable2GUI {
      */
     function getMyDataFromDb() 
     {
-    	$this->plugin_object->includeClass('class.ilExternalContentType.php');
         // get types data with usage info
         $data = ilExternalContentType::_getTypesData(true);
         $this->setDefaultOrderField('type_id');
@@ -73,25 +75,21 @@ class ilExternalContentTypesTableGUI extends ilTable2GUI {
      */
     protected function fillRow($a_set) 
     {
-        global $lng, $ilCtrl;
-
-        $ilCtrl->setParameter($this->parent_obj, 'type_id', $a_set['type_id']);
+        $this->ctrl->setParameter($this->parent_obj, 'type_id', $a_set['type_id']);
 
         $this->tpl->setVariable('TXT_ID', $a_set['type_id']);
         $this->tpl->setVariable('TXT_NAME', $a_set['type_name']);
         $this->tpl->setVariable('TXT_TITLE', $a_set['title']);
-        $this->tpl->setVariable('TXT_AVAILABILITY', $lng->txt('rep_robj_xxco_availability_' . $a_set['availability']));
+        $this->tpl->setVariable('TXT_AVAILABILITY', $this->lng->txt('rep_robj_xxco_availability_' . $a_set['availability']));
         $this->tpl->setVariable('TXT_USAGES', (int) $a_set['usages']);
 
-        $this->tpl->setVariable('TXT_EDIT', $lng->txt('edit'));
-        $this->tpl->setVariable('LINK_EDIT', $ilCtrl->getLinkTarget($this->parent_obj, 'editType'));
+        $this->tpl->setVariable('TXT_EDIT', $this->lng->txt('edit'));
+        $this->tpl->setVariable('LINK_EDIT', $this->ctrl->getLinkTarget($this->parent_obj, 'editType'));
 
         if ($a_set['usages'] == 0) {
-            $this->tpl->setVariable('TXT_DELETE', $lng->txt('delete'));
-            $this->tpl->setVariable('LINK_DELETE', $ilCtrl->getLinkTarget($this->parent_obj, 'deleteType'));
+            $this->tpl->setVariable('TXT_DELETE', $this->lng->txt('delete'));
+            $this->tpl->setVariable('LINK_DELETE', $this->ctrl->getLinkTarget($this->parent_obj, 'deleteType'));
         }
     }
 
 }
-
-?>

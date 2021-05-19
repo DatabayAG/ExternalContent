@@ -591,3 +591,81 @@ if(!$ilDB->tableExists('xxco_results'))
         $ilDB->dropTable('xxco_data_log');
     }
 ?>
+<#28>
+<?php
+    //Create settings_id in data_settings
+    if (!$ilDB->tableColumnExists('xxco_data_settings', 'settings_id')) {
+        $ilDB->addTableColumn('xxco_data_settings', 'settings_id', array(
+            'type' => 'integer',
+            'length' => 4,
+            'notnull' => true,
+            'default' => 0
+        ));
+    }
+
+    // Add a sequence to the table
+    if(!$ilDB->tableExists('xxco_data_settings_seq')) {
+        $ilDB->createSequence("xxco_data_settings");
+    }
+
+    // Create settings_id in data_values
+    if (!$ilDB->tableColumnExists('xxco_data_values', 'settings_id')) {
+        $ilDB->addTableColumn('xxco_data_values', 'settings_id', array(
+            'type' => 'integer',
+            'length' => 4,
+            'notnull' => true,
+            'default' => 0
+        ));
+    }
+
+    // fill the settings_id with new values
+    $result = $ilDB->query("SELECT obj_id FROM xxco_data_settings");
+    while ($row = $ilDB->fetchAssoc($result)) {
+        $obj_id = $row['obj_id'];
+        $settings_id = $ilDB->nextId("xxco_data_settings");
+
+        $update1 = "UPDATE xxco_data_settings SET settings_id=" . $ilDB->quote($settings_id, 'integer')
+            . " WHERE obj_id=" . $ilDB->quote($obj_id, 'integer');
+        $ilDB->manipulate($update1);
+
+        $update2 = "UPDATE xxco_data_values SET settings_id=" . $ilDB->quote($settings_id, 'integer')
+            . " WHERE obj_id=" . $ilDB->quote($obj_id, 'integer');
+        $ilDB->manipulate($update2);
+    }
+?>
+<#29>
+<?php
+    $ilDB->dropPrimaryKey("xxco_data_settings");
+    $ilDB->addPrimaryKey("xxco_data_settings", array("settings_id"));
+    $ilDB->addIndex('xxco_data_settings', array('obj_id'), 'i1');
+
+    $ilDB->dropPrimaryKey("xxco_data_values");
+    $ilDB->addPrimaryKey("xxco_data_values", array("settings_id", "field_name"));
+?>
+<#30>
+<?php
+if ($ilDB->tableColumnExists('xxco_data_values', 'obj_id')) {
+    $ilDB->dropTableColumn('xxco_data_values', 'obj_id');
+}
+?>
+<#31>
+<?php
+    if ($ilDB->tableColumnExists('xxco_data_types', 'time_to_delete')) {
+        $ilDB->dropTableColumn('xxco_data_types', 'time_to_delete');
+    }
+    if ($ilDB->tableColumnExists('xxco_data_types', 'use_logs')) {
+        $ilDB->dropTableColumn('xxco_data_types', 'use_logs');
+    }
+    if ($ilDB->tableColumnExists('xxco_data_types', 'use_learning_progress')) {
+        $ilDB->dropTableColumn('xxco_data_types', 'use_learning_progress');
+    }
+    if ($ilDB->tableColumnExists('xxco_data_settings', 'meta_data_xml')) {
+        $ilDB->dropTableColumn('xxco_data_settings', 'meta_data_xml');
+    }
+?>
+<#32>
+<?php
+    if ($ilDB->tableExists('xxco_data_token')) {
+        $ilDB->dropTable('xxco_data_token');
+    }
+?>

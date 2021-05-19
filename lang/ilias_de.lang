@@ -36,7 +36,6 @@ xxco_instructions#:#Anleitung
 xxco_instructions_info#:#Die Anleitung wird auf der Info-Seite angezeigt.
 xxco_message_type_not_available#:#Externe Inhalte dieses Typs sind leider nicht mehr verfügbar.
 xxco_online_info#:#Damit wird das Objekt sichtbar für andere Nutzer
-xxco_refresh_meta_data#:#Meta-Daten aktualisieren
 type_availability#:#Verfügbarkeit
 type_availability_info#:#Hiermit steuern Sie die Verfügbarkeit des Typs im Magazin. Alte Typen können statt gelöscht auf "Bestehende erlaubt" gesetzt werden.
 type_created#:#Die Typdefinition wurde gespeichert.
@@ -68,8 +67,6 @@ type_desc2#:#Beschreibungstext eingeben
 type_path_template#:#Pfad-Template
 type_desc3#:#Demonstriert dein Einbau von Feldern in Templates
 view#:#Ansehen
-type_time_to_delete#:#Ablauf-Zeit
-type_time_to_delete_info#:#Ablauf-Zeit für einen Zugriffs-Token (bei Callback-Authentifizierung)
 instructions#:#Anleitung
 online_info#:#Schalten Sie den Content online, damit er für Lernerinnen sichtbar und verwendbar wird.
 view_log#:#Log ansehen
@@ -134,7 +131,6 @@ learning_progress_set#:#Lernfortschritt verwenden
 lp_on#:#Ja
 lp_off#:#Nein
 lp_info#:#Wählen Sie "Ja" wenn Sie Lernfortschrittsdaten vom externen Inhalt erhalten möchten
-time_to_delete_info#:#Lösch-Zeitraum für einen Zugriffs-Token (bei Logging)
 type_edit#:#Typ-Definition bearbeiten
 type_failure_encoding#:#Das Encoding %s wurde nicht gefunden!
 model#:#Typ-Modell

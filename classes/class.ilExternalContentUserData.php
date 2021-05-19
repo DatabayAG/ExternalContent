@@ -49,12 +49,11 @@ class ilExternalContentUserData
      */
     public function __construct($plugin)
     {
-        // todo: replace by DIC
-        global $lng, $ilUser;
+        global $DIC;
 
         $this->plugin = $plugin;
-        $this->lng = $lng;
-        $this->user = $ilUser;
+        $this->lng = $DIC->language();
+        $this->user = $DIC->user();
 
         $this->initFields();
     }
@@ -158,11 +157,11 @@ class ilExternalContentUserData
                     $this->lng->txt('email'),
                     $this->user->getEmail()
                 ),
-//                'ILIAS_USER_EMAIL_SECOND' => array(
-//                    'lis_person_email_personal',
-//                    $this->lng->txt('email'),
-//                    ''
-//                ),
+                'ILIAS_USER_EMAIL_SECOND' => array(
+                    'lis_person_email_personal',
+                    $this->lng->txt('email'),
+                    ''
+                ),
                 'ILIAS_USER_HOBBY' => array(
                     'ilias_user_hobby',
                     $this->lng->txt('hobby'),
@@ -178,16 +177,16 @@ class ilExternalContentUserData
                     $this->lng->txt('matriculation'),
                     $this->user->getMatriculation()
                 ),
-//                'ILIAS_USER_LATITUDE' => array(
-//                    'ilias_user_latitude',
-//                    $this->lng->txt('latitude'),
-//                    ''
-//                ),
-//                'ILIAS_USER_LONGITUDE' => array(
-//                    'ilias_user_longitude',
-//                    $this->lng->txt('longitude'),
-//                    ''
-//                ),
+                'ILIAS_USER_LATITUDE' => array(
+                    'ilias_user_latitude',
+                    $this->lng->txt('latitude'),
+                    ''
+                ),
+                'ILIAS_USER_LONGITUDE' => array(
+                    'ilias_user_longitude',
+                    $this->lng->txt('longitude'),
+                    ''
+                ),
                 'ILIAS_USER_IMAGE' => array(
                     'user_image',
                     $this->lng->txt('personal_picture'),

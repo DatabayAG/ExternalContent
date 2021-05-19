@@ -36,7 +36,6 @@ xxco_instructions#:#Instructies
 xxco_instructions_info#:#De instructies worden getoond op de info pagina.
 xxco_message_type_not_available#:#Dit type Externe Content is niet langer beschikbaar.
 xxco_online_info#:#Dit maakt het object zichtbaar en bruikbaar voor de gebruiker.
-xxco_refresh_meta_data#:#Ververs metadata
 type_availability#:#Beschikbaarheid
 type_availability_info#:#Beschikbaarheid van dit type in het studiecentrum. U mag uitgefaseerde typen op "bestaande objecten toestaan" zetten in plaats van ze te verwijderen.
 type_created#:#De type definitie is opgeslagen.
@@ -68,8 +67,6 @@ type_desc2#:#Invoeren omschrijving
 type_path_template#:#Pad naar sjabloon
 type_desc3#:#Dit demontstreert het nesten van velden en sjablonen.
 view#:#Beeld
-type_time_to_delete#:#Verlooptijd
-type_time_to_delete_info#:#Verlooptijd van een toegangstoken (voor callback authenticatie).
 instructions#:#Instructies
 online_info#:#Zet de content online om het zichtbaar te maken voor de deelnemers.
 view_log#:#Toon Log
@@ -134,7 +131,6 @@ learning_progress_set#:#Gebruik voortgang
 lp_on#:#Ja
 lp_off#:#Nee
 lp_info#:#Kies of je informatie wilt opslaan die afkomstig is van de externe content met de voortgangsfunctionaliteit van ILIAS.
-time_to_delete_info#:#Verwijder tijd van een toegangstoken (voor logging)
 type_edit#:#Wijzig type definitie
 type_failure_encoding#:#Pad Customizing/global/encodings/%s niet gevonden.
 model#:#Type model

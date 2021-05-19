@@ -57,7 +57,6 @@ class ilExternalContentLPStatus extends ilLPStatusPlugin
      * @param $a_user_id
      * @param $a_obj_id
      * @param $a_ref_id
-     * @param string $a_obj_type
      */
     public static function trackAccess($a_user_id, $a_obj_id, $a_ref_id)
     {
@@ -81,7 +80,7 @@ class ilExternalContentLPStatus extends ilLPStatusPlugin
      * @param $a_status
      * @param $a_percentage
      */
-    public static function trackResult($a_user_id, $a_obj_id, $a_status = self::LP_STATUS_IN_PROGRESS_NUM, $a_percentage)
+    public static function trackResult($a_user_id, $a_obj_id, $a_status, $a_percentage)
     {
         self::writeStatus($a_obj_id, $a_user_id, $a_status, $a_percentage, true);
         self::raiseEventStatic($a_obj_id, $a_user_id, $a_status, $a_percentage);

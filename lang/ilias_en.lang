@@ -36,7 +36,6 @@ xxco_instructions#:#Instruction
 xxco_instructions_info#:#The instruction will be shown on the info page
 xxco_message_type_not_available#:#External contents of this type are not longer available.
 xxco_online_info#:#This makes the object visible and usable for the users
-xxco_refresh_meta_data#:#update meta data
 type_availability#:#Availability
 type_availability_info#:#Availability of this type in the repository. You may set deprecated types to "allow existing" instead of deleting them.
 type_created#:#the type definition is saved.
@@ -68,8 +67,6 @@ type_desc2#:#Enter description text
 type_path_template#:#Path template
 type_desc3#:#This demonstrates the nesting of fields and templates.
 view#:#View
-type_time_to_delete#:#Time to expire
-type_time_to_delete_info#:#Expire time of an access token (for callback authentication)
 instructions#:#Instructions
 online_info#:#Switch the content online to get it visible for the learners
 view_log#:#View Log
@@ -134,7 +131,6 @@ learning_progress_set#:#Use learning progress
 lp_on#:#Yes
 lp_off#:#No
 lp_info#:#Choose if you want to store the information received from this external content with the learning progress tool of ILIAS.
-time_to_delete_info#:#Delete time of an access token (for logging)
 type_edit#:#Edit type definition
 type_failure_encoding#:#Customizing/global/encodings/%s not found!
 model#:#Type model

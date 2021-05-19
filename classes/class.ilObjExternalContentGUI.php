@@ -3,9 +3,10 @@
  * Copyright (c) 2013 Institut für Lern-Innovation, Friedrich-Alexander-Universität Erlangen-Nürnberg 
  * GPLv2, see LICENSE 
  */
-include_once('./Services/Repository/classes/class.ilObjectPluginGUI.php');
-include_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/ExternalContent/classes/class.ilObjExternalContent.php');
-include_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/ExternalContent/classes/class.ilExternalContentType.php');
+
+require_once(__DIR__ . '/class.ilObjExternalContent.php');
+require_once(__DIR__ . '/class.ilExternalContentSettings.php');
+require_once(__DIR__ . '/class.ilExternalContentType.php');
 
 /**
  * External Content plugin: repository object GUI
@@ -19,19 +20,17 @@ include_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/
  */
 class ilObjExternalContentGUI extends ilObjectPluginGUI
 {
-    const META_TIMEOUT_INFO = 1;
-    const META_TIMEOUT_REFRESH = 60;
-
-    /**
-     * Valid meta data groups for displaying
-     */
-    var $meta_groups = array('General', 'LifeCycle', 'Technical', 'Rights');
-
     /** @var ilPropertyFormGUI */
     protected $form;
 
     /** @var ilObjExternalContent */
-    var $object;
+    public $object;
+
+    /** @var ilExternalContentSettings */
+    public $objectSettings;
+
+    /** @var ilExternalContentType */
+    public $typedef;
 
     /**
      * Goto redirection
@@ -39,21 +38,21 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
      */
     public static function _goto($a_target)
     {
-        global $ilCtrl, $ilAccess, $lng;
+        global $DIC;
 
         $t = explode("_", $a_target[0]);
         $ref_id = (int) $t[0];
         $class_name = $a_target[1];
         $goto_suffix = (string) $t[1];
 
-        if ($ilAccess->checkAccess("read", "", $ref_id))
+        if ($DIC->access()->checkAccess("read", "", $ref_id))
         {
-            $ilCtrl->initBaseClass("ilObjPluginDispatchGUI");
-            $ilCtrl->setTargetScript("ilias.php");
-            $ilCtrl->getCallStructure(strtolower("ilObjPluginDispatchGUI"));
-            $ilCtrl->setParameterByClass($class_name, "ref_id", $ref_id);
-            $ilCtrl->setParameterByClass($class_name, "goto_suffix", $goto_suffix);
-            $ilCtrl->redirectByClass(array("ilobjplugindispatchgui", $class_name), "");
+            $DIC->ctrl()->initBaseClass("ilObjPluginDispatchGUI");
+            $DIC->ctrl()->setTargetScript("ilias.php");
+            $DIC->ctrl()->getCallStructure(strtolower("ilObjPluginDispatchGUI"));
+            $DIC->ctrl()->setParameterByClass($class_name, "ref_id", $ref_id);
+            $DIC->ctrl()->setParameterByClass($class_name, "goto_suffix", $goto_suffix);
+            $DIC->ctrl()->redirectByClass(array("ilobjplugindispatchgui", $class_name), "");
         }
         else {
             parent::_goto($a_target);
@@ -63,12 +62,25 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
 
     /**
      * Initialisation
-     *
-     * @access protected
      */
     protected function afterConstructor()
     {
-        // anything needed after object has been constructed
+        $this->initObjectSettings();
+    }
+
+    /**
+     * Init the settings and type definiton
+     */
+    protected function initObjectSettings()
+    {
+        if ($this->object instanceof ilExternalContent) {
+            $this->objectSettings = $this->object->getSettings();
+            $this->typedef = $this->objectSettings->getTypeDef();
+        }
+        else {
+            $this->objectSettings = new ilExternalContentSettings();
+            $this->typedef = new ilExternalContentType();
+        }
     }
 
     /**
@@ -112,8 +124,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
 	 */
 	protected function checkCreationMode()
 	{
-		global $ilCtrl;
-		$cmd = $ilCtrl->getCmd();
+		$cmd = $this->ctrl->getCmd();
 		if ($cmd == "create" or $cmd == "cancelCreate" or $cmd == "save" or $cmd == "Save")
 		{
 			$this->setCreationMode(true);
@@ -123,19 +134,17 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
 
 	/**
      * Perform command
-     *
-     * @access public
      */
     public function performCommand($cmd)
     {
-    	global $ilErr, $ilCtrl, $ilTabs;
+        $this->initObjectSettings();
 
 		if (!$this->checkCreationMode())
 		{
 			// set a return URL
 			// IMPORTANT: the last parameter prevents an encoding of & to &amp;
 			// Otherwise the OAuth signatore is calculated wrongly!
-			$this->object->setReturnURL(ILIAS_HTTP_PATH . "/". $ilCtrl->getLinkTarget($this, "view", "", true));
+			$this->object->setReturnURL(ILIAS_HTTP_PATH . "/". $this->ctrl->getLinkTarget($this, "view", "", true));
 
 			// set the goto suffix, e.g. autostart
             $this->object->setGotoSuffix($_GET['goto_suffix']);
@@ -145,7 +154,6 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
         {
         	case "edit":
         	case "update":
-        	case "refreshMeta":
         	case "editIcons":
         	case "updateIcons":
         	case "editInstructions":
@@ -165,10 +173,6 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
                 $this->$cmd();
                 break;
 
-            case "checkToken":
-               	$this->$cmd();
-                break;
-            
             default:
             	
 				if ($this->checkCreationMode())
@@ -179,9 +183,9 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
 				{
 					$this->checkPermission("read");
 
-					if ($this->object->typedef->getAvailability() == ilExternalContentType::AVAILABILITY_NONE)
+					if ($this->typedef->getAvailability() == ilExternalContentType::AVAILABILITY_NONE)
 					{
-						$ilErr->raiseError($this->txt('xxco_message_type_not_available'), $ilErr->MESSAGE);
+						$this->ilErr->raiseError($this->txt('xxco_message_type_not_available'), $this->ilErr->MESSAGE);
 					}
 
 					if (!$cmd)
@@ -200,53 +204,49 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
      */
     function setTabs()
     {
-        global $ilTabs, $ilCtrl, $lng;
-
-		if ($this->checkCreationMode())
+ 		if ($this->checkCreationMode())
 		{
 			return;
 		}
 
-        $type = new ilExternalContentType($this->object->getTypeId());
-
 		// view tab
-		if ($this->object->typedef->getLaunchType() == ilExternalContentType::LAUNCH_TYPE_EMBED)
+		if ($this->typedef->getLaunchType() == ilExternalContentType::LAUNCH_TYPE_EMBED)
 		{
-			$ilTabs->addTab("viewEmbed", $this->lng->txt("content"), $ilCtrl->getLinkTarget($this, "viewEmbed"));
+			$this->tabs->addTab("viewEmbed", $this->lng->txt("content"), $this->ctrl->getLinkTarget($this, "viewEmbed"));
 		}
 
         //  info screen tab
-        $ilTabs->addTab("infoScreen", $this->lng->txt("info_short"), $ilCtrl->getLinkTarget($this, "infoScreen"));
+        $this->tabs->addTab("infoScreen", $this->lng->txt("info_short"), $this->ctrl->getLinkTarget($this, "infoScreen"));
 
         // add "edit" tab
         if ($this->checkPermissionBool("write"))
         {
-            $ilTabs->addTab("edit", $this->lng->txt("settings"), $ilCtrl->getLinkTarget($this, "edit"));
+            $this->tabs->addTab("edit", $this->lng->txt("settings"), $this->ctrl->getLinkTarget($this, "edit"));
         }
 
         include_once("Services/Tracking/classes/class.ilObjUserTracking.php");
         if (ilObjUserTracking::_enabledLearningProgress() &&
             ($this->checkPermissionBool("edit_learning_progress") || $this->checkPermissionBool("read_learning_progress")))
         {
-            if ($this->object->getLPMode() == ilObjExternalContent::LP_ACTIVE && $this->checkPermissionBool("read_learning_progress"))
+            if ($this->objectSettings->getLPMode() == ilExternalContentSettings::LP_ACTIVE && $this->checkPermissionBool("read_learning_progress"))
             {
                 if (ilObjUserTracking::_enabledUserRelatedData())
                 {
-                    $ilTabs->addTab("learning_progress", $lng->txt('learning_progress'), $ilCtrl->getLinkTargetByClass(array('ilObjExternalContentGUI','ilLearningProgressGUI','ilLPListOfObjectsGUI')));
+                    $this->tabs->addTab("learning_progress", $this->lng->txt('learning_progress'), $this->ctrl->getLinkTargetByClass(array('ilObjExternalContentGUI','ilLearningProgressGUI','ilLPListOfObjectsGUI')));
                 }
                 else
                 {
-                    $ilTabs->addTab("learning_progress", $lng->txt('learning_progress'), $ilCtrl->getLinkTargetByClass(array('ilObjExternalContentGUI','ilLearningProgressGUI', 'ilLPListOfObjectsGUI'), 'showObjectSummary'));
+                    $this->tabs->addTab("learning_progress", $this->lng->txt('learning_progress'), $this->ctrl->getLinkTargetByClass(array('ilObjExternalContentGUI','ilLearningProgressGUI', 'ilLPListOfObjectsGUI'), 'showObjectSummary'));
                 }
             }
             elseif ($this->checkPermissionBool("edit_learning_progress"))
             {
-                $ilTabs->addTab('learning_progress', $lng->txt('learning_progress'), $ilCtrl->getLinkTarget($this,'editLPSettings'));
+                $this->tabs->addTab('learning_progress', $this->lng->txt('learning_progress'), $this->ctrl->getLinkTarget($this,'editLPSettings'));
             }
 
-			if (in_array($ilCtrl->getCmdClass(), array('illearningprogressgui', 'illplistofobjectsgui')))
+			if (in_array($this->ctrl->getCmdClass(), array('illearningprogressgui', 'illplistofobjectsgui')))
 			{
-				$ilTabs->addSubTab("lp_settings", $this->txt('settings'), $ilCtrl->getLinkTargetByClass(array('ilObjExternalContentGUI'), 'editLPSettings'));
+                $this->tabs->addSubTab("lp_settings", $this->lng->txt('settings'), $this->ctrl->getLinkTargetByClass(array('ilObjExternalContentGUI'), 'editLPSettings'));
 			}
         }
 
@@ -256,36 +256,33 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
     
     /**
      * Set the sub tabs
-     * 
      * @param string	main tab identifier
      */
     function setSubTabs($a_tab)
     {
-    	global $ilUser, $ilTabs, $ilCtrl, $lng;
-    	
     	switch ($a_tab)
     	{
     		case "edit":
-           		$ilTabs->addSubTab("settings", $lng->txt('settings'), $ilCtrl->getLinkTarget($this, 'edit'));    			
-           		$ilTabs->addSubTab("instructions", $this->txt('instructions'), $ilCtrl->getLinkTarget($this, 'editInstructions'));    			
-           		$ilTabs->addSubTab("icons", $this->txt('icons'), $ilCtrl->getLinkTarget($this, 'editIcons'));
+           		$this->tabs->addSubTab("settings", $this->lng->txt('settings'), $this->ctrl->getLinkTarget($this, 'edit'));
+                $this->tabs->addSubTab("instructions", $this->txt('instructions'), $this->ctrl->getLinkTarget($this, 'editInstructions'));
+                $this->tabs->addSubTab("icons", $this->txt('icons'), $this->ctrl->getLinkTarget($this, 'editIcons'));
     			break;
 
             case "learning_progress":
-                $lng->loadLanguageModule('trac');
+                $this->lng->loadLanguageModule('trac');
 				if ($this->checkPermissionBool("edit_learning_progress"))
 				{
-					$ilTabs->addSubTab("lp_settings", $this->txt('settings'), $ilCtrl->getLinkTargetByClass(array('ilObjExternalContentGUI'), 'editLPSettings'));
+                    $this->tabs->addSubTab("lp_settings", $this->txt('settings'), $this->ctrl->getLinkTargetByClass(array('ilObjExternalContentGUI'), 'editLPSettings'));
 				}
-                if ($this->object->getLPMode() == ilObjExternalContent::LP_ACTIVE && $this->checkPermissionBool("read_learning_progress"))
+                if ($this->objectSettings->getLPMode() == ilExternalContentSettings::LP_ACTIVE && $this->checkPermissionBool("read_learning_progress"))
                 {
 
                     include_once("Services/Tracking/classes/class.ilObjUserTracking.php");
                     if (ilObjUserTracking::_enabledUserRelatedData())
                     {
-                        $ilTabs->addSubTab("trac_objects", $lng->txt('trac_objects'), $ilCtrl->getLinkTargetByClass(array('ilObjExternalContentGUI','ilLearningProgressGUI','ilLPListOfObjectsGUI')));
+                        $this->tabs->addSubTab("trac_objects", $this->lng->txt('trac_objects'), $this->ctrl->getLinkTargetByClass(array('ilObjExternalContentGUI','ilLearningProgressGUI','ilLPListOfObjectsGUI')));
                     }
-                    $ilTabs->addSubTab("trac_summary", $lng->txt('trac_summary'), $ilCtrl->getLinkTargetByClass(array('ilObjExternalContentGUI','ilLearningProgressGUI', 'ilLPListOfObjectsGUI'), 'showObjectSummary'));
+                    $this->tabs->addSubTab("trac_summary", $this->lng->txt('trac_summary'), $this->ctrl->getLinkTargetByClass(array('ilObjExternalContentGUI','ilLearningProgressGUI', 'ilLPListOfObjectsGUI'), 'showObjectSummary'));
                 }
                 break;
         }
@@ -293,76 +290,51 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
 
     /**
      * show info screen
-     *
-     * @access public
      */
     public function infoScreen() 
     {
-		global $ilCtrl;
-
         $this->tabs_gui->activateTab('infoScreen');
 
         include_once("./Services/InfoScreen/classes/class.ilInfoScreenGUI.php");
         $info = new ilInfoScreenGUI($this);
 
-        if (!empty( $this->object->getInstructions())) {
+        if (!empty( $this->objectSettings->getInstructions())) {
             $info->addSection($this->txt('xxco_instructions'));
-            $info->addProperty("", $this->object->getInstructions());
-        }
-        
-        // meta data
-        $xml_obj = $this->object->fetchMetaData(self::META_TIMEOUT_INFO);
-        if($xml_obj)
-        {
-            foreach ($xml_obj->group as $group)
-            {
-                if (in_array($group['name'], $this->meta_groups))
-                {
-                    $info->addSection(utf8_decode($group->title));
-                    foreach ($group->fields->field as $field)
-                    {
-                        $info->addProperty(utf8_decode($field->title), $field->content);
-                    }
-                }
-            }
+            $info->addProperty("", $this->objectSettings->getInstructions());
         }
 
         $info->enablePrivateNotes();
         
         // add view button
-        if ($this->object->typedef->getAvailability() == ilExternalContentType::AVAILABILITY_NONE)
+        if ($this->typedef->getAvailability() == ilExternalContentType::AVAILABILITY_NONE)
         {
             ilUtil::sendFailure($this->lng->txt('xxco_message_type_not_available'), false);
         } elseif ($this->object->getOnline())
         {
-            if ($this->object->typedef->getLaunchType() == ilExternalContentType::LAUNCH_TYPE_LINK)
+            if ($this->typedef->getLaunchType() == ilExternalContentType::LAUNCH_TYPE_LINK)
             {
-                $info->addButton($this->lng->txt("view"), $ilCtrl->getLinkTarget($this, "view"));
-            } elseif ($this->object->typedef->getLaunchType() == ilExternalContentType::LAUNCH_TYPE_PAGE)
+                $info->addButton($this->lng->txt("view"), $this->ctrl->getLinkTarget($this, "view"));
+            } elseif ($this->typedef->getLaunchType() == ilExternalContentType::LAUNCH_TYPE_PAGE)
              {
-                $info->addButton($this->lng->txt("view"), $ilCtrl->getLinkTarget($this, "viewPage"));
+                $info->addButton($this->lng->txt("view"), $this->ctrl->getLinkTarget($this, "viewPage"));
             }
         }
-		$ilCtrl->forwardCommand($info);
+		$this->ctrl->forwardCommand($info);
     }
 
     
     /**
      * view the object (default command)
-     *
-     * @access public
      */
     function viewObject() 
     {
-        global $ilErr;
-
         $this->ctrl->saveParameter($this, 'goto_suffix');
 
-        switch ($this->object->typedef->getLaunchType())
+        switch ($this->typedef->getLaunchType())
         {
             case ilExternalContentType::LAUNCH_TYPE_LINK:
                 $this->object->trackAccess();
-                ilUtil::redirect($this->object->getLaunchLink());
+                ilUtil::redirect($this->object->getRenderer()->render());
                 break;
 
             case ilExternalContentType::LAUNCH_TYPE_PAGE:
@@ -394,11 +366,9 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
      */
     function viewEmbedObject()
     {
-        global $ilErr, $ilUser;
-
         $this->object->trackAccess();
         $this->tabs_gui->activateTab('viewEmbed');
-        $this->tpl->setVariable('ADM_CONTENT', $this->object->getEmbedCode());
+        $this->tpl->setVariable('ADM_CONTENT', $this->object->getRenderer()->render());
     }
 
     /**
@@ -408,26 +378,19 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
      */
     function viewPageObject()
     {
-        global $ilErr;
-
         $this->object->trackAccess();
-        echo $this->object->getPageCode();
+        echo $this->object->getRenderer()->render();
         exit;
     }
 
     /**
      * create new object form
-     *
-     * @access	public
      */
     function create()
     {
-        global $rbacsystem, $ilErr;
-        
        $this->setCreationMode(true);
-        if (!$rbacsystem->checkAccess("create", $_GET["ref_id"], $this->type))
-        {
-            $ilErr->raiseError($this->lng->txt("permission_denied"), $ilErr->MESSAGE);
+       if (!$this->access->checkAccess("create", '', $_GET["ref_id"], $this->getType())) {
+           $this->ilErr->raiseError($this->lng->txt("permission_denied"), $this->ilErr->MESSAGE);
         }
 		else
         {
@@ -438,8 +401,6 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
     
     /**
      * cancel creation of a new object
-     *
-     * @access	public
      */
     function cancelCreate()
     {
@@ -448,30 +409,26 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
 
     /**
      * save the data of a new object
-     *
-     * @access	public
      */
     function save()
     {
-        global $rbacsystem, $ilErr;
-        
-        
-            $new_type = $this->getType();
-            $_REQUEST["new_type"] = $new_type;
-            if (!$rbacsystem->checkAccess("create", $_GET["ref_id"], $new_type))
+            $_REQUEST["new_type"] = $this->getType();
+            if (!$this->access->checkAccess("create", '', $_GET["ref_id"], $this->getType()))
             {
-                $ilErr->raiseError($this->lng->txt("permission_denied"), $ilErr->MESSAGE);
+                $this->ilErr->raiseError($this->lng->txt("permission_denied"), $this->ilErr->MESSAGE);
             }
             $this->initForm("create");
 
             if ($this->form->checkInput())
             {
                 $this->object = new ilObjExternalContent;
-                $this->object->setType($this->type);
+                $this->object->setType($this->getType());
                 $this->object->create();
                 $this->object->createReference();
                 $this->object->putInTree($_GET["ref_id"]);
                 $this->object->setPermissions($_GET["ref_id"]);
+
+                $this->initObjectSettings();
                 $this->saveFormValues();
 
                 $this->ctrl->setParameter($this, "ref_id", $this->object->getRefId());
@@ -486,25 +443,18 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
 
     /**
      * Edit object
-     *
-     * @access protected
      */
     public function editObject()
     {
-        global $ilErr, $ilAccess;
-
         $this->tabs_gui->activateTab('edit');
         $this->tabs_gui->activateSubTab('settings');
 
         $this->initForm('edit', $this->loadFormValues());
-        // $this->loadFormValues();
         $this->tpl->setContent($this->form->getHTML());
     }
 
     /**
      * update object
-     *
-     * @access public
      */
     public function updateObject()
     {
@@ -529,25 +479,23 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
      * Init properties form
      *
      * @param        int        $a_mode        Form Edit Mode (IL_FORM_EDIT | IL_FORM_CREATE)
-     * @param		 array		(assoc) form values
-     * @access       protected
+     * @param		 array		$a_values       (assoc) form values
      */
     protected function initForm($a_mode, $a_values = array())
     {
         if (is_object($this->form))
         {
-            return true;
+            return;
         }
 
-        include_once("./Services/Form/classes/class.ilPropertyFormGUI.php");
         $this->form = new ilPropertyFormGUI();
         $this->form->setFormAction($this->ctrl->getFormAction($this));
 
         if ($a_mode != "create")
         {
-	        $item = new ilCustomInputGUI($this->lng->txt('type'), '');
-	        $item->setHtml($this->object->typedef->getTitle());
-	        $item->setInfo($this->object->typedef->getDescription());
+	        $item = new ilNonEditableValueGUI($this->lng->txt('type'), '');
+	        $item->setValue($this->typedef->getTitle());
+	        $item->setInfo($this->typedef->getDescription());
 	        $this->form->addItem($item);
         }
         
@@ -594,24 +542,17 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
           	$this->form->addItem($item);
             
           	// add the type specific fields
-        	$this->object->typedef->addFormElements($this->form, $a_values, "object");
+        	$this->typedef->addFormElements($this->form, $a_values, "object");
         	            
             $this->form->setTitle($this->lng->txt('settings'));
             $this->form->addCommandButton("update", $this->lng->txt("save"));
             $this->form->addCommandButton("view", $this->lng->txt("cancel"));
-
-            if ($this->object->typedef->getMetaDataUrl())
-            {
-                $this->form->addCommandButton("refreshMeta", $this->lng->txt("xxco_refresh_meta_data"));
-            }
         }
     }
     
 
     /**
      * Fill the properties form with database values
-     *
-     * @access   protected
      */
     protected function loadFormValues()
     {
@@ -619,14 +560,14 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
 
         $values['title'] = $this->object->getTitle();
         $values['description'] = $this->object->getDescription();
-        $values['type_id'] = $this->object->getTypeId();
-        $values['type'] = $this->object->typedef->getTitle();
-        $values['instructions'] = $this->object->getInstructions();
-        if ($this->object->getAvailabilityType() == ilObjExternalContent::ACTIVATION_UNLIMITED)
+        $values['type_id'] = $this->typedef->getTypeId();
+        $values['type'] = $this->typedef->getTitle();
+        $values['instructions'] = $this->objectSettings->getInstructions();
+        if ($this->objectSettings->getAvailabilityType() == ilExternalContentSettings::ACTIVATION_UNLIMITED)
         {
             $values['online'] = '1';
         }
-        foreach ($this->object->getInputValues("object") as $field_name => $field_value)
+        foreach ($this->objectSettings->getInputValues() as $field_name => $field_value)
         {
             $values['field_' . $field_name] = $field_value;
         }
@@ -636,25 +577,22 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
     
     /**
      * Save the property form values to the object
-     *
-     * @access   protected
      */
     protected function saveFormValues() 
     {
-
         $this->object->setTitle($this->form->getInput("title"));
         $this->object->setDescription($this->form->getInput("description"));
         if ($this->form->getInput("type_id"))
         {
-            $this->object->setTypeId($this->form->getInput("type_id"));
+            $this->objectSettings->setTypeId($this->form->getInput("type_id"));
         }
-        $this->object->setAvailabilityType($this->form->getInput('online') ? ilObjExternalContent::ACTIVATION_UNLIMITED : ilObjExternalContent::ACTIVATION_OFFLINE);
+        $this->objectSettings->setAvailabilityType($this->form->getInput('online') ? ilExternalContentSettings::ACTIVATION_UNLIMITED : ilExternalContentSettings::ACTIVATION_OFFLINE);
         $this->object->update();
 
 
-        foreach ($this->object->typedef->getFormValues($this->form, 'object') as $field_name => $field_value)
+        foreach ($this->typedef->getFormValues($this->form, 'object') as $field_name => $field_value)
         {
-            $this->object->saveFieldValue($field_name, $field_value);
+            $this->objectSettings->saveInputValue($field_name, $field_value);
         }
     }
     
@@ -676,22 +614,18 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
      */
     protected function initFormInstructions()
     {
-        global $ilSetting, $lng, $ilCtrl;
-        
-      	include_once("./Services/Form/classes/class.ilPropertyFormGUI.php");
         $form = new ilPropertyFormGUI();
-        $form->setFormAction($ilCtrl->getFormAction($this));
+        $form->setFormAction($this->ctrl->getFormAction($this));
         $form->setTitle($this->txt('edit_instructions'));
 
 		$item = new ilTextAreaInputGUI($this->txt('xxco_instructions'), 'instructions');
 		$item->setInfo($this->txt('xxco_instructions_info'));
 		$item->setRows(10);
-		$item->setCols(80);
 		$item->setUseRte(true);
-		$item->setValue($this->object->getInstructions());
+		$item->setValue($this->objectSettings->getInstructions());
 		$form->addItem($item);
                 
-        $form->addCommandButton('updateInstructions', $lng->txt('save'));  
+        $form->addCommandButton('updateInstructions', $this->lng->txt('save'));
         $this->form = $form;
     }
     
@@ -701,8 +635,6 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
      */
     function updateInstructionsObject()
     {
-        global $ilCtrl, $lng, $tpl;
-
         $this->tabs_gui->activateTab('edit');
         $this->tabs_gui->activateSubTab('instuctions');
         
@@ -710,15 +642,15 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
         if (!$this->form->checkInput())
         {
             $this->form->setValuesByPost();
-            $tpl->setContent($this->form->getHTML());
+            $this->tpl->setContent($this->form->getHTML());
             return;
         } 
         
-        $this->object->setInstructions($this->form->getInput("instructions"));
-        $this->object->update();
+        $this->objectSettings->setInstructions($this->form->getInput("instructions"));
+        $this->objectSettings->save();
         
 		ilUtil::sendSuccess($this->txt('instructions_saved'), true);
-        $ilCtrl->redirect($this, 'editInstructions');
+        $this->ctrl->redirect($this, 'editInstructions');
     }
     
     
@@ -742,7 +674,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
     {
         global $ilSetting, $lng, $ilCtrl;
 
-        $type_id = $this->object->typedef->getTypeId();
+        $type_id = $this->typedef->getTypeId();
         $obj_id = $this->object->getId();
 
         $svg = ilExternalContentPlugin::_getIcon("xxco", "svg", $obj_id, $type_id, "object");
@@ -786,8 +718,6 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
      */
     function updateIconsObject()
     {
-        global $ilCtrl, $lng, $tpl;
-
         $this->tabs_gui->activateTab('edit');
         $this->tabs_gui->activateSubTab('icons');
                 
@@ -795,7 +725,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
         if (!$this->form->checkInput())
         {
             $this->form->setValuesByPost();
-            $tpl->setContent($this->form->getHTML());
+            $this->tpl->setContent($this->form->getHTML());
             return;
         }
 
@@ -822,7 +752,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
 		ilExternalContentPlugin::_saveIcon($_FILES["tiny_icon"]['tmp_name'], "tiny", "object", $this->object->getId());
 
 		ilUtil::sendSuccess($this->txt('icons_saved'), true);
-        $ilCtrl->redirect($this, 'editIcons');
+        $this->ctrl->redirect($this, 'editIcons');
     }
 
     /**
@@ -842,19 +772,16 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
      */
     protected function initFormLPSettings()
     {
-        global $ilSetting, $lng, $ilCtrl;
-
-        include_once("./Services/Form/classes/class.ilPropertyFormGUI.php");
         $form = new ilPropertyFormGUI();
-        $form->setFormAction($ilCtrl->getFormAction($this));
+        $form->setFormAction($this->ctrl->getFormAction($this));
         $form->setTitle($this->txt('lp_settings'));
 
         $rg = new ilRadioGroupInputGUI($this->txt('lp_mode'), 'lp_mode');
         $rg->setRequired(true);
-        $rg->setValue($this->object->getLPMode());
-        $ro = new ilRadioOption($this->txt('lp_inactive'),ilObjExternalContent::LP_INACTIVE, $this->txt('lp_inactive_info'));
+        $rg->setValue($this->objectSettings->getLPMode());
+        $ro = new ilRadioOption($this->txt('lp_inactive'),ilExternalContentSettings::LP_INACTIVE, $this->txt('lp_inactive_info'));
         $rg->addOption($ro);
-        $ro = new ilRadioOption($this->txt('lp_active'),ilObjExternalContent::LP_ACTIVE, $this->txt('lp_active_info'));
+        $ro = new ilRadioOption($this->txt('lp_active'),ilExternalContentSettings::LP_ACTIVE, $this->txt('lp_active_info'));
 
         $ni = new ilNumberInputGUI($this->txt('lp_threshold'),'lp_threshold');
         $ni->setMinValue(0);
@@ -862,14 +789,14 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
         $ni->setDecimals(2);
         $ni->setSize(4);
         $ni->setRequired(true);
-        $ni->setValue($this->object->getLPThreshold());
+        $ni->setValue($this->objectSettings->getLPThreshold());
         $ni->setInfo($this->txt('lp_threshold_info'));
         $ro->addSubItem($ni);
 
         $rg->addOption($ro);
         $form->addItem($rg);
 
-        $form->addCommandButton('updateLPSettings', $lng->txt('save'));
+        $form->addCommandButton('updateLPSettings', $this->lng->txt('save'));
         $this->form = $form;
 
     }
@@ -886,38 +813,13 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
         if (!$this->form->checkInput())
         {
             $this->form->setValuesByPost();
-            $tpl->setContent($this->form->getHTML());
+            $this->tpl->setContent($this->form->getHTML());
             return;
         }
 
-        $this->object->setLPMode($this->form->getInput('lp_mode'));
-        $this->object->setLPThreshold($this->form->getInput('lp_threshold'));
-        $this->object->update();
+        $this->objectSettings->setLPMode($this->form->getInput('lp_mode'));
+        $this->objectSettings->setLPThreshold($this->form->getInput('lp_threshold'));
+        $this->objectSettings->save();
         $this->ctrl->redirect($this, 'editLPSettings');
     }
-
-     /**
-     * Refresh the meta data
-     *
-     * @access   public
-     */
-    public function refreshMetaObject()
-    {
-        $this->object->fetchMetaData(self::META_TIMEOUT_REFRESH);
-        $this->ctrl->redirect($this, "infoScreen");
-    }
-
-    /**
-     * check a token for validity
-     * 
-     * @return boolean	check is ok
-     */
-    function checkToken()
-    {
-        $obj = new ilObjExternalContent();
-        $value = $obj->checkToken();
-        echo $value;
-    }
 }
-
-?>

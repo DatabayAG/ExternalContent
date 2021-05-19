@@ -29,7 +29,7 @@ class ilObjExternalContentAccess extends ilObjectPluginAccess
 	*
 	* @return	boolean		true, if everything is ok
 	*/
-	function _checkAccess($a_cmd, $a_permission, $a_ref_id, $a_obj_id, $a_user_id = "")
+	function _checkAccess($a_cmd, $a_permission, $a_ref_id, $a_obj_id, $a_user_id = 0)
 	{
 		global $DIC;
 
@@ -66,8 +66,6 @@ class ilObjExternalContentAccess extends ilObjectPluginAccess
 				return true;
 
 			case self::ACTIVATION_OFFLINE:
-				return false;
-
 			default:
 				return false;
 		}
@@ -115,6 +113,4 @@ class ilObjExternalContentAccess extends ilObjectPluginAccess
 		
 		return self::$settings_cache[$a_obj_id];
 	}
-} 
-
-?>
+}
