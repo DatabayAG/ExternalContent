@@ -89,8 +89,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
 	 */
 	protected function checkCreationMode()
 	{
-		$cmd = $this->ctrl->getCmd();
-		if ($cmd == "create" or $cmd == "cancelCreate" or $cmd == "save" or $cmd == "Save")
+		if (! $this->object instanceof ilObjExternalContent)
 		{
 			$this->setCreationMode(true);
 		}
@@ -472,7 +471,6 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
         $item = new ilTextAreaInputGUI($this->lng->txt('description'), 'description');
         $item->setInfo($this->txt('xxco_description_info'));
         $item->setRows(2);
-        $item->setCols(80);
 		$item->setValue($a_values['description']);        
         $this->form->addItem($item);
        
@@ -504,7 +502,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
           	$this->form->addItem($item);
             
           	// add the type specific fields
-        	$this->object->getTypeDef()->addFormElements($this->form, $a_values, "object");
+        	$this->object->getSettings()->getTypeDef()->addFormElements($this->form, $a_values, "object");
         	            
             $this->form->setTitle($this->lng->txt('settings'));
             $this->form->addCommandButton("update", $this->lng->txt("save"));
@@ -520,16 +518,18 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
     {
         $values = array();
 
+        $settings = $this->object->getSettings();
+
         $values['title'] = $this->object->getTitle();
         $values['description'] = $this->object->getDescription();
-        $values['type_id'] = $this->object->getTypeDef()->getTypeId();
-        $values['type'] = $this->object->getTypeDef()->getTitle();
-        $values['instructions'] = $this->object->getSettings()->getInstructions();
-        if ($this->object->getSettings()->getAvailabilityType() == ilExternalContentSettings::ACTIVATION_UNLIMITED)
+        $values['type_id'] = $settings->getTypeId();
+        $values['type'] = $settings->getTypeDef()->getTitle();
+        $values['instructions'] = $settings->getInstructions();
+        if ($settings->getAvailabilityType() == ilExternalContentSettings::ACTIVATION_UNLIMITED)
         {
             $values['online'] = '1';
         }
-        foreach ($this->object->getSettings()->getInputValues() as $field_name => $field_value)
+        foreach ($settings->getInputValues() as $field_name => $field_value)
         {
             $values['field_' . $field_name] = $field_value;
         }
@@ -544,17 +544,19 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
     {
         $this->object->setTitle($this->form->getInput("title"));
         $this->object->setDescription($this->form->getInput("description"));
-        if ($this->form->getInput("type_id"))
-        {
-            $this->object->getSettings()->setTypeId($this->form->getInput("type_id"));
-        }
-        $this->object->getSettings()->setAvailabilityType($this->form->getInput('online') ? ilExternalContentSettings::ACTIVATION_UNLIMITED : ilExternalContentSettings::ACTIVATION_OFFLINE);
         $this->object->update();
 
-
-        foreach ($this->object->getTypeDef()->getFormValues($this->form, 'object') as $field_name => $field_value)
+        $settings = $this->object->getSettings();
+        if ($this->form->getInput("type_id"))
         {
-            $this->object->getSettings()->saveInputValue($field_name, $field_value);
+            $settings->setTypeId($this->form->getInput("type_id"));
+        }
+        $settings->setAvailabilityType($this->form->getInput('online') ? ilExternalContentSettings::ACTIVATION_UNLIMITED : ilExternalContentSettings::ACTIVATION_OFFLINE);
+        $settings->save();
+
+        foreach ($settings->getTypeDef()->getFormValues($this->form, 'object') as $field_name => $field_value)
+        {
+            $settings->saveInputValue($field_name, $field_value);
         }
     }
     
