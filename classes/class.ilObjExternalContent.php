@@ -73,7 +73,6 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
 
         $this->db = $ilDB;
         $this->typedef = new ilExternalContentType();
-        $this->userData = ilExternalContentUserData::create($this->plugin);
     }
 
     /**
@@ -85,6 +84,20 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
     final public function initType() {
         $this->setType('xxco');
     }
+
+
+    /**
+     * Get the cached user data
+     * don't initialize in outcome service (ui for avatar not available)
+     * @return ilExternalContentUserData
+     */
+    protected function getUserData() {
+        if (!isset($this->userData)) {
+            $this->userData = ilExternalContentUserData::create($this->plugin);
+        }
+        return $this->userData;
+    }
+
 
     /**
      * Set instructions
@@ -558,7 +571,7 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
             default:
 
                 // fill additional user fields
-                foreach ($this->userData->getFieldValues() as $field_name => $field_value) {
+                foreach ($this->getUserData()->getFieldValues() as $field_name => $field_value) {
                     if ($field_name == $a_field['field_name']) {
                         $value = $field_value;
                     }
@@ -624,7 +637,7 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
         );
 
         // add user data fields
-        $ilias_names = array_merge($ilias_names, $this->userData->getFieldNames());
+        $ilias_names = array_merge($ilias_names, $this->getUserData()->getFieldNames());
 
         foreach ($ilias_names as $name) {
             $field = array();
@@ -662,7 +675,7 @@ class ilObjExternalContent extends ilObjectPlugin implements ilLPStatusPluginInt
             if ($field['field_type'] == ilExternalContentType::FIELDTYPE_SPECIAL) {
                 switch ($field['field_name']) {
                     case ilExternalContentType::FIELD_LTI_USER_DATA:
-                        $field['field_value'] = $this->userData->getLtiParams($field['field_value']);
+                        $field['field_value'] = $this->getUserData()->getLtiParams($field['field_value']);
                         break;
                 }
             }
