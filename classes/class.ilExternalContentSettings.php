@@ -4,6 +4,7 @@
  * GPLv2, see LICENSE
  */
 
+require_once(__DIR__ . '/class.ilExternalContentType.php');
 
 class ilExternalContentSettings
 {
