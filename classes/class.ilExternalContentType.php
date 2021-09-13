@@ -97,6 +97,27 @@ class ilExternalContentType
     }
 
     /**
+     * Get a content type id by name
+     * @param string $a_name
+     * @return int|null
+     */
+    public static function getIdByName($a_name)
+    {
+        global $DIC;
+        $db = $DIC->database();
+
+        $query = 'SELECT type_id FROM xxco_data_types WHERE type_name = '
+            . $db->quote($a_name, 'text');
+
+        $res = $db->query($query);
+        $row = $db->fetchAssoc($res);
+        if ($row) {
+            return $row['type_id'];
+        }
+        return null;
+    }
+
+    /**
      * Set Type Id
      * @param int $a_type_id
      */
@@ -431,7 +452,7 @@ class ilExternalContentType
     }
     
     /**
-     * get a DOM child elemet with a specific name
+     * get a DOM child element with a specific name
      * 
      * @param 	DOMNode		node
      * @param 	string		child name

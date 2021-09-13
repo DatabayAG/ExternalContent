@@ -15,7 +15,7 @@ class ilExternalContentSettings
     const LP_ACTIVE = 1;
 
     protected $settings_id;
-    protected $obj_id;
+    protected $obj_id = 0;
     protected $type_id;
     protected $instructions;
     protected $availability_type;
@@ -224,6 +224,119 @@ class ilExternalContentSettings
         $this->input_values[(string) $a_field_name] = $a_field_value;
     }
 
+    /**
+     * Get the settings as XML data
+     */
+    public function getXML()
+    {
+        $doc = new DOMDocument('1.0', 'utf-8');
+        $doc->formatOutput = true;
+        $settings = $doc->createElement('Settings');
+        $doc->appendChild($settings);
+
+        $type_name = $settings->appendChild($doc->createElement('TypeName'));
+        $type_name->appendChild($doc->createCDATASection($this->getTypeDef()->getName()));
+        $settings->appendChild($type_name);
+
+        $instructions = $doc->createElement('Instructions');
+        $instructions->appendChild($doc->createCDATASection($this->getInstructions()));
+        $settings->appendChild($instructions);
+
+        $settings->appendChild($doc->createElement('AvailabilityType', (int) $this->getAvailabilityType()));
+        $settings->appendChild($doc->createElement('LPMode', (int) $this->getLPMode()));
+        $settings->appendChild($doc->createElement('LPThreshold', (int) $this->getLPThreshold()));
+
+        $fields = $doc->createElement('Fields');
+        $settings->appendChild($fields);
+
+        foreach ($this->getInputValues() as $field_name => $field_value) {
+            $field = $doc->createElement('Field');
+            $field->setAttribute('name', $field_name);
+            $field->appendChild($doc->createCDATASection($field_value));
+            $fields->appendChild($field);
+        }
+
+        return $doc->saveXML($settings);
+    }
+
+    /**
+     * Set the settings as XML data
+     * @param	string	xml definition
+     * @param	string	(byref) variable for failure message
+     * @return	boolean setting successful
+     */
+    public function setXML($a_xml, &$a_failure_message)
+    {
+        $doc = new DOMDocument('1.0');
+        $doc->formatOutput = true;
+
+        if (!@$doc->loadXML($a_xml)) {
+            $err = error_get_last();
+            $a_failure_message = $err['message'];
+            return false;
+        }
+
+        if (!$settings = $this->getDomChildByName($doc, 'Settings')) {
+            $a_failure_message = "Missing element 'Settings'";
+            return false;
+        }
+
+        if (!$type_name = $this->getDomChildByName($settings, 'TypeName')) {
+            $a_failure_message = "Missing element 'TypeName'";
+            return false;
+        }
+
+        $type_id = ilExternalContentType::getIdByName($type_name->textContent);
+        if (!isset($type_id)) {
+            $a_failure_message = "Unknown external content type '". ilUtil::secureString($type_name->textContent) ."'";
+            return false;
+        }
+        $this->setTypeId($type_id);
+
+        if ($instructions = $this->getDomChildByName($settings, 'Instructions')) {
+            $this->setInstructions(ilUtil::secureString($instructions->textContent));
+        }
+        if ($availability_type = $this->getDomChildByName($settings, 'AvailabilityType')) {
+            $this->setAvailabilityType((int) $availability_type->textContent);
+        }
+        if ($lp_mode = $this->getDomChildByName($settings, 'LPMode')) {
+            $this->setLPMode((int) $availability_type->textContent);
+        }
+        if ($lp_threshold = $this->getDomChildByName($settings, 'LPThreshold')) {
+            $this->setLPThreshold((float) $availability_type->textContent);
+        }
+
+        $fields = $this->getDomChildByName($settings, 'Fields');
+        /** @var DOMElement $field */
+        foreach ($fields->getElementsByTagName('Field') as $field) {
+            $this->setInputValue(ilutil::secureString($field->getAttribute('name')), ilUtil::secureString($field->textContent));
+        }
+
+        return true;
+    }
+
+
+    /**
+     * get a DOM child element with a specific name
+     *
+     * @param 	DOMNode		node
+     * @param 	string		child name
+     * @return 	DOMElement|false
+     */
+    private function getDomChildByName($a_node, $a_name)
+    {
+        foreach ($a_node->childNodes as $child_node)
+        {
+            if ($child_node->nodeType == XML_ELEMENT_NODE
+                and $child_node->nodeName == $a_name)
+            {
+                // return the first found child
+                return $child_node;
+            }
+        }
+        // element was not found
+        return false;
+    }
 
 
 
@@ -335,7 +448,9 @@ class ilExternalContentSettings
      */
     public function clone($newSettings)
     {
-        $newSettings->setObjId($this->getObjId());
+        // don't clone the settings_id and obj_jd
+        // they will be different in newSettings
+
         $newSettings->setTypeId($this->getTypeId());
         $newSettings->setAvailabilityType($this->getAvailabilityType());
         $newSettings->setInstructions($this->getInstructions());
