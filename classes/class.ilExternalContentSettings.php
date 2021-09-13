@@ -22,6 +22,8 @@ class ilExternalContentSettings
     protected $lp_mode = self::LP_INACTIVE;
     protected $lp_threshold = 0.5;
 
+    protected $input_values = [];
+
     /**
      * @var ilDBInterface
      */
@@ -192,6 +194,40 @@ class ilExternalContentSettings
     }
 
     /**
+     * Get array of input values
+     */
+    public function getInputValues()
+    {
+        return $this->input_values;
+    }
+
+    /**
+     * Set an array of input values
+     * @param array $a_values   field_name => field_value
+     */
+    public function setInputValues($a_values)
+    {
+        $this->input_values = [];
+        foreach ($a_values as $a_field_name => $a_field_value) {
+            $this->input_values[(string) $a_field_name] = $a_field_value;
+        }
+    }
+
+
+    /**
+     * Set a single input
+     * @param $a_field_name
+     * @param $a_field_value
+     */
+    public function setInputValue($a_field_name, $a_field_value)
+    {
+        $this->input_values[(string) $a_field_name] = $a_field_value;
+    }
+
+
+
+
+    /**
      * Read from db with a given obj_id
      * Should only be used for the repository plugin where only one setting exists per object
      * The page editor plugin may have more settings for the same object
@@ -201,14 +237,15 @@ class ilExternalContentSettings
     {
         $this->setObjId($obj_id);
 
-        $query = 'SELECT * FROM xxco_data_settings WHERE obj_id = '
+        $query = 'SELECT settings_id FROM xxco_data_settings WHERE obj_id = '
             . $this->db->quote($obj_id, 'integer');
 
         $res = $this->db->query($query);
         $row = $this->db->fetchAssoc($res);
 
-        if ($row) {
-            $this->setData($row);
+        if (isset($row['settings_id'])) {
+            $this->setSettingsId((int) $row['settings_id']);
+            $this->read();
         }
     }
 
@@ -223,26 +260,26 @@ class ilExternalContentSettings
 
         $res = $this->db->query($query);
         $row = $this->db->fetchAssoc($res);
-
         if ($row) {
-            $this->setData($row);
+            $this->setSettingsId($row['settings_id']);
+            $this->setObjId($row['obj_id']);
+            $this->setTypeId($row['type_id']);
+            $this->setInstructions($row['instructions']);
+            $this->setAvailabilityType($row['availability_type']);
+            $this->setLPMode($row['lp_mode']);
+            $this->setLPThreshold($row['lp_threshold']);
+        }
+
+        $query = 'SELECT * FROM xxco_data_values WHERE settings_id = '
+            . $this->db->quote($this->getSettingsId(), 'integer');
+        $res = $this->db->query($query);
+
+        $this->setInputValues([]);
+        while ($row = $this->db->fetchAssoc($res)) {
+            $this->setInputValue($row['field_name'], $row['field_value']);
         }
     }
 
-    /**
-     * Set the data from an array
-     * @param array $row
-     */
-    protected function setData($row)
-    {
-        $this->setSettingsId($row['settings_id']);
-        $this->setObjId($row['obj_id']);
-        $this->setTypeId($row['type_id']);
-        $this->setInstructions($row['instructions']);
-        $this->setAvailabilityType($row['availability_type']);
-        $this->setLPMode($row['lp_mode']);
-        $this->setLPThreshold($row['lp_threshold']);
-    }
 
 
     /**
@@ -265,6 +302,16 @@ class ilExternalContentSettings
                 'lp_threshold' => array('float', $this->getLPThreshold())
             )
         );
+
+        foreach ($this->getInputValues() as $field_name => $field_value) {
+            $this->db->replace('xxco_data_values', array(
+                'settings_id' => array('integer', $this->getSettingsId()),
+                'field_name' => array('text', $field_name)
+            ), array(
+                    'field_value' => array('text', $field_value)
+                )
+            );
+        }
     }
 
     /**
@@ -294,48 +341,7 @@ class ilExternalContentSettings
         $newSettings->setInstructions($this->getInstructions());
         $newSettings->setLPMode($this->getLPMode());
         $newSettings->setLPThreshold($this->getLPThreshold());
+        $newSettings->setInputValues($this->getInputValues());
         $newSettings->save();
-
-        foreach($this->getInputValues() as $name => $value){
-            $this->db->insert('xxco_data_values', array(
-                    'settings_id' => array('integer', $newSettings->getSettingsId()),
-                    'field_name' => array('text', $name),
-                    'field_value' => array('text', $value)
-                )
-            );
-        }
-    }
-
-    /**
-     * Save an input value directly
-     * @param string $a_field_name
-     * @param string $a_field_value
-     */
-    public function saveInputValue($a_field_name, $a_field_value)
-    {
-        $this->db->replace('xxco_data_values', array(
-            'settings_id' => array('integer', $this->getSettingsId()),
-            'field_name' => array('text', $a_field_name)
-        ), array(
-                'field_value' => array('text', $a_field_value)
-            )
-        );
-    }
-
-
-    /**
-     * Get array of input values
-     */
-    function getInputValues()
-    {
-        $query = 'SELECT * FROM xxco_data_values WHERE settings_id = '
-            . $this->db->quote($this->getSettingsId(), 'integer');
-        $res = $this->db->query($query);
-
-        $values = array();
-        while ($row = $this->db->fetchAssoc($res)) {
-            $values[$row['field_name']] = $row['field_value'];
-        }
-        return $values;
     }
 }

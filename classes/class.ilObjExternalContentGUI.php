@@ -552,12 +552,13 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
             $settings->setTypeId($this->form->getInput("type_id"));
         }
         $settings->setAvailabilityType($this->form->getInput('online') ? ilExternalContentSettings::ACTIVATION_UNLIMITED : ilExternalContentSettings::ACTIVATION_OFFLINE);
+        $settings->setInputValues([]);
+        foreach ($settings->getTypeDef()->getFormValues($this->form, 'object') as $field_name => $field_value) {
+            $settings->setInputValue($field_name, $field_value);
+        }
+
         $settings->save();
 
-        foreach ($settings->getTypeDef()->getFormValues($this->form, 'object') as $field_name => $field_value)
-        {
-            $settings->saveInputValue($field_name, $field_value);
-        }
     }
     
     /**
