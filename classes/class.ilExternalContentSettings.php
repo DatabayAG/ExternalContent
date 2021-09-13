@@ -288,6 +288,7 @@ class ilExternalContentSettings
      */
     public function clone($newSettings)
     {
+        $newSettings->setObjId($this->getObjId());
         $newSettings->setTypeId($this->getTypeId());
         $newSettings->setAvailabilityType($this->getAvailabilityType());
         $newSettings->setInstructions($this->getInstructions());
