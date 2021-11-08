@@ -17,6 +17,7 @@ class ilExternalContentEncodings
 		'',
 		'plain',
 		'url',
+		'url_rfc3986',
 		'base64',
 		'dechex',
 		'md5',
@@ -107,7 +108,11 @@ class ilExternalContentEncodings
 	            case 'url':
 	                $value = urlencode($value);
 	                break;
-	
+
+	            case 'url_rfc3986':
+	                $value = rawurlencode($value);
+	                break;
+
 	            case 'md5':
 	                $value = md5($value);
 	                break;
