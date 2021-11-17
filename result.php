@@ -11,10 +11,9 @@
  * @version $Id$
  */ 
 
-// fim: [debug] optionally set error before initialisation
+// optionally set error before initialisation
 // error_reporting (E_ALL);
 // ini_set("display_errors","on");
-// fim.
 
 chdir("../../../../../../../");
 
