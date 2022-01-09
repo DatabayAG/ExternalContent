@@ -231,13 +231,14 @@ class OAuthRequest {
       $ourpost = $_POST;
       // Deal with magic_quotes
       // http://www.php.net/manual/en/security.magicquotes.disabling.php
-      if ( get_magic_quotes_gpc() ) {
-         $outpost = array();
-         foreach ($_POST as $k => $v) {
-            $v = stripslashes($v);
-            $ourpost[$k] = $v;
-         }
-      }
+      // Fred Neumann, 2022-01-09: Function is deprecated and delivers always false
+//      if ( get_magic_quotes_gpc() ) {
+//         $outpost = array();
+//         foreach ($_POST as $k => $v) {
+//            $v = stripslashes($v);
+//            $ourpost[$k] = $v;
+//         }
+//      }
      // Add POST Parameters if they exist
       $parameters = array_merge($parameters, $ourpost);
 

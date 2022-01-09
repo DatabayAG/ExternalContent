@@ -39,6 +39,12 @@ Version History
 * All versions for ILIAS 5.1 and higher are maintained in GitHub: https://github.com/ilifau/ExternalContent
 * Versions up to 1.5.x are in the 'master' branch
 * Version 1.6 for ILIAS 5.3 and ILIAS 5.4 is in the 'master-ilias53' branch
+* Version 1.7 for ILIAS 7 is in the 'main-ilias7' branch
+
+Version 1.7.0 (2022-01-08)
+* Support for ILIAS 7 and PHP 7.4
+* Refactored for page contents with the PCExternalContent plugin
+* Added url_rfc3986 encoding
 
 Version 1.6.3 (2021-03-30)
 * Support for ILIAS 6
