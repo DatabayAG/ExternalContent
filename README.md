@@ -33,6 +33,8 @@ Usage
 
 See [Manual](docs/Manual.pdf) for details.
 
+You may also try the [PCExternalContent](https://github.com/ilifau/PCExternalContent) plugin to embed contents with the ILIAS page editor.
+
 Version History
 ===============
 
