@@ -75,7 +75,7 @@ class ilExternalContentFunctions
 	 */
 	private static function signOAuth($a_params)
 	{
-		require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/ExternalContent/lib/OAuth.php');
+		require_once('./Modules/LTIConsumer/lib/OAuth.php');
 
 		switch ($a_params['sign_method'])
 		{

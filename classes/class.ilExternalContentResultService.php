@@ -333,8 +333,8 @@ class ilExternalContentResultService
      */
     private function checkSignature($a_key, $a_secret)
     {
-        require_once ($this->plugin_path.'/lib/OAuth.php');
-        require_once ($this->plugin_path.'/lib/TrivialOAuthDataStore.php');
+        require_once('./Modules/LTIConsumer/lib/OAuth.php');
+        require_once('./Modules/LTIConsumer/lib/TrivialOAuthDataStore.php');
 
         $store = new TrivialOAuthDataStore();
         $store->add_consumer($this->fields['KEY'], $this->fields['SECRET']);
@@ -343,7 +343,7 @@ class ilExternalContentResultService
         $method = new OAuthSignatureMethod_HMAC_SHA1();
         $server->add_signature_method($method);
 
-        $request = OAuthRequest::from_request();
+        $request = OAuthRequest::from_request(null, null, $this->getParameters());
         try
         {
             $server->verify_request($request);
@@ -353,5 +353,36 @@ class ilExternalContentResultService
 			return $e;
         }
 		return true;
+    }
+
+    /**
+     * Get the Parameters from an OAuthRequest
+     * Extracted from OAuthRequest::from_request to omit the deprecated get_magic_quotes_gpc()
+     * @see OAuthRequest::from_request
+     * @return array
+     */
+    private function getParameters()
+    {
+        // Find request headers
+        $request_headers = OAuthUtil::get_headers();
+
+        // Parse the query-string to find GET parameters
+        $parameters = OAuthUtil::parse_parameters($_SERVER['QUERY_STRING']);
+
+        $ourpost = $_POST;
+
+        // Add POST Parameters if they exist
+        $parameters = array_merge($parameters, $ourpost);
+
+        // We have a Authorization-header with OAuth data. Parse the header
+        // and add those overriding any duplicates from GET or POST
+        if (@substr($request_headers['Authorization'], 0, 6) == "OAuth ") {
+            $header_parameters = OAuthUtil::split_header(
+                $request_headers['Authorization']
+            );
+            $parameters = array_merge($parameters, $header_parameters);
+        }
+
+        return $parameters;
     }
 } 
