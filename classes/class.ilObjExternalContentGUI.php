@@ -506,7 +506,6 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
         	            
             $this->form->setTitle($this->lng->txt('settings'));
             $this->form->addCommandButton("update", $this->lng->txt("save"));
-            $this->form->addCommandButton("view", $this->lng->txt("cancel"));
         }
     }
     
