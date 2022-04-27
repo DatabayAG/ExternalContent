@@ -27,6 +27,7 @@ class ilExternalContentType
 
     // input field types
     const FIELDTYPE_TEXT = "text";
+    const FIELDTYPE_RAWTEXT = "rawtext";        // text without manipulation at input check
     const FIELDTYPE_TEXTAREA = "textarea";
     const FIELDTYPE_PASSWORD = "password";
     const FIELDTYPE_CHECKBOX = "checkbox";
@@ -415,6 +416,7 @@ class ilExternalContentType
                 case self::FIELDTYPE_TEMPLATE:
                	case self::FIELDTYPE_CALCULATED:
                 case self::FIELDTYPE_TEXT:
+                case self::FIELDTYPE_RAWTEXT:
                 case self::FIELDTYPE_TEXTAREA:
                 case self::FIELDTYPE_PASSWORD:
                 case self::FIELDTYPE_CHECKBOX:
@@ -622,7 +624,16 @@ class ilExternalContentType
 			    	break;
 
 				case self::FIELDTYPE_TEXT:
-					$item = new ilTextInputGUI($field->title, 'field_' . $field->field_name);
+                    $item = new ilTextInputGUI($field->title, 'field_' . $field->field_name);
+                    $item->setInfo($field->description);
+                    $item->setRequired($field->required ? true : false);
+                    $item->setSize($field->size);
+                    $item->setValue($value);
+                    break;
+
+                case self::FIELDTYPE_RAWTEXT:
+                    require_once (__DIR__ . '/class.ilExternalContentRawtextInputGUI.php');
+					$item = new ilExternalContentRawtextInputGUI($field->title, 'field_' . $field->field_name);
 					$item->setInfo($field->description);
 					$item->setRequired($field->required ? true : false);
 					$item->setSize($field->size);
