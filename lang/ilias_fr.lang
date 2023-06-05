@@ -1,0 +1,48 @@
+<!-- language file start -->
+cat_create_xxco#:#Créer un nouveau contenu externe
+crs_create_xxco#:#Créer un nouveau contenu externe
+xxco#:#Contenu externe
+xxco_add#:#Ajouter
+xxco_copy#:#Copier le contenu externe
+xxco_created#:#Le contenu externe a été ajouté
+xxco_delete#:#Supprimer le contenu externe
+xxco_edit_permission#:#Modifier les paramètres d'autorisation
+xxco_new#:#Ajouter un contenu externe
+xxco_read#:#Utiliser le contenu externe
+xxco_visible#:#Le contenu externe est visible
+xxco_write#:#Configurer le contenu externe
+fold_create_xxco#:#Créer un nouveau contenu externe
+grp_create_xxco#:#Créer un nouveau contenu externe
+obj_xxco#:#Contenu externe
+objs_xxco#:#Contenus externes
+xxco_apply#:#Appliquer
+xxco_availability#:#Disponibilité
+availability_0#:#Non disponible
+availability_1#:#Autorisé existant
+availability_2#:#Création possible
+xxco_configuration#:#Configuration des contenus externes
+create_type#:#Définir un nouveau type
+delete_type#:#Supprimer la définition du type
+xxco_description_info#:#La description apparaîtra dans les listes sous le titre
+xxco_edit_type#:#Modifier la définition du type
+xxco_instructions#:#Instructions
+xxco_instructions_info#:#Les instructions s'afficheront sur la page d'information.
+xxco_message_type_not_available#:#Les contenus externes de ce type ne sont plus disponibles.
+xxco_online_info#:#Cela rendra l'objet visible pour les autres utilisateurs
+type_availability#:#Disponibilité
+type_availability_info#:#Cela contrôle la disponibilité du type dans le magazine. Les anciens types peuvent être définis sur "Autorisé existant" au lieu d'être supprimés.
+type_created#:#La définition du type a été enregistrée.
+type_definition#:#Définition XML
+type_definition_info#:#Saisissez ici la définition XML de l'interface. Créez un nouveau type pour voir un exemple de définition.
+type_deleted#:#La définition du type a été supprimée.
+type_failure_encoding#:#L'encodage "%s" n'existe pas !
+type_failure_field_name#:#Chaque champ doit avoir un nom !
+type_failure_field_type#:#Le type de champ "%s" n'existe pas !
+type_failure_input#:#Certaines entrées sont incorrectes ! Veuillez consulter les indications des champs.
+type_failure_interfaces#:#Il doit y avoir exactement un élément racine <interface>.
+type_failure_launch_type#:#Le type "%s" n'existe pas !
+type_failure_xml#:#La définition XML de l'interface comporte des erreurs :
+type_name#:#Nom du type
+type_name_info#:#Nom interne du type pour le tri et une meilleure distinction des versions. Le nom du type n'est pas affiché aux utilisateurs.
+type_remarks#:#Remarques
+type_remarks_info#:#Remarques administratives
