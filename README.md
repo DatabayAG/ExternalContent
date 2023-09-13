@@ -35,6 +35,16 @@ See [Manual](docs/Manual.pdf) for details.
 
 You may also try the [PCExternalContent](https://github.com/ilifau/PCExternalContent) plugin to embed contents with the ILIAS page editor.
 
+
+Update
+------
+
+If you update your plugin to ILIAS 8, you should change the XML of your LTI type definitions to get rid if the jQuery dependencies.
+
+See here, how this is done in the included type models:
+https://github.com/ilifau/ExternalContent/commit/9d21b2bb64be2c5020262cfaf1df9d53364fc89f#diff-cec2d9d3b80db0ab89abc4421b6ff87838bb346e2888d8a60a431eb3280b47a0
+
+
 Version History
 ===============
 
@@ -42,6 +52,14 @@ Version History
 * Versions up to 1.5.x are in the 'master' branch
 * Version 1.6 for ILIAS 5.3 and ILIAS 5.4 is in the 'master-ilias53' branch
 * Version 1.7 for ILIAS 7 is in the 'main-ilias7' branch
+* Version 1.8 for ILIAS 8 is in the 'main-ilias8' branch
+
+Version 1.8.1 (2023-09-13)
+* Support for ILIAS 8
+* Used FileSystem service for icons
+* Dropped support for PNG icons (only SVG allowed like in other ILIAS objects)
+* Removed jQuery dependency from type models
+* Changed example test service url in type models
 
 Version 1.7.1 (2022-01-11)
 * Support for ILIAS 7 and PHP 7.4
