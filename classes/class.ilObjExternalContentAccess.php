@@ -21,15 +21,15 @@ class ilObjExternalContentAccess extends ilObjectPluginAccess
 	* checks wether a user may invoke a command or not
 	* (this method is called by ilAccessHandler::checkAccess)
 	*
-	* @param	string		$a_cmd		command (not permission!)
-	* @param	string		$a_permission	permission
-	* @param	int			$a_ref_id	reference id
-	* @param	int			$a_obj_id	object id
-	* @param	int			$a_user_id	user id (if not provided, current user is taken)
+	* @param	string		$cmd		command (not permission!)
+	* @param	string		$permission	permission
+	* @param	int			$ref_id	reference id
+	* @param	int			$obj_id	object id
+	* @param	int			$user_id	user id (if not provided, current user is taken)
 	*
 	* @return	boolean		true, if everything is ok
 	*/
-	function _checkAccess($a_cmd, $a_permission, $a_ref_id, $a_obj_id, $a_user_id = 0)
+	function _checkAccess(string $cmd, string $permission, int $ref_id, int $obj_id, ?int $user_id = null): bool
 	{
 		global $DIC;
 
@@ -38,12 +38,12 @@ class ilObjExternalContentAccess extends ilObjectPluginAccess
 			$a_user_id = $DIC->user()->getId();
 		}
 
-		switch ($a_permission)
+		switch ($permission)
 		{
 			case "visible":
 			case "read":
-				if (!self::_lookupOnline($a_obj_id) &&
-					(!$DIC->access()->checkAccessOfUser($a_user_id,'write', '', $a_ref_id)))
+				if (!self::_lookupOnline($obj_id) &&
+					(!$DIC->access()->checkAccessOfUser($a_user_id,'write', '', $ref_id)))
 				{
 					return false;
 				}
@@ -88,12 +88,12 @@ class ilObjExternalContentAccess extends ilObjectPluginAccess
 	 * fetch the settings of an object that are needed for list views
 	 * (the settings are cached)
 	 * 
-	 * @param 	integer		object id
+	 * @param 	integer		$a_obj_id object id
 	 * @return	array		fetched row
 	 */
 	private static function fetchSettings($a_obj_id)
 	{
-		if (!is_array(self::$settings_cache[$a_obj_id]))
+		if (!isset(self::$settings_cache[$a_obj_id]))
 		{
 	       	global $DIC;
 	       	$ilDB = $DIC->database();

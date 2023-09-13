@@ -6,7 +6,7 @@
  */
 class ilExternalContentRawtextInputGUI extends ilTextInputGUI
 {
-    public function stripSlashesAddSpaceFallback($a_str)
+    public function stripSlashesAddSpaceFallback(string $a_str): string
     {
         return ilUtil::stripSlashes($a_str, false);
     }

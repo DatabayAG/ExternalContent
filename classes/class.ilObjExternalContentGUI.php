@@ -4,7 +4,7 @@
  * GPLv2, see LICENSE 
  */
 
-require_once(__DIR__ . '/class.ilObjExternalContent.php');
+use JetBrains\PhpStorm\NoReturn;
 
 /**
  * External Content plugin: repository object GUI
@@ -22,26 +22,24 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
     protected $form;
 
     /** @var ilObjExternalContent */
-    public $object;
+    public ?ilObject $object = null;
 
     /**
      * Goto redirection
      * Overridden to provide the goto suffix
      */
-    public static function _goto($a_target)
+    public static function _goto(array $a_target): void
     {
         global $DIC;
 
         $t = explode("_", $a_target[0]);
-        $ref_id = (int) $t[0];
-        $class_name = $a_target[1];
-        $goto_suffix = (string) $t[1];
+        $ref_id = (int) ($t[0] ?? 0);
+        $class_name = (string) ($a_target[1] ?? '');
+        $goto_suffix = (string) ($t[1] ?? '');
 
         if ($DIC->access()->checkAccess("read", "", $ref_id))
         {
-            $DIC->ctrl()->initBaseClass("ilObjPluginDispatchGUI");
             $DIC->ctrl()->setTargetScript("ilias.php");
-            $DIC->ctrl()->getCallStructure(strtolower("ilObjPluginDispatchGUI"));
             $DIC->ctrl()->setParameterByClass($class_name, "ref_id", $ref_id);
             $DIC->ctrl()->setParameterByClass($class_name, "goto_suffix", $goto_suffix);
             $DIC->ctrl()->redirectByClass(array("ilobjplugindispatchgui", $class_name), "");
@@ -55,7 +53,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
     /**
      * Get type.
      */
-    final function getType()
+    public function getType(): string
     {
         return "xxco";
     }
@@ -64,7 +62,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
     /**
      * After object has been created -> jump to this command
      */
-    function getAfterCreationCmd()
+    function getAfterCreationCmd(): string
     {
         return "edit";
     }
@@ -72,7 +70,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
     /**
      * Get standard command
      */
-    function getStandardCmd()
+    function getStandardCmd(): string
     {
         return "view";
     }
@@ -99,8 +97,11 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
 	/**
      * Perform command
      */
-    public function performCommand($cmd)
+    public function performCommand(string $cmd): void
     {
+        global $DIC;
+        $ilErr = $DIC['ilErr'];
+        
 		if (!$this->checkCreationMode())
 		{
 			// set a return URL
@@ -147,12 +148,12 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
 
 					if ($this->object->getTypeDef()->getAvailability() == ilExternalContentType::AVAILABILITY_NONE)
 					{
-						$this->ilErr->raiseError($this->txt('xxco_message_type_not_available'), $this->ilErr->MESSAGE);
+                        $ilErr->raiseError($this->txt('xxco_message_type_not_available'), $ilErr->MESSAGE);
 					}
 
 					if (!$cmd)
 					{
-						$cmd = "viewObject";
+						$cmd = "view";
 					}
 					$cmd .= "Object";
 					$this->$cmd();
@@ -164,7 +165,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
     /**
      * Set tabs
      */
-    function setTabs()
+    protected function setTabs(): void
     {
  		if ($this->checkCreationMode())
 		{
@@ -218,7 +219,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
     
     /**
      * Set the sub tabs
-     * @param string	main tab identifier
+     * @param string	$a_tab main tab identifier
      */
     function setSubTabs($a_tab)
     {
@@ -253,7 +254,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
     /**
      * show info screen
      */
-    public function infoScreen() 
+    public function infoScreen() : void
     {
         $this->tabs_gui->activateTab('infoScreen');
 
@@ -270,7 +271,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
         // add view button
         if ($this->object->getTypeDef()->getAvailability() == ilExternalContentType::AVAILABILITY_NONE)
         {
-            ilUtil::sendFailure($this->lng->txt('xxco_message_type_not_available'), false);
+            $this->tpl->setOnScreenMessage('failure', $this->lng->txt('xxco_message_type_not_available'), false);
         } elseif ($this->object->getOnline())
         {
             if ($this->object->getTypeDef()->getLaunchType() == ilExternalContentType::LAUNCH_TYPE_LINK)
@@ -288,7 +289,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
     /**
      * view the object (default command)
      */
-    function viewObject() 
+    function viewObject() : void
     {
         $this->ctrl->saveParameter($this, 'goto_suffix');
 
@@ -306,11 +307,11 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
             case ilExternalContentType::LAUNCH_TYPE_EMBED:
     			if ($_GET['lti_msg'])
     			{
-    				ilUtil::sendInfo(ilUtil::stripSlashes($_GET['lti_msg']), true);
+                    $this->tpl->setOnScreenMessage('info', ilUtil::stripSlashes($_GET['lti_msg']), true);
     			}
     			if ($_GET['lti_errormsg'])
     			{
-    				ilUtil::sendFailure(ilUtil::stripSlashes($_GET['lti_errormsg']), true);
+                    $this->tpl->setOnScreenMessage('failure', ilUtil::stripSlashes($_GET['lti_errormsg']), true);
     			}
     			$this->ctrl->redirect($this, "viewEmbed");
                 break;
@@ -348,13 +349,16 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
     /**
      * create new object form
      */
-    function create()
+    function create(): void
     {
-       $this->setCreationMode(true);
-       if (!$this->access->checkAccess("create", '', $_GET["ref_id"], $this->getType())) {
-           $this->ilErr->raiseError($this->lng->txt("permission_denied"), $this->ilErr->MESSAGE);
+        global $DIC;
+        $ilErr = $DIC['ilErr'];
+        
+        $this->setCreationMode(true);
+        if (!$this->access->checkAccess("create", '', $_GET["ref_id"], $this->getType())) {
+            $ilErr->raiseError($this->lng->txt("permission_denied"), $ilErr->MESSAGE);
         }
-		else
+        else
         {
             $this->initForm("create");
             $this->tpl->setVariable('ADM_CONTENT', $this->form->getHTML());
@@ -372,12 +376,16 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
     /**
      * save the data of a new object
      */
-    function save()
+    function save(): void 
     {
-            $_REQUEST["new_type"] = $this->getType();
+        global $DIC;
+        $ilErr = $DIC['ilErr'];
+        
+            //$_REQUEST["new_type"] = $this->getType();
             if (!$this->access->checkAccess("create", '', $_GET["ref_id"], $this->getType()))
             {
-                $this->ilErr->raiseError($this->lng->txt("permission_denied"), $this->ilErr->MESSAGE);
+
+                $ilErr->raiseError($this->lng->txt("permission_denied"), $ilErr->MESSAGE);
             }
             $this->initForm("create");
 
@@ -405,7 +413,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
     /**
      * Edit object
      */
-    public function editObject()
+    public function editObject(): void
     {
         $this->tabs_gui->activateTab('edit');
         $this->tabs_gui->activateSubTab('settings');
@@ -417,7 +425,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
     /**
      * update object
      */
-    public function updateObject()
+    public function updateObject(): void
     {
         $this->tabs_gui->activateTab('edit');
         $this->tabs_gui->activateSubTab('settings');
@@ -426,7 +434,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
         if ($this->form->checkInput())
         {
             $this->saveFormValues();
-            ilUtil::sendInfo($this->lng->txt("settings_saved"), true);
+            $this->tpl->setOnScreenMessage('info', $this->lng->txt("settings_saved"), true);
             $this->ctrl->redirect($this, "edit");
         }
         else
@@ -465,13 +473,13 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
         $item->setMaxLength(128);
         $item->setRequired(true);
         $item->setInfo($this->txt('xxco_title_info'));
-		$item->setValue($a_values['title']);        
+		$item->setValue((string) ($a_values['title'] ?? ''));        
         $this->form->addItem($item);
 
         $item = new ilTextAreaInputGUI($this->lng->txt('description'), 'description');
         $item->setInfo($this->txt('xxco_description_info'));
         $item->setRows(2);
-		$item->setValue($a_values['description']);        
+		$item->setValue((string) ($a_values['description'] ?? ''));        
         $this->form->addItem($item);
        
         if ($a_mode == "create")
@@ -495,7 +503,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
             $item = new ilCheckboxInputGUI($this->lng->txt('online'), 'online');
             $item->setInfo($this->txt("xxco_online_info"));
 			$item->setValue("1");
-			if ($a_values['online'])
+			if ($a_values['online'] ?? false)
 			{
 				$item->setChecked(true);
 			}        
@@ -586,7 +594,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
 		$item->setInfo($this->txt('xxco_instructions_info'));
 		$item->setRows(10);
 		$item->setUseRte(true);
-		$item->setValue($this->object->getSettings()->getInstructions());
+		$item->setValue((string) $this->object->getSettings()->getInstructions());
 		$form->addItem($item);
                 
         $form->addCommandButton('updateInstructions', $this->lng->txt('save'));
@@ -613,7 +621,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
         $this->object->getSettings()->setInstructions($this->form->getInput("instructions"));
         $this->object->getSettings()->save();
         
-		ilUtil::sendSuccess($this->txt('instructions_saved'), true);
+        $this->tpl->setOnScreenMessage('success', $this->txt('instructions_saved'), true);
         $this->ctrl->redirect($this, 'editInstructions');
     }
     
@@ -639,7 +647,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
         $type_id = $this->object->getTypeDef()->getTypeId();
         $obj_id = $this->object->getId();
 
-        $svg = ilExternalContentPlugin::_getIcon("xxco", "svg", $obj_id, $type_id, "object");
+        $svg = ilExternalContentPlugin::_getContentIcon("xxco", "svg", $obj_id, $type_id, "object");
 
         $form = new ilPropertyFormGUI();
         $form->setFormAction($this->ctrl->getFormAction($this));
@@ -650,25 +658,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
 		$item->setSuffixes(array("svg"));
 		$item->setImage($svg);
 		$form->addItem($item);
-
-        if (empty($svg))
-        {
-            $caption = $this->txt("big_icon")." (".ilExternalContentPlugin::BIG_ICON_SIZE.")";
-            $item = new ilImageFileInputGUI($caption, "big_icon");
-            $item->setImage(ilExternalContentPlugin::_getIcon("xxco", "big", $obj_id, $type_id, "object"));
-            $form->addItem($item);
-
-            $caption = $this->txt("standard_icon")." (".ilExternalContentPlugin::SMALL_ICON_SIZE.")";
-            $item = new ilImageFileInputGUI($caption, "small_icon");
-            $item->setImage(ilExternalContentPlugin::_getIcon("xxco", "small", $obj_id, $type_id, "object"));
-            $form->addItem($item);
-
-            $caption = $this->txt("tiny_icon")." (".ilExternalContentPlugin::TINY_ICON_SIZE.")";
-            $item = new ilImageFileInputGUI($caption, "tiny_icon");
-            $item->setImage(ilExternalContentPlugin::_getIcon("xxco", "tiny", $obj_id, $type_id, "object"));
-            $form->addItem($item);
-        }
-
+        
         $form->addCommandButton('updateIcons', $this->lng->txt('save'));
         $this->form = $form;
     }
@@ -694,25 +684,9 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
 		{
 			ilExternalContentPlugin::_removeIcon("svg", "object", $this->object->getId());
 		}
-		if($_POST["big_icon_delete"])
-		{
-			ilExternalContentPlugin::_removeIcon("big", "object", $this->object->getId());
-		}
-		if($_POST["small_icon_delete"])
-		{
-			ilExternalContentPlugin::_removeIcon("small", "object", $this->object->getId());
-		}
-		if($_POST["tiny_icon_delete"])
-		{
-			ilExternalContentPlugin::_removeIcon("tiny", "object", $this->object->getId());
-		}
-
 		ilExternalContentPlugin::_saveIcon($_FILES["svg_icon"]['tmp_name'], "svg", "object", $this->object->getId());
-		ilExternalContentPlugin::_saveIcon($_FILES["big_icon"]['tmp_name'], "big", "object", $this->object->getId());
-		ilExternalContentPlugin::_saveIcon($_FILES["small_icon"]['tmp_name'], "small", "object", $this->object->getId());
-		ilExternalContentPlugin::_saveIcon($_FILES["tiny_icon"]['tmp_name'], "tiny", "object", $this->object->getId());
 
-		ilUtil::sendSuccess($this->txt('icons_saved'), true);
+        $this->tpl->setOnScreenMessage('success', $this->txt('icons_saved'), true);
         $this->ctrl->redirect($this, 'editIcons');
     }
 

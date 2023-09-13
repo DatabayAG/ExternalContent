@@ -4,8 +4,6 @@
  * GPLv2, see LICENSE 
  */
 
-include_once "./Services/Repository/classes/class.ilObjectPluginListGUI.php";
-
 /**
  * External Content plugin: repository object list
  *
@@ -31,7 +29,7 @@ class ilObjExternalContentListGUI extends ilObjectPluginListGUI
     /**
      * Get name of gui class handling the commands
      */
-    function getGuiClass() 
+    public function getGuiClass() : string
     {
         return "ilObjExternalContentGUI";
     }
@@ -39,7 +37,7 @@ class ilObjExternalContentListGUI extends ilObjectPluginListGUI
     /**
      * Get commands
      */
-    function initCommands() 
+    public function initCommands() : array
     {
         return array
             (
@@ -57,23 +55,19 @@ class ilObjExternalContentListGUI extends ilObjectPluginListGUI
 
     /**
      * get properties (offline)
-     *
-     * @access public
-     * @param
-     * 
+     * @return array
      */
-    public function getProperties() 
+    public function getProperties() : array
     {
         global $DIC;
         $lng = $DIC->language();
 
-        $this->plugin->includeClass("class.ilObjExternalContentAccess.php");
         if (!ilObjExternalContentAccess::_lookupOnline($this->obj_id)) 
         {
             $props[] = array("alert" => true, "property" => $lng->txt("status"),
                 "value" => $lng->txt("offline"));
         }
-        return $props ? $props : array();
+        return $props ?? array();
     }
 
 }

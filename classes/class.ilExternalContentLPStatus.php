@@ -3,7 +3,6 @@
  * Copyright (c) 2015 Institut für Lern-Innovation, Friedrich-Alexander-Universität Erlangen-Nürnberg
  * GPLv2, see LICENSE
  */
-require_once 'Services/Tracking/classes/status/class.ilLPStatusPlugin.php';
 
 /**
  * Class ilExternalContentLPStatus
@@ -30,9 +29,9 @@ class ilExternalContentLPStatus extends ilLPStatusPlugin
      * @param $a_status
      * @return mixed
      */
-    public static function getLPStatusDataFromDb($a_obj_id, $a_status)
+    public static function getLPStatusDataFromDb($a_obj_id, $a_status): mixed
     {
-        return self::getLPStatusData($a_obj_id, $a_status);
+        return self::getLPStatusData((int) $a_obj_id, (int) $a_status);
     }
 
     /**
@@ -45,7 +44,7 @@ class ilExternalContentLPStatus extends ilLPStatusPlugin
      */
     public static function getLPDataForUserFromDb($a_obj_id, $a_user_id)
     {
-        return self::getLPDataForUser($a_obj_id, $a_user_id);
+        return self::getLPDataForUser((int) $a_obj_id, (int) $a_user_id);
     }
 
 
@@ -60,15 +59,19 @@ class ilExternalContentLPStatus extends ilLPStatusPlugin
      */
     public static function trackAccess($a_user_id, $a_obj_id, $a_ref_id)
     {
-        require_once('Services/Tracking/classes/class.ilChangeEvent.php');
-        ilChangeEvent::_recordReadEvent('xxco', $a_ref_id, $a_obj_id, $a_user_id);
+        ilChangeEvent::_recordReadEvent('xxco', (int) $a_ref_id, (int) $a_obj_id, (int) $a_user_id);
 
-        $status = self::getLPDataForUser($a_obj_id, $a_user_id);
+        try {
+            $status = self::getLPDataForUser((int) $a_obj_id, (int) $a_user_id);
+        }
+        catch (Exception $e) {
+            $status = self::LP_STATUS_NOT_ATTEMPTED_NUM;
+        }
         if ($status == self::LP_STATUS_NOT_ATTEMPTED_NUM)
         {
-            self::writeStatus($a_obj_id, $a_user_id, self::LP_STATUS_IN_PROGRESS_NUM);
-            self::raiseEventStatic($a_obj_id, $a_user_id, self::LP_STATUS_IN_PROGRESS_NUM,
-                self::getPercentageForUser($a_obj_id, $a_user_id));
+            self::writeStatus((int) $a_obj_id, (int) $a_user_id, self::LP_STATUS_IN_PROGRESS_NUM);
+            self::raiseEventStatic((int) $a_obj_id, (int) $a_user_id, self::LP_STATUS_IN_PROGRESS_NUM,
+                self::getPercentageForUser((int) $a_obj_id, (int) $a_user_id));
         }
     }
 
@@ -82,8 +85,8 @@ class ilExternalContentLPStatus extends ilLPStatusPlugin
      */
     public static function trackResult($a_user_id, $a_obj_id, $a_status, $a_percentage)
     {
-        self::writeStatus($a_obj_id, $a_user_id, $a_status, $a_percentage, true);
-        self::raiseEventStatic($a_obj_id, $a_user_id, $a_status, $a_percentage);
+        self::writeStatus((int) $a_obj_id, (int) $a_user_id, (int) $a_status, (int) $a_percentage, true);
+        self::raiseEventStatic((int) $a_obj_id, (int) $a_user_id, (int) $a_status, (int) $a_percentage);
     }
 
     /**
@@ -100,10 +103,10 @@ class ilExternalContentLPStatus extends ilLPStatusPlugin
         global $DIC;
 
         $DIC->event()->raise("Services/Tracking", "updateStatus", array(
-            "obj_id" => $a_obj_id,
-            "usr_id" => $a_usr_id,
-            "status" => $a_status,
-            "percentage" => $a_percentage
+            "obj_id" => (int) $a_obj_id,
+            "usr_id" => (int) $a_usr_id,
+            "status" => (int) $a_status,
+            "percentage" => (int) $a_percentage
         ));
     }
 }

@@ -4,8 +4,6 @@
  * GPLv2, see LICENSE
  */
 
-require_once("./Services/User/classes/class.ilUserDefinedFields.php");
-
 /**
  * ExternalContent plugin: user data
  * Provides the user profile fields for template processing
@@ -215,7 +213,7 @@ class ilExternalContentUserData
     /**
      * Get a valid field name for a user defined field
      * @param $name
-     * @return string|string[]
+     * @return string
      */
     protected function getUdfFieldname($name) {
         $name = ilUtil::getASCIIFilename($name);
@@ -330,7 +328,7 @@ class ilExternalContentUserData
 
     /**
      * Get the url of a personal picture
-     * @return mixed|string
+     * @return string
      */
     protected function getUserImageUrl() {
 

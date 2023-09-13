@@ -4,8 +4,6 @@
  * GPLv2, see LICENSE 
  */
 
-require_once(__DIR__ . '/class.ilExternalContentPlugin.php');
-
 /**
  * External Content plugin: type definition
  *
@@ -295,16 +293,18 @@ class ilExternalContentType
     /**
      * set the type definition from an xml structure
      * 
-     * @param	string	xml definition
-     * @param	string	(byref) variable for failure message
+     * @param	string	$a_xml xml definition
+     * @param	string	$a_failure_message (byref) variable for failure message
      * @return	boolean setting successful
      */
     public function setXML($a_xml, &$a_failure_message)
     {
-        $this->plugin->includeClass('class.ilExternalContentEncodings.php');
-        
         $doc = new DOMDocument('1.0');
         $doc->formatOutput = true;
+        
+        $title = null;
+        $description = null;
+        $template = null;
 
         if (!@$doc->loadXML($a_xml))
         {
@@ -348,24 +348,24 @@ class ilExternalContentType
         $fields = $interface->getElementsByTagName('field');
         foreach ($fields as $field)
         {
-            $tmp = (object) null;
+            $tmp = new ilExternalContentField();
             
             // basic properties
-            $tmp->field_name = $field->getAttribute('name');
-            $tmp->field_type = $field->getAttribute('type');
+            $tmp->field_name = (string) $field->getAttribute('name');
+            $tmp->field_type = (string) $field->getAttribute('type');
             
             // properties for input fields
             $tmp->required = $field->getAttribute('required');
-            $tmp->size = $field->getAttribute('size');
-           	$tmp->rows = $field->getAttribute('rows');
-           	$tmp->cols = $field->getAttribute('cols');
-           	$tmp->richtext = $field->getAttribute('richtext');
-           	$tmp->default = $field->getAttribute('default');
+            $tmp->size = (int) $field->getAttribute('size');
+           	$tmp->rows = (int) $field->getAttribute('rows');
+           	$tmp->cols = (int) $field->getAttribute('cols');
+           	$tmp->richtext = (string) $field->getAttribute('richtext');
+           	$tmp->default = (string) $field->getAttribute('default');
 
            	// appearance of input fields
-           	$tmp->parentfield = $field->getAttribute('parentfield');
-            $tmp->parentvalue = $field->getAttribute('parentvalue');
-            $tmp->level = $field->getAttribute('level') ? $field->getAttribute('level') : "object";
+           	$tmp->parentfield = (string) $field->getAttribute('parentfield');
+            $tmp->parentvalue = (string) $field->getAttribute('parentvalue');
+            $tmp->level = (string) ($field->getAttribute('level') ?? "object");
             
             // processing properties
            	$tmp->encoding = $field->getAttribute('encoding');
@@ -374,25 +374,25 @@ class ilExternalContentType
             // optional sub elements (field type specific)
             if ($title_element = $this->getDomChildByName($field, 'title'))
             {
-            	$tmp->title = $title_element->textContent;
+            	$tmp->title = (string) $title_element->textContent;
             }
             if ($description_element = $this->getDomChildByName($field, 'description'))
             {
-            	$tmp->description = $description_element->textContent;
+            	$tmp->description = (string) $description_element->textContent;
             }
             if ($template_element = $this->getDomChildByName($field, 'template'))
             {
-            	$tmp->template = $template_element->textContent;
+            	$tmp->template = (string) $template_element->textContent;
             }
             
             // set options for radio fields
             $tmp->options = array();
-           foreach ($field->getElementsByTagName('option') as $option)
+            foreach ($field->getElementsByTagName('option') as $option)
             {
-            	$opt = (object) null;
-            	$opt->value = $option->getAttribute('value');
-            	$opt->title = $this->getDomChildByName($option, 'title')->textContent;
-            	$opt->description = $this->getDomChildByName($option, 'description')->textContent;
+            	$opt = new ilExternalContentOption();
+            	$opt->value = (string) $option->getAttribute('value');
+            	$opt->title = (string) $this->getDomChildByName($option, 'title')->textContent;
+            	$opt->description = (string) $this->getDomChildByName($option, 'description')->textContent;
             	$tmp->options[$opt->value] = $opt;
             }
             
@@ -400,7 +400,7 @@ class ilExternalContentType
             $tmp->params = array();
             foreach ($field->getElementsByTagName('param') as $param)
             {
-          		$tmp->params[$param->getAttribute('name')] = $param->textContent;
+          		$tmp->params[(string) $param->getAttribute('name')] = (string) $param->textContent;
             }
                         
             // checks field name
@@ -456,8 +456,8 @@ class ilExternalContentType
     /**
      * get a DOM child element with a specific name
      * 
-     * @param 	DOMNode		node
-     * @param 	string		child name
+     * @param 	DOMNode		$a_node node
+     * @param 	string		$a_name child name
      * @return 	mixed		DomElement	or false if not found
      */
     private function getDomChildByName($a_node, $a_name)
@@ -589,12 +589,12 @@ class ilExternalContentType
     /**
      * add type specific input fields to a form
      *
-     * @param object	form, property or radio option
-     * @param array		(assoc) input values
-     * @param string	configuration level ("type" or "object")
-     * @param string	parent field value
-     * @param string	parent option value
-     * @param int		maximum recursion depth
+     * @param object	$a_object form, property or radio option
+     * @param array		$a_values (assoc) input values
+     * @param string	$a_level configuration level ("type" or "object")
+     * @param string	$a_parentfield parent field value
+     * @param string	$a_parentvalue parent option value
+     * @param int		$a_maxdepth maximum recursion depth
      */
     public function addFormElements($a_object, $a_values = array(),
     	$a_level = "object", $a_parentfield = '', $a_parentvalue = '',
@@ -608,19 +608,18 @@ class ilExternalContentType
 
 		foreach ($this->getInputFields($a_level, $a_parentfield, $a_parentvalue) as $field)
 		{
-			$value = $a_values['field_' . $field->field_name];
-			$value = $value ? $value : $field->default;
+			$value = ($a_values['field_' . $field->field_name] ?? $field->default);
 
 			switch($field->field_type)
 			{
 			    case self::FIELDTYPE_HEADER:
 			    	$item = new ilFormSectionHeaderGUI();
-			    	$item->setTitle($field->title);
+			    	$item->setTitle((string) $field->title);
 			    	break;
 
 			    case self::FIELDTYPE_DESCRIPTION:
 		    		$item = new ilCustomInputGUI($field->title);
-		    		$item->setHtml(nl2br($field->description));
+		    		$item->setHtml((string) nl2br($field->description));
 			    	break;
 
 				case self::FIELDTYPE_TEXT:
@@ -628,16 +627,15 @@ class ilExternalContentType
                     $item->setInfo($field->description);
                     $item->setRequired($field->required ? true : false);
                     $item->setSize($field->size);
-                    $item->setValue($value);
+                    $item->setValue((string) $value);
                     break;
 
                 case self::FIELDTYPE_RAWTEXT:
-                    require_once (__DIR__ . '/class.ilExternalContentRawtextInputGUI.php');
 					$item = new ilExternalContentRawtextInputGUI($field->title, 'field_' . $field->field_name);
 					$item->setInfo($field->description);
 					$item->setRequired($field->required ? true : false);
 					$item->setSize($field->size);
-			    	$item->setValue($value);
+			    	$item->setValue((string) $value);
 					break;
 
 				case self::FIELDTYPE_TEXTAREA:
@@ -647,7 +645,7 @@ class ilExternalContentType
 					$item->setUseRte($field->richtext ? true : false);
 					$item->setRows($field->rows);
 					$item->setCols($field->cols);
-			    	$item->setValue($value);
+			    	$item->setValue((string) $value);
 					break;
 
 				case self::FIELDTYPE_PASSWORD:
@@ -655,7 +653,7 @@ class ilExternalContentType
 					$item->setInfo($field->description);
 					$item->setRequired($field->required ? true : false);
 					$item->setSkipSyntaxCheck(true);
-			    	$item->setValue($value);
+			    	$item->setValue((string) $value);
 					break;
 
 			    case self::FIELDTYPE_CHECKBOX:
@@ -670,7 +668,7 @@ class ilExternalContentType
 			    case self::FIELDTYPE_RADIO:
 					$item = new ilRadioGroupInputGUI($field->title, 'field_' . $field->field_name);
 					$item->setInfo($field->description);
-			    	$item->setValue($value);
+			    	$item->setValue((string) $value);
 
 					foreach ($field->options as $option)
 					{
@@ -686,7 +684,6 @@ class ilExternalContentType
                 case self::FIELDTYPE_SPECIAL:
                     switch ($field->field_name) {
                         case self::FIELD_LTI_USER_DATA:
-                            $this->plugin->includeClass('class.ilExternalContentUserData.php');
                             $data = ilExternalContentUserData::create($this->plugin);
                             $item = $data->getFormItem($field->title, $field->description, $value);
                             break;
@@ -732,17 +729,14 @@ class ilExternalContentType
         foreach ($this->getInputFields($a_level) as $field)
         {
             if ($field->field_type == self::FIELDTYPE_SPECIAL) {
-                switch ($field->field_name) {
-                    case self::FIELD_LTI_USER_DATA:
-                        $this->plugin->includeClass('class.ilExternalContentUserData.php');
-                        $value = ilExternalContentUserData::create($this->plugin)->getFormValue($a_form);
-                        $values[$field->field_name] = ($value ? $value : $field->default);
-                        break;
+                if ($field->field_name == self::FIELD_LTI_USER_DATA) {
+                    $value = ilExternalContentUserData::create($this->plugin)->getFormValue($a_form);
+                    $values[$field->field_name] = ($value ?? $field->default);
                 }
             }
             else {
                 $value = trim($a_form->getInput("field_" . $field->field_name));
-                $values[$field->field_name] = ( $value ? $value : $field->default);
+                $values[$field->field_name] = ( $value ?? $field->default);
             }
         }
         return $values;
@@ -753,9 +747,9 @@ class ilExternalContentType
     /**
      * Get array of input fields for the type
      *
-     * @var		mixed	level ("type" or "object")
-     * @var		mixed	parent field name or null
-     * @var		mixed	parent field option or null
+     * @var		mixed	$a_level level ("type" or "object")
+     * @var		mixed	$a_parentfield parent field name or null
+     * @var		mixed	$a_parentvalue parent field option or null
      * @return	array	list of field objects
      */
     public function getInputFields($a_level = 'object', $a_parentfield = null, $a_parentvalue = null)
@@ -806,7 +800,7 @@ class ilExternalContentType
     /**
      * get a language text
 	 *
-     * @param 	string		language variable
+     * @param 	string		$a_langvar language variable
      * @return 	string		interface text
      */
     public function txt($a_langvar)
@@ -817,7 +811,7 @@ class ilExternalContentType
     /**
      * Get array of options for selecting the type
      *
-     * @param	mixed		required availability or null
+     * @param	mixed		$a_availability required availability or null
      * @return	array		id => title
      */
     static function _getTypeOptions($a_availability = null)
@@ -842,8 +836,8 @@ class ilExternalContentType
     /**
      * Get basic data array of all types (without field definitions)
      *
-     * @param	boolean		get extended data ('usages')
-     * @param	mixed		required availability or null
+     * @param	boolean		$a_extended get extended data ('usages')
+     * @param	mixed		$a_availability required availability or null
      * @return	array		array of assoc data arrays
      */
     static function _getTypesData($a_extended = false, $a_availability = null)
@@ -873,7 +867,7 @@ class ilExternalContentType
     /**
      * Count the number of untrashed usages of a type
      *
-     * @var		integer		type_id
+     * @var		integer		$a_type_id type_id
      * @return	integer		number of references
      */
     static function _countUntrashedUsages($a_type_id)

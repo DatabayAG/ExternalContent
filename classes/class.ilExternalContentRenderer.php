@@ -1,11 +1,5 @@
 <?php
 
-require_once(__DIR__ . '/interface.ilExternalContent.php');
-require_once(__DIR__ . '/class.ilExternalContentPlugin.php');
-require_once(__DIR__ . '/class.ilExternalContentType.php');
-require_once(__DIR__ . '/class.ilExternalContentEncodings.php');
-require_once(__DIR__ . '/class.ilExternalContentUserData.php');
-
 /**
  * Output processor
  * Generates output by processing templates and filling fields recursively
@@ -167,22 +161,20 @@ class ilExternalContentRenderer
             if ($field['field_type'] != ilExternalContentType::FIELDTYPE_TEMPLATE and $field['field_type'] != ilExternalContentType::FIELDTYPE_CALCULATED) {
                 switch ($field['level']) {
                     case "type":
-                        $field['field_value'] = $type_values[$field['field_name']];
+                        $field['field_value'] = (string) ($type_values[$field['field_name']] ?? '');
                         break;
 
                     case "object":
                     default:
-                        $field['field_value'] = $object_values[$field['field_name']];
+                        $field['field_value'] = (string) ($object_values[$field['field_name']] ?? '');
                         break;
                 }
             }
 
             // special input fields: process user input to a new value
             if ($field['field_type'] == ilExternalContentType::FIELDTYPE_SPECIAL) {
-                switch ($field['field_name']) {
-                    case ilExternalContentType::FIELD_LTI_USER_DATA:
-                        $field['field_value'] = $this->userData->getLtiParams($field['field_value']);
-                        break;
+                if ($field['field_name'] == ilExternalContentType::FIELD_LTI_USER_DATA) {
+                    $field['field_value'] = $this->userData->getLtiParams($field['field_value']);
                 }
             }
 
@@ -194,8 +186,8 @@ class ilExternalContentRenderer
     /**
      * Fill a field and return its value
      *
-     * @param	array	field
-     * @param	int		maximum recoursion depth
+     * @param	array	$a_field field
+     * @param	int		$a_maxdepth maximum recoursion depth
      * @return 	mixed	field value (depending on type)
      */
     private function fillField($a_field, $a_maxdepth = 100) {
@@ -261,7 +253,6 @@ class ilExternalContentRenderer
         }
 
         // apply the function
-        require_once("./Customizing/global/plugins/Services/Repository/RepositoryObject/ExternalContent/classes/class.ilExternalContentFunctions.php");
         $value = ilExternalContentFunctions::applyFunction($a_field['function'], $parsed_params);
 
         // save the value so that it is not re-calculated
@@ -342,7 +333,6 @@ class ilExternalContentRenderer
             case "ILIAS_RESULT_ID":
                 if ($this->settings->getLPMode() == ilExternalContentSettings::LP_ACTIVE)
                 {
-                    $this->plugin->includeClass('class.ilExternalContentResult.php');
                     $result = ilExternalContentResult::getByKeys($this->content->getId(), $ilUser->getId(), true);
                     $value = $result->id;
                 }
@@ -413,7 +403,6 @@ class ilExternalContentRenderer
                 break;
 
             case "ILIAS_LMS_URL":
-                require_once ('./Services/Link/classes/class.ilLink.php');
                 $value = ilLink::_getLink(ROOT_FOLDER_ID, "root");
                 break;
 
@@ -429,7 +418,6 @@ class ilExternalContentRenderer
                 break;
 
             case "ILIAS_LMS_DESCRIPTION":
-                require_once("Modules/SystemFolder/classes/class.ilObjSystemFolder.php");
                 if (!$value = ilObjSystemFolder::_getHeaderTitle()) {
                     $value = $ilClientIniFile->readVariable('client', 'description');
                 }

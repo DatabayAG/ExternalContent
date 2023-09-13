@@ -67,7 +67,6 @@ class ilExternalContentResultService
             $this->operation = str_replace('Request','', $request->getName());
             $result_id = $request->resultRecord->sourcedGUID->sourcedId;
 
-            require_once (__DIR__ .'/class.ilExternalContentResult.php');
             $this->result = ilExternalContentResult::getById($result_id);
             if (empty($this->result))
             {
@@ -159,14 +158,13 @@ class ilExternalContentResultService
             $this->result->result = (float) $result;
             $this->result->save();
 
-            require_once(__DIR__ .'/class.ilExternalContentLPStatus.php');
             if ($result >= $this->properties['lp_threshold'])
             {
-                $lp_status = ilExternalContentLPStatus::LP_STATUS_COMPLETED_NUM;
+                $lp_status = ilLPStatus::LP_STATUS_COMPLETED_NUM;
             }
             else
             {
-                $lp_status = ilExternalContentLPStatus::LP_STATUS_FAILED_NUM;
+                $lp_status = ilLPStatus::LP_STATUS_FAILED_NUM;
             }
             $lp_percentage = 100 * $result;
             ilExternalContentLPStatus::trackResult($this->result->usr_id, $this->result->obj_id, $lp_status, $lp_percentage);
@@ -197,8 +195,7 @@ class ilExternalContentResultService
         $this->result->result = null;
         $this->result->save();
 
-        require_once(__DIR__ .'/class.ilExternalContentLPStatus.php');
-        $lp_status = ilExternalContentLPStatus::LP_STATUS_IN_PROGRESS_NUM;
+        $lp_status = ilLPStatus::LP_STATUS_IN_PROGRESS_NUM;
         $lp_percentage = 0;
         ilExternalContentLPStatus::trackResult($this->result->usr_id, $this->result->obj_id, $lp_status, $lp_percentage);
 
@@ -219,7 +216,7 @@ class ilExternalContentResultService
 
     /**
      * Load the XML template for the response
-     * @param string    file name
+     * @param string    $a_name file name
      * @return string   file content
      */
     protected function loadResponse($a_name)
@@ -260,7 +257,7 @@ class ilExternalContentResultService
 
     /**
      * Send a "bad request" response
-     * @param string  response message
+     * @param string  $message response message
      */
     protected function respondBadRequest($message = null)
     {
@@ -279,7 +276,7 @@ class ilExternalContentResultService
 
     /**
      * Send an "unauthorized" response
-     * @param   string response message
+     * @param   string $message response message
      *
      */
     protected function respondUnauthorized($message = null)
@@ -331,19 +328,20 @@ class ilExternalContentResultService
      * Check the reqest signature
 	 * @return mixed	Exception or true
      */
-    private function checkSignature($a_key, $a_secret)
+    private function checkSignature($a_key, $a_secret): mixed
     {
-        require_once('./Modules/LTIConsumer/lib/OAuth.php');
-        require_once('./Modules/LTIConsumer/lib/TrivialOAuthDataStore.php');
-
         $store = new TrivialOAuthDataStore();
         $store->add_consumer($this->fields['KEY'], $this->fields['SECRET']);
 
-        $server = new OAuthServer($store);
-        $method = new OAuthSignatureMethod_HMAC_SHA1();
+        $server = new \ILIAS\LTIOAuth\OAuthServer($store);
+        $method = new \ILIAS\LTIOAuth\OAuthSignatureMethod_HMAC_SHA1();
         $server->add_signature_method($method);
 
-        $request = OAuthRequest::from_request(null, null, $this->getParameters());
+        $request = \ILIAS\LTIOAuth\OAuthRequest::from_request();
+
+        // produces 'invalid signature in verify_request
+        // seems not to be needed in ILIAS 8 because from_request does not use get_magic_quotes_gpc() anymore
+        // $request = \ILIAS\LTIOAuth\OAuthRequest::from_request(null, null, $this->getParameters());
         try
         {
             $server->verify_request($request);
@@ -358,26 +356,27 @@ class ilExternalContentResultService
     /**
      * Get the Parameters from an OAuthRequest
      * Extracted from OAuthRequest::from_request to omit the deprecated get_magic_quotes_gpc()
+     * @deprecated seems not to be needed in ILIAS 8 because from_request does not use get_magic_quotes_gpc() anymore
      * @see OAuthRequest::from_request
      * @return array
      */
     private function getParameters()
     {
         // Find request headers
-        $request_headers = OAuthUtil::get_headers();
+        $request_headers =  \ILIAS\LTIOAuth\OAuthUtil::get_headers();
 
         // Parse the query-string to find GET parameters
-        $parameters = OAuthUtil::parse_parameters($_SERVER['QUERY_STRING']);
+        $parameters = \ILIAS\LTIOAuth\OAuthUtil::parse_parameters($_SERVER['QUERY_STRING']);
 
-        $ourpost = $_POST;
+        $ourpost = (array) $_POST;
 
         // Add POST Parameters if they exist
         $parameters = array_merge($parameters, $ourpost);
 
         // We have a Authorization-header with OAuth data. Parse the header
         // and add those overriding any duplicates from GET or POST
-        if (@substr($request_headers['Authorization'], 0, 6) == "OAuth ") {
-            $header_parameters = OAuthUtil::split_header(
+        if (substr((string) ($request_headers['Authorization'] ?? ''), 0, 6) == "OAuth ") {
+            $header_parameters = \ILIAS\LTIOAuth\OAuthUtil::split_header(
                 $request_headers['Authorization']
             );
             $parameters = array_merge($parameters, $header_parameters);

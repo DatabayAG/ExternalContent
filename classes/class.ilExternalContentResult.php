@@ -35,7 +35,7 @@ class ilExternalContentResult
 
     /**
      * Get a result by id
-     * @param integer id
+     * @param integer $a_id
      * @return ilExternalContentResult|null
      */
     public static function getById($a_id)
@@ -62,9 +62,9 @@ class ilExternalContentResult
     /**
      * Get a result by object and user key
      *
-     * @param integer   object id
-     * @param integer   user id
-     * @param boolean   save a new result object result if not exists
+     * @param integer   $a_obj_id 
+     * @param integer   $a_usr_id 
+     * @param boolean   $a_create save a new result object result if not exists
      * @return ilExternalContentResult|null
      */
     public static function getByKeys($a_obj_id, $a_usr_id, $a_create = false)
@@ -100,7 +100,7 @@ class ilExternalContentResult
 
     /**
      * Fill the properties with data from an array
-     * @param array assoc data
+     * @param array $data assoc data
      */
     protected function fillData($data)
     {

@@ -4,18 +4,13 @@
  * GPLv2, see LICENSE 
  */
 
-require_once(__DIR__ . '/trait.ilExternalContentGUIBase.php');
-require_once(__DIR__ . '/class.ilExternalContentType.php');
-require_once(__DIR__ . '/class.ilObjExternalContent.php');
-require_once(__DIR__ . '/class.ilExternalContentTypesTableGUI.php');
-require_once(__DIR__ . '/class.ilExternalContentModel.php');
-
 /**
  * ExternalContent plugin: configuration GUI
  *
  * @author Fred Neumann <fred.neumann@fim.uni-erlangen.de>
  * @author Jesus Copado <jesus.copado@fim.uni-erlangen.de>
  * @version $Id$
+ * @ilCtrl_IsCalledBy ilExternalContentConfigGUI: ilObjComponentSettingsGUI
  */ 
 class ilExternalContentConfigGUI extends ilPluginConfigGUI
 {
@@ -39,10 +34,10 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
      * perform command
      * @param string $cmd
      */
-    public function performCommand($cmd)
+    public function performCommand(string $cmd): void
     {
         // control flow
-        $cmd = $this->ctrl->getCmd($this);
+        $cmd = $this->ctrl->getCmd();
         switch ($cmd)
         {
             case 'editType':
@@ -103,6 +98,7 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
     				$this->plugin_object->txt('xxco_edit_type'),
                     $this->ctrl->getLinkTarget($this, 'editType')
     			);
+                $this->tabs->activateTab('edit_type');
 
                 $this->tabs->addSubTab("type_settings",
     				$this->plugin_object->txt('type_settings'),
@@ -178,7 +174,7 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
         $value = '';
         foreach ($models as $model)
         {
-        	$value = $value ? $value : $model['name'];
+        	$value = $value ?? $model['name'];
         	$option = new ilRadioOption($model['title'], $model['name'], $model['description']);
             $item->addOption($option);
         }
@@ -228,7 +224,7 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
     /**
      * Init the form to edit the type settings
      * 
-     * @param	array	values to set
+     * @param	array	$a_values values to set
      */
     protected function initFormSettings($a_values = array())
     {
@@ -237,21 +233,21 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
         $form->setTitle($this->lng->txt('settings'));
 
         $item = new ilTextInputGUI($this->txt('type_name'), 'name');
-        $item->setValue($a_values['name']);
+        $item->setValue((string) ($a_values['name'] ?? ''));
         $item->setInfo($this->txt('type_name_info'));
         $item->setRequired(true);
         $item->setMaxLength(32);
         $form->addItem($item);
 
         $item = new ilTextInputGUI($this->lng->txt('title'), 'title');
-        $item->setValue($a_values['title']);
+        $item->setValue((string) ($a_values['title'] ?? ''));
         $item->setInfo($this->txt('type_title_info'));
         $item->setRequired(true);
         $item->setMaxLength(255);
         $form->addItem($item);
 
         $item = new ilTextInputGUI($this->lng->txt('description'), 'description');
-        $item->setValue($a_values['description']);
+        $item->setValue((string) ($a_values['description'] ?? ''));
         $item->setInfo($this->txt('type_description_info'));
         $form->addItem($item);
         
@@ -263,14 +259,14 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
                     ilExternalContentType::AVAILABILITY_NONE => $this->txt('availability_' . ilExternalContentType::AVAILABILITY_NONE)
                 )
         );
-        $item->setValue($a_values['availability']);
+        $item->setValue((int) ($a_values['availability'] ?? ilExternalContentType::AVAILABILITY_CREATE));
         $item->setInfo($this->txt('type_availability_info'));
         $item->setRequired(true);
         $form->addItem($item);
 
         $item = new ilTextAreaInputGUI($this->txt('type_remarks'), 'remarks');
         $item->setInfo($this->txt('type_remarks_info'));
-        $item->setValue($a_values['remarks']);
+        $item->setValue((string) ($a_values['remarks'] ?? ''));
         $item->setRows(5);
         $form->addItem($item);
 
@@ -331,7 +327,7 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
 	            $this->type->saveInputValue($field_name, $field_value);
 	        }
             
-            ilUtil::sendSuccess($this->txt('type_saved'), true);
+            $this->tpl->setOnScreenMessage('success', $this->txt('type_saved'), true);
         }
 
         $this->ctrl->redirect($this, 'editType');
@@ -350,13 +346,13 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
     /**
      * Init the form to set the type icons
      * 
-     * @param	integer		type id 
+     * @param	integer		$a_values type id 
      */
     protected function initFormIcons()
     {
         $type_id = $this->type->getTypeId();
 
-        $svg = ilExternalContentPlugin::_getIcon("xxco", "svg", 0, $type_id, "type");
+        $svg = ilExternalContentPlugin::_getContentIcon("xxco", "svg", 0, $type_id, "type");
         
         $form = new ilPropertyFormGUI();
         $form->setFormAction($this->ctrl->getFormAction($this));
@@ -367,25 +363,7 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
 		$item->setSuffixes(array("svg"));
 		$item->setImage($svg);
 		$form->addItem($item);
-
-        if (empty($svg))
-        {
-            $caption = $this->txt("big_icon")." (".ilExternalContentPlugin::BIG_ICON_SIZE.")";
-            $item = new ilImageFileInputGUI($caption, "big_icon");
-            $item->setImage(ilExternalContentPlugin::_getIcon("xxco", "big", 0, $type_id, "type"));
-            $form->addItem($item);
-
-            $caption = $this->txt("standard_icon")." (".ilExternalContentPlugin::SMALL_ICON_SIZE.")";
-            $item = new ilImageFileInputGUI($caption, "small_icon");
-            $item->setImage(ilExternalContentPlugin::_getIcon("xxco", "small", 0, $type_id, "type"));
-            $form->addItem($item);
-
-            $caption = $this->txt("tiny_icon")." (".ilExternalContentPlugin::TINY_ICON_SIZE.")";
-            $item = new ilImageFileInputGUI($caption, "tiny_icon");
-            $item->setImage(ilExternalContentPlugin::_getIcon("xxco", "tiny", 0, $type_id, "type"));
-            $form->addItem($item);
-        }
-
+        
         $form->addCommandButton('submitFormIcons', $this->lng->txt('save'));
         $this->form = $form;
     }
@@ -411,25 +389,10 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
 		{
 			ilExternalContentPlugin::_removeIcon("svg", "type", $type_id);
 		}
-  		if ($_POST["big_icon_delete"])
-		{
-			ilExternalContentPlugin::_removeIcon("big", "type", $type_id);
-		}
-		if ($_POST["small_icon_delete"])
-		{
-			ilExternalContentPlugin::_removeIcon("small", "type", $type_id);
-		}
-		if ($_POST["tiny_icon_delete"])
-		{
-			ilExternalContentPlugin::_removeIcon("tiny", "type", $type_id);
-		}
 
 		ilExternalContentPlugin::_saveIcon($_FILES["svg_icon"]['tmp_name'], "svg", "type", $type_id);
-		ilExternalContentPlugin::_saveIcon($_FILES["big_icon"]['tmp_name'], "big", "type", $type_id);
-		ilExternalContentPlugin::_saveIcon($_FILES["small_icon"]['tmp_name'], "small", "type", $type_id);
-		ilExternalContentPlugin::_saveIcon($_FILES["tiny_icon"]['tmp_name'], "tiny", "type", $type_id);
 
-		ilUtil::sendSuccess($this->plugin_object->txt('icons_saved'), true);
+        $this->tpl->setOnScreenMessage('success', $this->plugin_object->txt('icons_saved'), true);
         $this->ctrl->redirect($this, 'editIcons');
     }
     
@@ -464,7 +427,7 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
 
         $item = new ilCustomInputGUI('');
         $tpl = new ilTemplate('tpl.edit_xml.html', true, true, "Customizing/global/plugins/Services/Repository/RepositoryObject/ExternalContent/");
-        $tpl->setVariable("CONTENT", ilUtil::prepareFormOutput($a_xml));
+        $tpl->setVariable("CONTENT", ilLegacyFormElementsUtil::prepareFormOutput($a_xml));
         $item->setHTML($tpl->get());
         $item->setInfo($this->txt('type_definition_info'));
         $form->addItem($item);
@@ -491,14 +454,14 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
         if (!$this->type->setXML($xml, $message))
         {
             $this->form->setValuesByPost();
-            ilUtil::sendFailure($this->txt('type_failure_xml') . '<br />' . $message, false);
+            $this->tpl->setOnScreenMessage('failure', $this->txt('type_failure_xml') . '<br />' . $message, false);
         	$style="<style>#il_prop_cont_ {display:none;}</style>";
             $this->tpl->setContent($style.$this->form->getHTML());
             return;
         } 
                 
         $this->type->update();
-        ilUtil::sendSuccess($this->txt('type_updated'), true);
+        $this->tpl->setOnScreenMessage('success', $this->txt('type_updated'), true);
         $this->ctrl->redirect($this, 'editDefinition');
     }
     
@@ -525,7 +488,7 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
     protected function deleteTypeConfirmed()
     {
         $this->type->delete();
-        ilUtil::sendSuccess($this->txt('type_deleted'), true);
+        $this->tpl->setOnScreenMessage('success', $this->txt('type_deleted'), true);
         $this->ctrl->redirect($this, 'listTypes');
     }
 }

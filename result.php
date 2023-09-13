@@ -40,14 +40,14 @@ if (isset($_GET["client_id"]))
     $_COOKIE["ilClientId"] = $_GET["client_id"];
 }
 
+/** @noRector */
+require_once("libs/composer/vendor/autoload.php");
+
 // REST context has http and client but no user, templates, html or redirects
-require_once "Services/Context/classes/class.ilContext.php";
 ilContext::init(ilContext::CONTEXT_REST);
 
-require_once(__DIR__."/classes/class.ilExternalContentInitialisation.php");
 ilExternalContentInitialisation::initILIAS();
 
-require_once (__DIR__ ."/classes/class.ilExternalContentResultService.php");
 $service = new ilExternalContentResultService;
 $service->handleRequest();
 

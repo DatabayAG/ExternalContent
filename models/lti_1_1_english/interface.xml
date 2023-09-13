@@ -326,7 +326,7 @@
 	<field name="AUTOSTART_SCRIPT" type="template">
 	  <template><![CDATA[
 		<script type="text/javascript">
-			$(document).ready(function() {
+			document.addEventListener("DOMContentLoaded", function(event) { 
 				window.document.forms["basicltiLaunchForm"].submit();
 			});
 		</script>

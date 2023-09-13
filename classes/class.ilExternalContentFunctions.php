@@ -18,11 +18,11 @@ class ilExternalContentFunctions
 	/**
 	 * single entry point
 	 * 
-	 * @param string	function name
-	 * @param array		(assoc) parameters	
+	 * @param string	$a_function function name
+	 * @param array		$a_params (assoc) parameters	
 	 * @return mixed	return value (can be any type)
 	 */
-	public static function applyFunction($a_function, $a_params = array())
+	public static function applyFunction($a_function, $a_params = array()): mixed
 	{
 		// apply the function
         switch ($a_function) 
@@ -63,7 +63,7 @@ class ilExternalContentFunctions
 	/**
 	 * sign request data with OAuth
 	 * 
-	 * @param array (	"method => signature methos
+	 * @param array $a_params (	"method => signature methos
 	 * 					"key" => consumer key
 	 * 					"secret" => shared secret
 	 * 					"token"	=> request token
@@ -75,27 +75,26 @@ class ilExternalContentFunctions
 	 */
 	private static function signOAuth($a_params)
 	{
-		require_once('./Modules/LTIConsumer/lib/OAuth.php');
-
 		switch ($a_params['sign_method'])
 		{
 			case "HMAC_SHA1":
-				$method = new OAuthSignatureMethod_HMAC_SHA1();
+				$method = new \ILIAS\LTIOAuth\OAuthSignatureMethod_HMAC_SHA1();
 				break;
 			case "PLAINTEXT":	
-				$method = new OAuthSignatureMethod_PLAINTEXT();
+				$method = new \ILIAS\LTIOAuth\OAuthSignatureMethod_PLAINTEXT();
 				break;
 			case "RSA_SHA1":	
-				$method = new OAuthSignatureMethod_RSA_SHA1();
+				$method = new ilExternalContentOAuthSignatureMethodRsaSha1();
 				break;
 				
 			default:
 				return ["ERROR: unsupported signature method!"];
 		}
 		
-		$consumer = new OAuthConsumer($a_params["key"], $a_params["secret"], $a_params["callback"]);
-		$request = OAuthRequest::from_consumer_and_token($consumer, $a_params["token"], $a_params["http_method"], $a_params["url"], $a_params["data"]);
-		$request->sign_request($method, $consumer, $a_params["token"]);
+		$consumer = new \ILIAS\LTIOAuth\OAuthConsumer($a_params["key"], $a_params["secret"], $a_params["callback"]);
+        $token = new \ILIAS\LTIOAuth\OAuthToken($a_params["key"], $a_params["secret"]);
+		$request = \ILIAS\LTIOAuth\OAuthRequest::from_consumer_and_token($consumer, $token, $a_params["http_method"], $a_params["url"], $a_params["data"]);
+		$request->sign_request($method, $consumer, null);
 		
 		// Pass this back up "out of band" for debugging
 		self::$last_oauth_base_string = $request->get_signature_base_string();
@@ -106,7 +105,7 @@ class ilExternalContentFunctions
 	
 	/**
 	 * create simple HTML input fields
-	 * @param 	array		['type' => string, 'data' => [ 'name' => 'value', ... ]]
+	 * @param 	array		$a_params ['type' => string, 'data' => [ 'name' => 'value', ... ]]
 	 * @return	string		HTML with input fields
 	 */
 	private static function createInputs($a_params)
@@ -127,7 +126,7 @@ class ilExternalContentFunctions
 	
 	/**
 	 * show parameter values
-	 * @param 	array		['type' => string, 'data' => [ 'name' => 'value', ... ]]
+	 * @param 	array		$a_params ['type' => string, 'data' => [ 'name' => 'value', ... ]]
 	 * @return	string		HTML with name = value texts
 	 */
 	private static function showValues($a_params)
@@ -143,7 +142,7 @@ class ilExternalContentFunctions
 	/**
 	 * Select a value from a list of params by matching the parameter name
 	 * 
-	 * @param 	array		['' => default_value, 'value' => selection_name, 'name1' => value1, name2 => value2, ...]
+	 * @param 	array		$a_params ['' => default_value, 'value' => selection_name, 'name1' => value1, name2 => value2, ...]
 	 * @return 	string		return value
 	 */
 	private static function selectByName($a_params)
@@ -169,7 +168,7 @@ class ilExternalContentFunctions
 
 	/**
 	 * Split a string of key/value pairs to an array of keys and values
-	 * @param 	array 	['source => string, 'key_delimiter' => string, 'entry_delimiter => string ]
+	 * @param 	array 	$a_params ['source => string, 'key_delimiter' => string, 'entry_delimiter => string ]
 	 * @return	array	[key => value, ... ]
 	 */
 	private static function splitToArray($a_params)
@@ -201,7 +200,7 @@ class ilExternalContentFunctions
 	 * Values of following array set will overwrite those of previous array with the same key.
 	 * Other values will be added.
      * Params that are not arrays will be ignored
-	 * @param array	['name1' => array, 'name2' => array, ... ]
+	 * @param array	$a_params ['name1' => array, 'name2' => array, ... ]
      * @return array
 	 */
 	private static function mergeArrays($a_params)

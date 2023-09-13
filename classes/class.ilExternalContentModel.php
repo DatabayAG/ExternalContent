@@ -4,8 +4,6 @@
  * GPLv2, see LICENSE 
  */
 
-require_once(__DIR__ . "/class.ilExternalContentType.php");
-
 /**
  * External Content plugin: model for type definition
  *
@@ -27,43 +25,45 @@ class ilExternalContentModel
 	 */
 	static function _getModelsList()
 	{	
-		$models = array();
-		$path = self::$builtin_path;
-		if ($dp = @opendir($path))
-		{
-			while (($file = readdir($dp)) != false)
-			{
-				if (is_dir($path."/".$file) && $file != "." && $file != ".." && $file != "CVS"
-					&& $file != ".svn")
-				{
-					if (is_file($path."/".$file."/interface.xml"))
-					{
-						$message = "";
-						$xml = file_get_contents($path."/".$file."/interface.xml");
-						$tmp_type = new ilExternalContentType();
-						if ($tmp_type->setXML($xml, $message))
-						{
-							$model = array (
-								'name' => $file,
-								'title' => $tmp_type->getTitle(),
-								'description' => $tmp_type->getDescription()
-							);
-
-							array_push($models, $model);
-						}
-						else {
-                            $model = array (
-                                'name' => $file,
-                                'title' => $file,
-                                'description' => $message
-                            );
-
-                            array_push($models, $model);
+		$models = [];
+        try {
+            $path = self::$builtin_path;
+            if ($dp = opendir($path))
+            {
+                while (($file = readdir($dp)) != false)
+                {
+                    if (is_dir($path."/".$file) && $file != "." && $file != ".." && $file != "CVS"
+                        && $file != ".svn")
+                    {
+                        if (is_file($path."/".$file."/interface.xml"))
+                        {
+                            $message = "";
+                            $xml = file_get_contents($path."/".$file."/interface.xml");
+                            $tmp_type = new ilExternalContentType();
+                            if ($tmp_type->setXML($xml, $message))
+                            {
+                                $model = array (
+                                    'name' => $file,
+                                    'title' => $tmp_type->getTitle(),
+                                    'description' => $tmp_type->getDescription()
+                                );
+                            }
+                            else {
+                                $model = array (
+                                    'name' => $file,
+                                    'title' => $file,
+                                    'description' => $message
+                                );
+                            }
+                            $models[] = $model;
                         }
-					}
-				}
-			} 
-		}
+                    }
+                }
+            }
+        }
+        catch (Exception $e) {
+            // nothing to do
+        }
 	
 		return $models;
 	}
@@ -72,8 +72,8 @@ class ilExternalContentModel
 	/**
 	 * Create a new type from a model
 	 * 
-	 * @param string	model name (= sub directory of models)
-	 * @param string	title of the new type
+	 * @param string	$a_model_name model name (= sub directory of models)
+	 * @param string	$a_type_name title of the new type
 	 * 
 	 * @return int		type id
 	 */

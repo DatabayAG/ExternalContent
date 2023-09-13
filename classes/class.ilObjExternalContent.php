@@ -4,10 +4,6 @@
  * GPLv2, see LICENSE 
  */
 
-require_once(__DIR__ . '/interface.ilExternalContent.php');
-require_once(__DIR__ . '/class.ilExternalContentSettings.php');
-require_once(__DIR__ . '/class.ilExternalContentRenderer.php');
-
 /**
  * External Content plugin: base class for repository object
  *
@@ -48,7 +44,8 @@ class ilObjExternalContent extends ilObjectPlugin implements ilExternalContent, 
      *
      * @access	public
      */
-    final public function initType() {
+    protected function initType(): void
+    {
         $this->setType('xxco');
     }
 
@@ -101,7 +98,7 @@ class ilObjExternalContent extends ilObjectPlugin implements ilExternalContent, 
     /**
      * set a return url for coming back from the content
      * 
-     * @param string	return url
+     * @param string	$a_return_url return url
      */
     public function setReturnUrl($a_return_url) {
         $this->return_url = $a_return_url;
@@ -118,7 +115,7 @@ class ilObjExternalContent extends ilObjectPlugin implements ilExternalContent, 
 
     /**
      * get the url for receiving lti outcomes
-     * @return string|void
+     * @return string
      */
     public function getResultUrl(){
         return ILIAS_HTTP_PATH . "/Customizing/global/plugins/Services/Repository/RepositoryObject/ExternalContent/result.php"
@@ -128,7 +125,7 @@ class ilObjExternalContent extends ilObjectPlugin implements ilExternalContent, 
     /**
      * set a suffix provided by the goto link
      *
-     * @param string	goto suffix
+     * @param string	$a_goto_suffix goto suffix
      */
     public function setGotoSuffix($a_goto_suffix) {
         $this->goto_suffix = (string) $a_goto_suffix;
@@ -151,7 +148,7 @@ class ilObjExternalContent extends ilObjectPlugin implements ilExternalContent, 
      * The most outer matching course or group is used
      * If not found the most inner category or root node is used
      * 
-     * @param	array	list of valid types
+     * @param	array	$a_valid_types list of valid types
      * @return 	array	context array ("ref_id", "title", "type")
      */
     public function getContext($a_valid_types = array('crs', 'grp', 'cat', 'root'))
@@ -190,7 +187,7 @@ class ilObjExternalContent extends ilObjectPlugin implements ilExternalContent, 
     /**
      * Create
      */
-    public function doCreate()
+    protected function doCreate(bool $clone_mode = false): void
     {
         $this->getSettings()->setObjId($this->getId());
         $this->getSettings()->save();
@@ -199,7 +196,7 @@ class ilObjExternalContent extends ilObjectPlugin implements ilExternalContent, 
     /**
      * Read
      */
-    public function doRead()
+    protected function doRead(): void
     {
         // nothing special
     }
@@ -207,7 +204,7 @@ class ilObjExternalContent extends ilObjectPlugin implements ilExternalContent, 
     /**
      * Update function
      */
-    public function doUpdate()
+    protected function doUpdate(): void
     {
         $this->getSettings()->save();
     }
@@ -215,7 +212,7 @@ class ilObjExternalContent extends ilObjectPlugin implements ilExternalContent, 
     /**
      * Delete
      */
-    public function doDelete()
+    protected function doDelete(): void
     {
         $this->getSettings()->delete();
     }
@@ -227,7 +224,7 @@ class ilObjExternalContent extends ilObjectPlugin implements ilExternalContent, 
      * @param int $a_target_id
      * @param int $a_copy_id
      */
-    function doCloneObject($new_obj, $a_target_id, $a_copy_id = null)
+    protected function doCloneObject(ilObject2 $new_obj, int $a_target_id, ?int $a_copy_id = null): void
     {
         $this->getSettings()->clone($new_obj->getSettings());
     }
@@ -238,9 +235,8 @@ class ilObjExternalContent extends ilObjectPlugin implements ilExternalContent, 
      *
      * @return array
      */
-    public function getLPCompleted()
+    public function getLPCompleted(): array
     {
-        $this->plugin->includeClass('class.ilExternalContentLPStatus.php');
         return ilExternalContentLPStatus::getLPStatusDataFromDb($this->getId(), ilLPStatus::LP_STATUS_COMPLETED_NUM);
     }
 
@@ -249,9 +245,8 @@ class ilObjExternalContent extends ilObjectPlugin implements ilExternalContent, 
      *
      * @return array
      */
-    public function getLPNotAttempted()
+    public function getLPNotAttempted(): array
     {
-        $this->plugin->includeClass('class.ilExternalContentLPStatus.php');
         return ilExternalContentLPStatus::getLPStatusDataFromDb($this->getId(), ilLPStatus::LP_STATUS_NOT_ATTEMPTED_NUM);
     }
 
@@ -260,9 +255,8 @@ class ilObjExternalContent extends ilObjectPlugin implements ilExternalContent, 
      *
      * @return array
      */
-    public function getLPFailed()
+    public function getLPFailed(): array
     {
-        $this->plugin->includeClass('class.ilExternalContentLPStatus.php');
         return ilExternalContentLPStatus::getLPStatusDataFromDb($this->getId(), ilLPStatus::LP_STATUS_FAILED_NUM);
     }
 
@@ -271,9 +265,8 @@ class ilObjExternalContent extends ilObjectPlugin implements ilExternalContent, 
      *
      * @return array
      */
-    public function getLPInProgress()
+    public function getLPInProgress(): array
     {
-        $this->plugin->includeClass('class.ilExternalContentLPStatus.php');
         return ilExternalContentLPStatus::getLPStatusDataFromDb($this->getId(), ilLPStatus::LP_STATUS_IN_PROGRESS_NUM);
     }
 
@@ -283,9 +276,8 @@ class ilObjExternalContent extends ilObjectPlugin implements ilExternalContent, 
      * @param int $a_user_id
      * @return int
      */
-    public function getLPStatusForUser($a_user_id)
+    public function getLPStatusForUser(int $a_user_id): int
     {
-        $this->plugin->includeClass('class.ilExternalContentLPStatus.php');
         return ilExternalContentLPStatus::getLPDataForUserFromDb($this->getId(), $a_user_id);
     }
 
@@ -299,7 +291,6 @@ class ilObjExternalContent extends ilObjectPlugin implements ilExternalContent, 
         // track access for learning progress
         if ($DIC->user()->getId() != ANONYMOUS_USER_ID and $this->settings->getLPMode() == ilExternalContentSettings::LP_ACTIVE)
         {
-            $this->plugin->includeClass('class.ilExternalContentLPStatus.php');
             ilExternalContentLPStatus::trackAccess($DIC->user()->getId(),$this->getId(), $this->getRefId());
         }
     }

@@ -38,7 +38,7 @@ class ilExternalContentEncodings
 	/**
 	 * check if an encoding is defined
 	 * 
-	 * @param  string	encoding (may also be comma separated list of encodings)
+	 * @param  string	$a_encoding (may also be comma separated list of encodings)
 	 * @return bool		is defined
 	 */
 	public static function _encodingExists($a_encoding = '')
@@ -67,8 +67,8 @@ class ilExternalContentEncodings
 	/**
 	 * apply an encoding to a value
 	 * 
-	 * @param 	string	encoding (may also be comma separated list of encodings)
-	 * @param 	string|array 	value
+	 * @param 	string	$a_encoding (may also be comma separated list of encodings)
+	 * @param 	string|array 	$a_value
 	 * @return	string|array 	encoded value
 	 */
 	public static function _applyEncoding($a_encoding = "", $a_value = "")
@@ -171,7 +171,8 @@ class ilExternalContentEncodings
 		            if (file_exists($path))
 		            {
 		               	require_once($path);
-		              	$value = call_user_func(array($classname,'encode'), $value);
+                        /** @noinspection PhpUndefinedCallbackInspection */
+                        $value = call_user_func(array($classname, 'encode'), $value);
 		            }
 	              	break;
 	        }

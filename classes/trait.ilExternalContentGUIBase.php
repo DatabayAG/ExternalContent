@@ -3,26 +3,15 @@
 
 trait ilExternalContentGUIBase
 {
-    /** @var ilObjUser */
-    protected $user;
+    protected ilObjUser $user;
+    protected ilAccessHandler $access;
+    protected ilCtrl $ctrl;
+    protected ilLanguage $lng;
+    protected ilTabsGUI $tabs;
+    protected ilToolbarGUI $toolbar;
 
-    /** @var  ilAccessHandler $access */
-    protected $access;
-
-    /** @var ilCtrl $ctrl */
-    protected $ctrl;
-
-    /** @var  ilLanguage $lng */
-    protected $lng;
-
-    /** @var ilTabsGUI */
-    protected $tabs;
-
-    /** @var  ilToolbarGUI $toolbar */
-    protected $toolbar;
-
-    /** @var ilTemplate $tpl */
-    protected $tpl;
+    /** @var ilGlobalTemplate $tpl */
+    protected  $tpl;
 
 
     protected function initGlobals()
@@ -34,6 +23,6 @@ trait ilExternalContentGUIBase
         $this->lng = $DIC->language();
         $this->tabs = $DIC->tabs();
         $this->toolbar = $DIC->toolbar();
-        $this->tpl = $DIC['tpl'];
+        $this->tpl = $DIC->ui()->mainTemplate();
     }
 }

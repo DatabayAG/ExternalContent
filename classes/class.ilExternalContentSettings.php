@@ -4,8 +4,6 @@
  * GPLv2, see LICENSE
  */
 
-require_once(__DIR__ . '/class.ilExternalContentType.php');
-
 class ilExternalContentSettings
 {
     const ACTIVATION_OFFLINE = 0;
@@ -86,7 +84,7 @@ class ilExternalContentSettings
     /**
      * Set Type Id
      *
-     * @param int type id
+     * @param int $a_type_id type id
      */
     public function setTypeId($a_type_id)
     {
@@ -116,7 +114,7 @@ class ilExternalContentSettings
     /**
      * Set instructions
      *
-     * @param string instructions
+     * @param string $a_instructions instructions
      */
     public function setInstructions($a_instructions) {
         $this->instructions = $a_instructions;
@@ -132,7 +130,7 @@ class ilExternalContentSettings
     /**
      * Set availability type
      *
-     * @param int availability type
+     * @param int $a_type availability type
      */
     public function setAvailabilityType($a_type) {
         $this->availability_type = $a_type;
@@ -261,8 +259,8 @@ class ilExternalContentSettings
 
     /**
      * Set the settings as XML data
-     * @param	string	xml definition
-     * @param	string	(byref) variable for failure message
+     * @param	string	$a_xml xml definition
+     * @param	string	$a_failure_message (byref) variable for failure message
      * @return	boolean setting successful
      */
     public function setXML($a_xml, &$a_failure_message)
@@ -319,8 +317,8 @@ class ilExternalContentSettings
     /**
      * get a DOM child element with a specific name
      *
-     * @param 	DOMNode		node
-     * @param 	string		child name
+     * @param 	DOMNode		$a_node node
+     * @param 	string		$a_name child name
      * @return 	DOMElement|false
      */
     private function getDomChildByName($a_node, $a_name)

@@ -4,10 +4,6 @@
  * GPLv2, see LICENSE 
  */
 
-require_once(__DIR__ . '/trait.ilExternalContentGUIBase.php');
-require_once(__DIR__ . '/class.ilExternalContentPlugin.php');
-require_once(__DIR__ . '/class.ilExternalContentType.php');
-
 /**
  * External Content plugin: content types table GUI
  *
@@ -73,7 +69,7 @@ class ilExternalContentTypesTableGUI extends ilTable2GUI {
     /**
      * Fill a single data row.
      */
-    protected function fillRow($a_set) 
+    protected function fillRow(array $a_set): void
     {
         $this->ctrl->setParameter($this->parent_obj, 'type_id', $a_set['type_id']);
 

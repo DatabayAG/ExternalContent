@@ -169,7 +169,7 @@ if(!$ilDB->tableExists('xxco_data_token'))
 ?>
 <#7>
 <?php
-    ilUtil::makeDirParents(ilUtil::getWebspaceDir().'/xxco/cache');
+    // replaced by install() method of hte plugin
 ?>
 <#8>
 <?php
