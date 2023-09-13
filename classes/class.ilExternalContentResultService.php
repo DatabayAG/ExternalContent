@@ -326,9 +326,9 @@ class ilExternalContentResultService
 
     /**
      * Check the reqest signature
-	 * @return mixed	Exception or true
+	 * @return mixed	Exception or true, , not defined because of error in php 7.4
      */
-    private function checkSignature($a_key, $a_secret): mixed
+    private function checkSignature($a_key, $a_secret)
     {
         $store = new TrivialOAuthDataStore();
         $store->add_consumer($this->fields['KEY'], $this->fields['SECRET']);

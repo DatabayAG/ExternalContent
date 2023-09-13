@@ -20,9 +20,9 @@ class ilExternalContentFunctions
 	 * 
 	 * @param string	$a_function function name
 	 * @param array		$a_params (assoc) parameters	
-	 * @return mixed	return value (can be any type)
+	 * @return mixed	return value (can be any type), not defined because of error in php 7.4
 	 */
-	public static function applyFunction($a_function, $a_params = array()): mixed
+	public static function applyFunction($a_function, $a_params = array())
 	{
 		// apply the function
         switch ($a_function) 
