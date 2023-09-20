@@ -306,10 +306,11 @@ class ilExternalContentType
         $description = null;
         $template = null;
 
-        if (!@$doc->loadXML($a_xml))
-        {
-            $err = error_get_last();
-            $a_failure_message = $err['message'];
+        try {
+            $doc->loadXML($a_xml);
+        }
+        catch (Exception $e) {
+            $a_failure_message = $e->getMessage();
             return false;
         }
 

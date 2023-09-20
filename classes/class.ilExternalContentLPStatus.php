@@ -44,7 +44,12 @@ class ilExternalContentLPStatus extends ilLPStatusPlugin
      */
     public static function getLPDataForUserFromDb($a_obj_id, $a_user_id)
     {
-        return self::getLPDataForUser((int) $a_obj_id, (int) $a_user_id);
+        try {
+            return self::getLPDataForUser((int) $a_obj_id, (int) $a_user_id);
+        }
+        catch (Exception $e) {
+            return self::LP_STATUS_NOT_ATTEMPTED_NUM;
+        }
     }
 
 
