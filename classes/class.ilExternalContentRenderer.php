@@ -276,7 +276,7 @@ class ilExternalContentRenderer
         $ilClientIniFile = $DIC->clientIni();
 
         $value = "";
-        switch ($a_field['field_name']) {
+        switch ($a_field['field_name'] ?? null) {
             // object information
 
             case "ILIAS_REF_ID":
@@ -299,23 +299,23 @@ class ilExternalContentRenderer
 
             case "ILIAS_CONTEXT_ID":
                 $context = $this->content->getContext();
-                $value = $context['id'];
+                $value = $context['id'] ?? null;
                 break;
 
             case "ILIAS_CONTEXT_TYPE":
                 $context = $this->content->getContext();
-                $value = $context['type'];
+                $value = $context['type'] ?? null;
                 break;
 
             case "ILIAS_CONTEXT_TITLE":
                 $context = $this->content->getContext();
-                $value = $context['title'];
+                $value = $context['title'] ?? null;
                 break;
 
             // call-time imformation
 
             case "ILIAS_REMOTE_ADDR":
-                $value = $_SERVER["REMOTE_ADDR"];
+                $value = $_SERVER["REMOTE_ADDR"]  ?? null;
                 break;
 
             case "ILIAS_TIME":
@@ -408,7 +408,7 @@ class ilExternalContentRenderer
 
             case "ILIAS_LMS_GUID":
                 $parsed = parse_url(ILIAS_HTTP_PATH);
-                $value = CLIENT_ID . "." . implode(".", array_reverse(explode("/", $parsed["path"]))) . $parsed["host"];
+                $value = CLIENT_ID . "." . implode(".", array_reverse(explode("/", $parsed["path"] ?? ''))) . ($parsed["host"] ?? '');
                 break;
 
             case "ILIAS_LMS_NAME":
@@ -427,7 +427,7 @@ class ilExternalContentRenderer
 
                 // fill additional user fields
                 foreach ($this->userData->getFieldValues() as $field_name => $field_value) {
-                    if ($field_name == $a_field['field_name']) {
+                    if ($field_name == ($a_field['field_name'] ?? null)) {
                         $value = $field_value;
                     }
                 }
