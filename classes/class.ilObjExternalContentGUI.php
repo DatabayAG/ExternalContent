@@ -113,6 +113,8 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
             $this->object->setGotoSuffix($_GET['goto_suffix'] ?? '');
 		}
 
+        $this->tpl->setTitleIcon(ilExternalContentPlugin::_getContentIcon('xxco', 'svg', $this->obj_id));
+        
         switch ($cmd)
         {
         	case "edit":

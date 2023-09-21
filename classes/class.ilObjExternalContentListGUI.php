@@ -70,6 +70,14 @@ class ilObjExternalContentListGUI extends ilObjectPluginListGUI
         return $props ?? array();
     }
 
+    /**
+     * Get object type specific type icon
+     */
+    public function getTypeIcon(): string
+    {
+        return ilExternalContentPlugin::_getContentIcon('xxco', 'svg', $this->obj_id);
+    }
+    
 }
 // END class.ilObjExternalContentListGUI
 ?>
