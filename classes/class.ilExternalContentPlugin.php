@@ -23,15 +23,6 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
     /** @var self */
     protected static $instance;
 
-    /** @var Filesystem */
-    protected $fs;
-    
-    public function __construct(ilDBInterface $db, ilComponentRepositoryWrite $component_repository, string $id)
-    {
-        global $DIC;
-        parent::__construct($db, $component_repository, $id);
-        $this->fs = $DIC->filesystem()->web();
-    }
 
     /**
 	 * Returns name of the plugin
@@ -57,17 +48,6 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
         }
         return self::$instance;
     }
-
-    
-    public function install(): void
-    {
-        parent::install();
-
-        if (!$this->fs->hasDir('xxco/cache')) {
-            $this->fs->createDir('xxco/cache');
-        }
-    }
-
 
     /**
 	 * Remove all custom tables when plugin is uninstalled
