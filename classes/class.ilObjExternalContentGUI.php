@@ -110,7 +110,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
 			$this->object->setReturnURL(ILIAS_HTTP_PATH . "/". $this->ctrl->getLinkTarget($this, "view", "", true));
 
 			// set the goto suffix, e.g. autostart
-            $this->object->setGotoSuffix($_GET['goto_suffix']);
+            $this->object->setGotoSuffix($_GET['goto_suffix'] ?? '');
 		}
 
         switch ($cmd)
