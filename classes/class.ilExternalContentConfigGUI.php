@@ -48,7 +48,7 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
             case 'submitFormDefinition':
             case 'deleteType':
             case 'deleteTypeConfirmed':
-            	$this->type = new ilExternalContentType($_GET['type_id']);
+            	$this->type = new ilExternalContentType($_GET['type_id'] ?? 0);
             	$this->tpl->setDescription($this->type->getName());
             	
             	$this->ctrl->saveParameter($this, 'type_id');
@@ -385,12 +385,12 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
             return;
         }
 
-		if ($_POST["svg_icon_delete"])
-		{
+		if (!empty($_POST["svg_icon_delete"])) {
 			ilExternalContentPlugin::_removeIcon("svg", "type", $type_id);
 		}
-
-		ilExternalContentPlugin::_saveIcon($_FILES["svg_icon"]['tmp_name'], "svg", "type", $type_id);
+        if (!empty($_FILES["svg_icon"]) && !empty($_FILES["svg_icon"]['tmp_name'])) {
+            ilExternalContentPlugin::_saveIcon($_FILES["svg_icon"]['tmp_name'], "svg", "type", $type_id);
+        }
 
         $this->tpl->setOnScreenMessage('success', $this->plugin_object->txt('icons_saved'), true);
         $this->ctrl->redirect($this, 'editIcons');
@@ -445,6 +445,10 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
     {
         $this->ctrl->saveParameter($this, 'type_id');
         $this->tabs->activateSubTab('type_definition');
+        
+        if (empty($_POST['xml'])) {
+            $this->ctrl->redirect($this, 'editDefinition');
+        }
         
         $xml = ilUtil::stripOnlySlashes($_POST['xml']);
         $this->initFormDefinition($xml);

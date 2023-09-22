@@ -307,11 +307,11 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
                 break;
 
             case ilExternalContentType::LAUNCH_TYPE_EMBED:
-    			if ($_GET['lti_msg'])
+    			if (!empty($_GET['lti_msg']))
     			{
                     $this->tpl->setOnScreenMessage('info', ilUtil::stripSlashes($_GET['lti_msg']), true);
     			}
-    			if ($_GET['lti_errormsg'])
+    			if (!empty($_GET['lti_errormsg']))
     			{
                     $this->tpl->setOnScreenMessage('failure', ilUtil::stripSlashes($_GET['lti_errormsg']), true);
     			}
@@ -357,7 +357,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
         $ilErr = $DIC['ilErr'];
         
         $this->setCreationMode(true);
-        if (!$this->access->checkAccess("create", '', $_GET["ref_id"], $this->getType())) {
+        if (!isset($_GET["ref_id"]) || !$this->access->checkAccess("create", '', $_GET["ref_id"], $this->getType())) {
             $ilErr->raiseError($this->lng->txt("permission_denied"), $ilErr->MESSAGE);
         }
         else
@@ -384,7 +384,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
         $ilErr = $DIC['ilErr'];
         
             //$_REQUEST["new_type"] = $this->getType();
-            if (!$this->access->checkAccess("create", '', $_GET["ref_id"], $this->getType()))
+            if (!isset($_GET["ref_id"]) || !$this->access->checkAccess("create", '', $_GET["ref_id"], $this->getType()))
             {
 
                 $ilErr->raiseError($this->lng->txt("permission_denied"), $ilErr->MESSAGE);
@@ -682,11 +682,12 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
             return;
         }
 
-		if($_POST["svg_icon_delete"])
-		{
+		if(!empty($_POST["svg_icon_delete"])) {
 			ilExternalContentPlugin::_removeIcon("svg", "object", $this->object->getId());
 		}
-		ilExternalContentPlugin::_saveIcon($_FILES["svg_icon"]['tmp_name'], "svg", "object", $this->object->getId());
+        if (!empty($_FILES["svg_icon"]) && !empty($_FILES["svg_icon"]['tmp_name'])) {
+            ilExternalContentPlugin::_saveIcon($_FILES["svg_icon"]['tmp_name'], "svg", "object", $this->object->getId());
+        }
 
         $this->tpl->setOnScreenMessage('success', $this->txt('icons_saved'), true);
         $this->ctrl->redirect($this, 'editIcons');
