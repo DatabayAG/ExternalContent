@@ -3,7 +3,7 @@ ILIAS External Content plugin
 
 Copyright (c) 2016 Institut fuer Lern-Innovation, Friedrich-Alexander-Universitaet Erlangen-Nuernberg, GPLv2, see LICENSE
 
-**Further maintenance is provided by [Databay AG](https://www.databay.de).**
+**Further maintenance can be offered by [Databay AG](https://www.databay.de).**
 
 - Forum: http://www.ilias.de/docu/goto_docu_frm_3474_1946.html
 - Bug Reports: http://www.ilias.de/mantis (Choose project "ILIAS plugins" and filter by category "External Content")
