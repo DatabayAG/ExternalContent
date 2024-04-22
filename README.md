@@ -44,7 +44,7 @@ Update
 If you update your plugin to ILIAS 8, you should change the XML of your LTI type definitions to get rid if the jQuery dependencies.
 
 See here, how this is done in the included type models:
-https://github.com/ilifau/ExternalContent/commit/9d21b2bb64be2c5020262cfaf1df9d53364fc89f#diff-cec2d9d3b80db0ab89abc4421b6ff87838bb346e2888d8a60a431eb3280b47a0
+https://github.com/DatabayAG/ExternalContent/commit/9d21b2bb64be2c5020262cfaf1df9d53364fc89f#diff-cec2d9d3b80db0ab89abc4421b6ff87838bb346e2888d8a60a431eb3280b47a0
 
 
 Version History
