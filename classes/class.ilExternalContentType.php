@@ -349,6 +349,7 @@ class ilExternalContentType
         $fields = $interface->getElementsByTagName('field');
         foreach ($fields as $field)
         {
+            /** @var DOMNode $field */
             $tmp = new ilExternalContentField();
             
             // basic properties
@@ -366,7 +367,7 @@ class ilExternalContentType
            	// appearance of input fields
            	$tmp->parentfield = (string) $field->getAttribute('parentfield');
             $tmp->parentvalue = (string) $field->getAttribute('parentvalue');
-            $tmp->level = (string) ($field->getAttribute('level') ?? "object");
+            $tmp->level = (string) ($field->getAttribute('level') ?: "object");
             
             // processing properties
            	$tmp->encoding = $field->getAttribute('encoding');
@@ -609,7 +610,7 @@ class ilExternalContentType
 
 		foreach ($this->getInputFields($a_level, $a_parentfield, $a_parentvalue) as $field)
 		{
-			$value = ($a_values['field_' . $field->field_name] ?? $field->default);
+            $value = ($a_values['field_' . $field->field_name] ?? '') ?: $field->default;
 
 			switch($field->field_type)
 			{
@@ -732,12 +733,12 @@ class ilExternalContentType
             if ($field->field_type == self::FIELDTYPE_SPECIAL) {
                 if ($field->field_name == self::FIELD_LTI_USER_DATA) {
                     $value = ilExternalContentUserData::create($this->plugin)->getFormValue($a_form);
-                    $values[$field->field_name] = ($value ?? $field->default);
+                    $values[$field->field_name] = $value ?: $field->default;
                 }
             }
             else {
                 $value = trim($a_form->getInput("field_" . $field->field_name));
-                $values[$field->field_name] = ( $value ?? $field->default);
+                $values[$field->field_name] = $value ?: $field->default; 
             }
         }
         return $values;
