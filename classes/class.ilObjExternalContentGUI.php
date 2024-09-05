@@ -293,6 +293,11 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
      */
     function viewObject() : void
     {
+        // debug: set learning progress
+//        global $DIC;
+//        ilExternalContentLPStatus::trackResult($DIC->user()->getId(), $this->object->getId(), ilLPStatus::LP_STATUS_FAILED_NUM, 30);
+        // debug.
+
         $this->ctrl->saveParameter($this, 'goto_suffix');
 
         switch ($this->object->getTypeDef()->getLaunchType())

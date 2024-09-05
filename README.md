@@ -52,6 +52,9 @@ Version History
 
 Plugin versions for different ILIAS releases are provided in separate branches of this repository.
 
+Version 1.8.2 (2024-09-05)
+* Fixed update of learning progress
+
 Version 1.8.1 (2023-09-13)
 * Support for ILIAS 8
 * Used FileSystem service for icons
