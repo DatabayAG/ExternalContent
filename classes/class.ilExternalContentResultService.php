@@ -18,6 +18,11 @@ class ilExternalContentResultService
     protected $plugin_path = '';
 
     /**
+     * @var string  relative path of the plugin durectory from the
+     */
+    protected $plugin_relative_path = 'Customizing/global/plugins/Services/Repository/RepositoryObject/ExternalContent';
+
+    /**
      * @var ilExternalContentResult
      */
     protected $result = null;
@@ -337,7 +342,16 @@ class ilExternalContentResultService
         $method = new \ILIAS\LTIOAuth\OAuthSignatureMethod_HMAC_SHA1();
         $server->add_signature_method($method);
 
-        $request = \ILIAS\LTIOAuth\OAuthRequest::from_request();
+        // get the correct request url for checking the signature
+        // this must corresond to the lis_outcome_service_url provided with the call of the tool
+        // the variable ILAS_RESULT_URL is used for this
+        // see \ilObjExternalContent::getResultUrl
+        // The port and scheme might be wrong when HTTP is termiated by a load balalncer
+        // In this case the http_path in ilias.ini.php should be set correctly
+        $result_url = str_replace($this->plugin_relative_path, '', ILIAS_HTTP_PATH);
+        $result_url = rtrim($result_url, '/') . '/' . $this->plugin_relative_path . '/result.php?client_id='.CLIENT_ID;
+        $request = \ILIAS\LTIOAuth\OAuthRequest::from_request(null, $result_url);
+        //$request = \ILIAS\LTIOAuth\OAuthRequest::from_request();
 
         // produces 'invalid signature in verify_request
         // seems not to be needed in ILIAS 8 because from_request does not use get_magic_quotes_gpc() anymore
