@@ -5,7 +5,7 @@
   <description>LTI 1.1 with Basic Outcome Service, see http://developers.imsglobal.org</description>
 
   <template><![CDATA[
-  <form name="basicltiLaunchForm" action="{LAUNCH_URL}" method="post" target="{FORM_TARGET}" encType="application/x-www-form-urlencoded">
+  <form name="basicltiLaunchForm" action="{LAUNCH_URL}" method="post" target="{FORM_TARGET}" rel="noopener noreferrer" encType="application/x-www-form-urlencoded">
 	  {HIDDEN_INPUTS}
 	  <input class="btn btn-default" type="submit" value = "Press to launch" />
 	  {DEBUG_EMBED}

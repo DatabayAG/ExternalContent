@@ -48,6 +48,18 @@ and replace it with:
 document.addEventListener("DOMContentLoaded", function(event)
 ````
 
+## Security
 
+To improve security with opening external sites, we recommend setting `noopener` and `noreferrer` in the lauch forms or links used in the XML of your type definitions, e.g. for LTI types:
 
+Search for:
+````
+target="{FORM_TARGET}" 
+````
+and replace with:
+````
+target="{FORM_TARGET}" rel="noopener noreferrer"
+````
+
+This is done in the models for creating new LTI 1.1 types.
 
