@@ -2,6 +2,7 @@
 
 ## Version 1.9.0 for ILIAS 9 (2024-09-19)
 * Update for ILIAS 9
+* Add noopener and noreferrer to lauch forms in LTI type models
 
 ## Version 1.8.2 for ILIAS 8 (2024-09-05)
 * Fixed update of learning progress
