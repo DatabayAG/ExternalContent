@@ -1,5 +1,4 @@
-ILIAS External Content plugin
-=============================
+# ILIAS External Content plugin
 
 Copyright (c) 2016 Institut fuer Lern-Innovation, Friedrich-Alexander-Universitaet Erlangen-Nuernberg, GPLv2, see LICENSE
 
@@ -8,9 +7,7 @@ Copyright (c) 2016 Institut fuer Lern-Innovation, Friedrich-Alexander-Universita
 - Forum: http://www.ilias.de/docu/goto_docu_frm_3474_1946.html
 - Bug Reports: http://www.ilias.de/mantis (Choose project "ILIAS plugins" and filter by category "External Content")
 
-
-Installation
-------------
+## Installation
 
 When you download the Plugin as ZIP file from GitHub, please rename the extracted directory to *ExternalContent*
 (remove the branch suffix, e.g. -master).
@@ -22,45 +19,35 @@ When you download the Plugin as ZIP file from GitHub, please rename the extracte
 4. Choose action  "Update" for the ExternalContent plugin
 5. Choose action  "Activate" for the ExternalContent plugin
 
-Server Configuration Notes
---------------------------
+## Server Configuration Notes
 
 If you want to use the LTI outcome service with PHP-FPM behind an Apache web server, please add the following configuration
 to your virtual host or directory configuration in Apache:
 
 `SetEnvIfNoCase ^Authorization$ "(.+)" HTTP_AUTHORIZATION=$1`
 
-Usage
------
+## Usage
 
 See [Manual](docs/Manual.pdf) for details.
 
 You may also try the [PCExternalContent](https://github.com/DatabayAG/PCExternalContent) plugin to embed contents with the ILIAS page editor.
 
 
-Update
-------
+## Update
 
-If you update your plugin to ILIAS 8, you should change the XML of your LTI type definitions to get rid of the jQuery dependencies.
+Plugin versions for different ILIAS releases are provided in separate branches of this repository. See [Changelog](CHANGELOG.md) for Details.
 
-See here, how this is done in the included type models:
-https://github.com/DatabayAG/ExternalContent/commit/9d21b2bb64be2c5020262cfaf1df9d53364fc89f#diff-cec2d9d3b80db0ab89abc4421b6ff87838bb346e2888d8a60a431eb3280b47a0
+When you update your plugin to ILIAS 8, you should change the XML of your LTI type definitions to get rid of the jQuery dependencies.
+
+Search for:
+````
+$(document).ready(function()
+````
+and replace it with: 
+````
+document.addEventListener("DOMContentLoaded", function(event)
+````
 
 
-Version History
-===============
 
-Plugin versions for different ILIAS releases are provided in separate branches of this repository.
-Version 1.9.0
-* Update for ILIAS 9
-
-Version 1.8.2 (2024-09-05)
-* Fixed update of learning progress
-
-Version 1.8.1 (2023-09-13)
-* Support for ILIAS 8
-* Used FileSystem service for icons
-* Dropped support for PNG icons (only SVG allowed like in other ILIAS objects)
-* Removed jQuery dependency from type models
-* Changed example test service url in type models
 
