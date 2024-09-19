@@ -1,7 +1,7 @@
 <?php
 /**
  * Copyright (c) 2015 Institut für Lern-Innovation, Friedrich-Alexander-Universität Erlangen-Nürnberg
- * GPLv2, see LICENSE 
+ * GPLv2, see LICENSE
  */
 
 /**
@@ -9,46 +9,16 @@
  *
  * @author Fred Neumann <fred.neumann@fim.uni-erlangen.de>
  * @version $Id$
- */ 
-
-// optionally set error before initialisation
-// error_reporting (E_ALL);
-// ini_set("display_errors","on");
+ */
 
 chdir("../../../../../../../");
-
-// this should bring us all session data of the desired client
-// @see feed.php
-if (isset($_GET["client_id"]))
-{
-    $cookie_domain = $_SERVER['SERVER_NAME'];
-    $cookie_path = dirname( $_SERVER['PHP_SELF'] );
-
-    /* if ilias is called directly within the docroot $cookie_path
-    is set to '/' expecting on servers running under windows..
-    here it is set to '\'.
-    in both cases a further '/' won't be appended due to the following regex
-    */
-    $cookie_path .= (!preg_match("/[\/|\\\\]$/", $cookie_path)) ? "/" : "";
-
-    if($cookie_path == "\\") $cookie_path = '/';
-
-    $cookie_domain = ''; // Temporary Fix
-
-    setcookie("ilClientId", $_GET["client_id"], 0, $cookie_path, $cookie_domain);
-
-    $_COOKIE["ilClientId"] = $_GET["client_id"];
-}
 
 /** @noRector */
 require_once("libs/composer/vendor/autoload.php");
 
-// REST context has http and client but no user, templates, html or redirects
-ilContext::init(ilContext::CONTEXT_REST);
+// most appropriate context, user and ILIAS_HTTP_PATH is set
+ilContext::init(ilContext::CONTEXT_RSS_AUTH);
+ilInitialisation::initILIAS();
 
-ilExternalContentInitialisation::initILIAS();
-
-$service = new ilExternalContentResultService;
+$service = new ilExternalContentResultService();
 $service->handleRequest();
-
-?>

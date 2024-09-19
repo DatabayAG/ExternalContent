@@ -139,6 +139,7 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
      */
     protected function listTypes()
     {
+        $this->tabs->activateTab('types');
         $table_gui = new ilExternalContentTypesTableGUI($this, 'listTypes');
         $table_gui->init($this);
         $this->tpl->setContent($table_gui->getHTML());

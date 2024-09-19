@@ -237,7 +237,7 @@ class ilExternalContentSettings
         $settings->appendChild($type_name);
 
         $instructions = $doc->createElement('Instructions');
-        $instructions->appendChild($doc->createCDATASection($this->getInstructions()));
+        $instructions->appendChild($doc->createCDATASection((string) $this->getInstructions()));
         $settings->appendChild($instructions);
 
         $settings->appendChild($doc->createElement('AvailabilityType', (int) $this->getAvailabilityType()));
@@ -250,7 +250,7 @@ class ilExternalContentSettings
         foreach ($this->getInputValues() as $field_name => $field_value) {
             $field = $doc->createElement('Field');
             $field->setAttribute('name', $field_name);
-            $field->appendChild($doc->createCDATASection($field_value));
+            $field->appendChild($doc->createCDATASection((string) $field_value));
             $fields->appendChild($field);
         }
 
