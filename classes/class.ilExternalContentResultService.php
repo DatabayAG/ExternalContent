@@ -13,39 +13,44 @@ class ilExternalContentResultService
     protected $db;
 
     /**
-     * @var string  path of the plugin's base directory
+     * @var string path of the plugin's base directory
      */
-    protected $plugin_path = '';
+    protected string $plugin_path = '';
 
     /**
-     * @var string  relative path of the plugin durectory from the
+     * @var string  relative path of the plugin directory from the ILIAS directory
      */
-    protected $plugin_relative_path = 'Customizing/global/plugins/Services/Repository/RepositoryObject/ExternalContent';
+    protected string $plugin_relative_path = 'Customizing/global/plugins/Services/Repository/RepositoryObject/ExternalContent';
 
     /**
-     * @var ilExternalContentResult
+     * @var ilExternalContentResult|null LTI result for a user and object
      */
-    protected $result = null;
+    protected ?ilExternalContentResult $result = null;
 
     /**
-     * @var  array properties: name => value
+     * @var  array<string, mixed> properties: name => value
      */
-    protected $properties = array();
+    protected array $properties = [];
 
     /**
-     * @var array fields: name => value
+     * @var array<string, string> fields: name => value
      */
-    protected $fields = array();
+    protected array $fields = [];
 
     /**
      * @var string the message reference id
      */
-    protected $message_ref_id = '';
+    protected string $message_ref_id = '';
+
     /**
      * @var string  the requested operation
      */
-    protected $operation = '';
+    protected string $operation = '';
 
+    /**
+     * @var ilLogger
+     */
+    protected ilLogger $log;
 
     /**
      * Constructor: general initialisations
@@ -55,7 +60,8 @@ class ilExternalContentResultService
         global $DIC;
 
         $this->db = $DIC->database();
-        $this->plugin_path = realpath(dirname(__FILE__).'/..');
+        $this->log = $DIC->logger()->root();
+        $this->plugin_path = (string) realpath(dirname(__FILE__) . '/..');
     }
 
     /**
@@ -63,18 +69,17 @@ class ilExternalContentResultService
      */
     public function handleRequest()
     {
-        try
-        {
+        try {
             // get the request as xml
             $xml = simplexml_load_file('php://input');
             $this->message_ref_id = (string) $xml->imsx_POXHeader->imsx_POXRequestHeaderInfo->imsx_messageIdentifier;
-            $request = current($xml->imsx_POXBody->children());
-            $this->operation = str_replace('Request','', $request->getName());
-            $result_id = $request->resultRecord->sourcedGUID->sourcedId;
+            foreach($xml->imsx_POXBody->children() as $request) {
+                $this->operation = str_replace('Request', '', $request->getName());
+                $result_id = $request->resultRecord->sourcedGUID->sourcedId;
+            }
 
             $this->result = ilExternalContentResult::getById($result_id);
-            if (empty($this->result))
-            {
+            if (empty($this->result)) {
                 $this->respondUnauthorized("sourcedId $result_id not found!");
                 return;
             }
@@ -82,24 +87,23 @@ class ilExternalContentResultService
             // check the object status
             $this->readProperties($this->result->obj_id);
             if ($this->properties['availability_type'] == 0
-                or $this->properties['lp_mode'] == 0)
-            {
+                or $this->properties['lp_mode'] == 0) {
                 $this->respondUnsupported();
                 return;
             }
 
             // Verify the signature
             $this->readFields($this->properties['settings_id']);
-			$result = $this->checkSignature($this->fields['KEY'], $this->fields['SECRET']);
-			if ($result instanceof Exception)
-			{
-				$this->respondUnauthorized($result->getMessage());
-				return;
-			}
+            $result = $this->checkSignature($this->fields['KEY'], $this->fields['SECRET']);
+            if ($result instanceof Exception) {
+                $this->log->error($result->getMessage());
+                $this->log->logStack();
+                $this->respondUnauthorized($result->getMessage());
+                return;
+            }
 
             // Dispatch the operation
-            switch($this->operation)
-            {
+            switch($this->operation) {
                 case 'readResult':
                     $this->readResult($request);
                     break;
@@ -116,10 +120,10 @@ class ilExternalContentResultService
                     $this->respondUnknown();
                     break;
             }
-        }
-        catch (Exception $exception)
-        {
-           $this->respondBadRequest($exception->getMessage());
+        } catch (Exception $exception) {
+            $this->log->error($exception->getMessage());
+            $this->log->logStack();
+            $this->respondBadRequest($exception->getMessage());
         }
     }
 
@@ -130,7 +134,7 @@ class ilExternalContentResultService
     protected function readResult($request)
     {
         $response = $this->loadResponse('readResult.xml');
-        $response = str_replace('{message_id}', md5(rand(0,999999999)), $response);
+        $response = str_replace('{message_id}', md5(rand(0, 999999999)), $response);
         $response = str_replace('{message_ref_id}', $this->message_ref_id, $response);
         $response = str_replace('{operation}', $this->operation, $response);
         $response = str_replace('{result}', $this->result->result, $response);
@@ -146,29 +150,21 @@ class ilExternalContentResultService
     protected function replaceResult($request)
     {
         $result = (string) $request->resultRecord->result->resultScore->textString;
-        if (!is_numeric($result))
-        {
+        if (!is_numeric($result)) {
             $code = "failure";
             $severity = "status";
             $description = "The result is not a number.";
-        }
-        elseif ($result < 0 or $result > 1)
-        {
+        } elseif ($result < 0 or $result > 1) {
             $code = "failure";
             $severity = "status";
             $description = "The result is out of range from 0 to 1.";
-        }
-        else
-        {
+        } else {
             $this->result->result = (float) $result;
             $this->result->save();
 
-            if ($result >= $this->properties['lp_threshold'])
-            {
+            if ($result >= $this->properties['lp_threshold']) {
                 $lp_status = ilLPStatus::LP_STATUS_COMPLETED_NUM;
-            }
-            else
-            {
+            } else {
                 $lp_status = ilLPStatus::LP_STATUS_FAILED_NUM;
             }
             $lp_percentage = 100 * $result;
@@ -180,7 +176,7 @@ class ilExternalContentResultService
         }
 
         $response = $this->loadResponse('replaceResult.xml');
-        $response = str_replace('{message_id}', md5(rand(0,999999999)), $response);
+        $response = str_replace('{message_id}', md5(rand(0, 999999999)), $response);
         $response = str_replace('{message_ref_id}', $this->message_ref_id, $response);
         $response = str_replace('{operation}', $this->operation, $response);
         $response = str_replace('{code}', $code, $response);
@@ -208,7 +204,7 @@ class ilExternalContentResultService
         $severity = "status";
 
         $response = $this->loadResponse('deleteResult.xml');
-        $response = str_replace('{message_id}', md5(rand(0,999999999)), $response);
+        $response = str_replace('{message_id}', md5(rand(0, 999999999)), $response);
         $response = str_replace('{message_ref_id}', $this->message_ref_id, $response);
         $response = str_replace('{operation}', $this->operation, $response);
         $response = str_replace('{code}', $code, $response);
@@ -226,7 +222,7 @@ class ilExternalContentResultService
      */
     protected function loadResponse($a_name)
     {
-        return file_get_contents($this->plugin_path .'/responses/'.$a_name);
+        return file_get_contents($this->plugin_path . '/responses/' . $a_name);
     }
 
 
@@ -237,7 +233,7 @@ class ilExternalContentResultService
     protected function respondUnsupported()
     {
         $response = $this->loadResponse('unsupported.xml');
-        $response = str_replace('{message_id}', md5(rand(0,999999999)), $response);
+        $response = str_replace('{message_id}', md5(rand(0, 999999999)), $response);
         $response = str_replace('{message_ref_id}', $this->message_ref_id, $response);
         $response = str_replace('{operation}', $this->operation, $response);
 
@@ -251,7 +247,7 @@ class ilExternalContentResultService
     protected function respondUnknown()
     {
         $response = $this->loadResponse('unknown.xml');
-        $response = str_replace('{message_id}', md5(rand(0,999999999)), $response);
+        $response = str_replace('{message_id}', md5(rand(0, 999999999)), $response);
         $response = str_replace('{message_ref_id}', $this->message_ref_id, $response);
         $response = str_replace('{operation}', $this->operation, $response);
 
@@ -268,12 +264,9 @@ class ilExternalContentResultService
     {
         header('HTTP/1.1 400 Bad Request');
         header('Content-type: text/plain');
-        if (isset($message))
-        {
+        if (isset($message)) {
             echo $message;
-        }
-        else
-        {
+        } else {
             echo 'This is not a well-formed LTI Basic Outcomes Service request.';
         }
     }
@@ -288,12 +281,9 @@ class ilExternalContentResultService
     {
         header('HTTP/1.1 401 Unauthorized');
         header('Content-type: text/plain');
-        if (isset($message))
-        {
+        if (isset($message)) {
             echo $message;
-        }
-        else
-        {
+        } else {
             echo 'This request could not be authorized.';
         }
     }
@@ -308,8 +298,7 @@ class ilExternalContentResultService
     {
         $query = "SELECT * FROM xxco_data_settings WHERE obj_id =" . $this->db->quote($a_obj_id, 'integer');
         $res = $this->db->query($query);
-        if ($row = $this->db->fetchAssoc($res))
-        {
+        if ($row = $this->db->fetchAssoc($res)) {
             $this->properties = $row;
         }
     }
@@ -323,15 +312,14 @@ class ilExternalContentResultService
     {
         $query = "SELECT * FROM xxco_data_values WHERE settings_id =" . $this->db->quote($a_settings_id, 'integer');
         $res = $this->db->query($query);
-        while ($row = $this->db->fetchAssoc($res))
-        {
+        while ($row = $this->db->fetchAssoc($res)) {
             $this->fields[$row['field_name']] = $row['field_value'];
         }
     }
 
     /**
      * Check the reqest signature
-	 * @return mixed	Exception or true, , not defined because of error in php 7.4
+     * @return mixed	Exception or true, , not defined because of error in php 7.4
      */
     private function checkSignature($a_key, $a_secret)
     {
@@ -346,25 +334,22 @@ class ilExternalContentResultService
         // this must corresond to the lis_outcome_service_url provided with the call of the tool
         // the variable ILAS_RESULT_URL is used for this
         // see \ilObjExternalContent::getResultUrl
-        // The port and scheme might be wrong when HTTP is termiated by a load balalncer
+        // The port and scheme might be wrong when HTTP is terminated by a load balancer
         // In this case the http_path in ilias.ini.php should be set correctly
         $result_url = str_replace($this->plugin_relative_path, '', ILIAS_HTTP_PATH);
-        $result_url = rtrim($result_url, '/') . '/' . $this->plugin_relative_path . '/result.php?client_id='.CLIENT_ID;
+        $result_url = rtrim($result_url, '/') . '/' . $this->plugin_relative_path . '/result.php?client_id=' . CLIENT_ID;
         $request = \ILIAS\LTIOAuth\OAuthRequest::from_request(null, $result_url);
         //$request = \ILIAS\LTIOAuth\OAuthRequest::from_request();
 
         // produces 'invalid signature in verify_request
         // seems not to be needed in ILIAS 8 because from_request does not use get_magic_quotes_gpc() anymore
         // $request = \ILIAS\LTIOAuth\OAuthRequest::from_request(null, null, $this->getParameters());
-        try
-        {
+        try {
             $server->verify_request($request);
+        } catch (Exception $e) {
+            return $e;
         }
-        catch (Exception $e)
-        {
-			return $e;
-        }
-		return true;
+        return true;
     }
 
     /**
@@ -377,7 +362,7 @@ class ilExternalContentResultService
     private function getParameters()
     {
         // Find request headers
-        $request_headers =  \ILIAS\LTIOAuth\OAuthUtil::get_headers();
+        $request_headers = \ILIAS\LTIOAuth\OAuthUtil::get_headers();
 
         // Parse the query-string to find GET parameters
         $parameters = \ILIAS\LTIOAuth\OAuthUtil::parse_parameters($_SERVER['QUERY_STRING']);
@@ -398,4 +383,4 @@ class ilExternalContentResultService
 
         return $parameters;
     }
-} 
+}
