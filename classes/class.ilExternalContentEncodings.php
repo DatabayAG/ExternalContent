@@ -167,7 +167,7 @@ class ilExternalContentEncodings
 	               	$classname = preg_replace('/[^A-Za-z0-9]/', '', trim($encoding));
 
                     // use an encoding class with that name
-                    $path = './Customizing/global/encodings/class.'.$classname.'.php';
+                    $path = './public/Customizing/global/encodings/class.'.$classname.'.php';
 		            if (file_exists($path))
 		            {
 		               	require_once($path);

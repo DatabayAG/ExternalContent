@@ -50,7 +50,7 @@ class ilExternalContentTypesTableGUI extends ilTable2GUI {
         $this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
         $this->addCommandButton('createType', $this->lng->txt('rep_robj_xxco_create_type'));
 
-        $this->setRowTemplate('tpl.types_row.html', 'Customizing/global/plugins/Services/Repository/RepositoryObject/ExternalContent');
+        $this->setRowTemplate('tpl.types_row.html', ilExternalContentPlugin::PLUGIN_PATH);
         $this->getMyDataFromDb();
     }
 

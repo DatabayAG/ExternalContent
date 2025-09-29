@@ -75,7 +75,7 @@ class ilObjExternalContentListGUI extends ilObjectPluginListGUI
      */
     public function getTypeIcon(): string
     {
-        return ilExternalContentPlugin::_getContentIcon('xxco', 'svg', $this->obj_id);
+        return ilExternalContentPlugin::getContentIcon($this->obj_id);
     }
     
 }

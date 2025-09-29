@@ -138,9 +138,9 @@ content_types#:#Inhalts-Typen
 type_title_info#:#Dieser Titel wird zur Auswahl des Typs bei neuen Objekten angezeigt.
 type_description_info#:#Diese Beschreibung wird zur Auswahl des Typs bei neuen Objekten angezeigt.
 type_settings#:#Einstellungen
-icons#:#Icons
-icons_failure#:#Beim Hochladen der Icons ist ein Fehler aufgetreten!
-icons_saved#:#Die Icons wurden gespeichert.
+icons#:#Icon
+icons_failure#:#Beim Hochladen des Icons ist ein Fehler aufgetreten!
+icons_saved#:#Das Icon wurden gespeichert.
 edit_instructions#:#Anleitung bearbeiten
 instructions_saved#:#Die Anleitung wurde gespeichert.
 xxco_title_info#:#Geben Sie dem Objekt einen Titel

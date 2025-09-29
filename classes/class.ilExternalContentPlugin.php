@@ -16,13 +16,12 @@ use ILIAS\FileUpload\Location;
  */
 class ilExternalContentPlugin extends ilRepositoryObjectPlugin
 {
-	const BIG_ICON_SIZE = "45x45";
-	const SMALL_ICON_SIZE = "35x35";
-	const TINY_ICON_SIZE = "22x22";
+    public const PLUGIN_PATH = 'public/Customizing/global/plugins/Services/Repository/RepositoryObject/ExternalContent';
+    private const DEFAULT_ICON_URL = 'assets/images/standard/icon_xxco.svg';
+    private const ICON_NAME = 'icon.svg';
 
     /** @var self */
     protected static $instance;
-
 
     /**
 	 * Returns name of the plugin
@@ -32,6 +31,14 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
 	{
 		return 'ExternalContent';
 	}
+
+    /**
+     * Get the icon for the ILIAS object creation modal
+     */
+    public static function _getIcon(string $a_type): string
+    {
+        return self::DEFAULT_ICON_URL;
+    }
 
     /**
      * Get the plugin instance
@@ -70,7 +77,7 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
 	* 
 	* @return	string		webspace directory
 	*/
-	static function _createWebspaceDir($a_level = "plugin", $a_id = 0)
+	private static function createWebspaceDir($a_level = "plugin", $a_id = 0)
 	{
         global $DIC;
         $fs = $DIC->filesystem()->web();
@@ -78,7 +85,7 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
 		switch($a_level)
 		{
 			case "type":
-				$plugin_dir = self::_createWebspaceDir("plugin");
+				$plugin_dir = self::createWebspaceDir("plugin");
 				$type_dir = $plugin_dir . "/type_". $a_id;
 				if (!is_dir($type_dir))
 				{
@@ -87,7 +94,7 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
 				return $type_dir;
 								
 			case "object":
-				$plugin_dir = self::_createWebspaceDir("plugin");
+				$plugin_dir = self::createWebspaceDir("plugin");
 				$object_dir = $plugin_dir . "/object_". $a_id;
 				if (!is_dir($object_dir))
 				{
@@ -97,7 +104,7 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
 
             case "plugin":
             default:
-                $plugin_dir = self::_getRelativeWebspaceDir('plugin');
+                $plugin_dir = self::getRelativeWebspaceDir('plugin');
                 if (!is_dir($plugin_dir))
                 {
                     $fs->createDir($plugin_dir);
@@ -114,7 +121,7 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
 	* 
 	* @return	string		webspace directory
 	*/
-	static function _getRelativeWebspaceDir($a_level = "plugin", $a_id = 0)
+	private static function getRelativeWebspaceDir($a_level = "plugin", $a_id = 0)
 	{
 		switch($a_level)
 		{
@@ -130,19 +137,6 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
         }
 	}
 
-    /**
-     * Get an absolute webspace directory
-     * 
-     * @param	string	$a_level	level ("plugin", "type" or "object")
-     * @param	integer	$a_id	type id or object id
-     *
-     * @return	string		webspace directory
-     */
-    static function _getAbsoluteWebspaceDir($a_level = "plugin", $a_id = 0) 
-    {
-        return CLIENT_WEB_DIR . '/' . self::_getRelativeWebspaceDir($a_level, $a_id);
-    }
-
 
     /**
      * Get an absolute webspace directory
@@ -152,9 +146,9 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
      *
      * @return	string		webspace directory
      */
-    static function _getWebspaceURL($a_level = "plugin", $a_id = 0)
+    private static function getWebspaceURL($a_level = "plugin", $a_id = 0)
     {
-        return './data/' . CLIENT_ID . '/' . self::_getRelativeWebspaceDir($a_level, $a_id);
+        return './data/' . CLIENT_ID . '/' . self::getRelativeWebspaceDir($a_level, $a_id);
     }
 
 
@@ -164,104 +158,63 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
 	* @param	string	$a_level	level ("plugin", "type" or "object")
 	* @param	integer	$a_id	type id or object id
 	*/
-	static function _deleteWebspaceDir($a_level = "plugin", $a_id = 0)
+	public static function deleteWebspaceDir($a_level = "plugin", $a_id = 0)
 	{
         global $DIC;
         $fs = $DIC->filesystem()->web();
-        if ($fs->hasDir(self::_getRelativeWebspaceDir($a_level, $a_id))) {
-            $fs->deleteDir(self::_getRelativeWebspaceDir($a_level, $a_id));
+        if ($fs->hasDir(self::getRelativeWebspaceDir($a_level, $a_id))) {
+            $fs->deleteDir(self::getRelativeWebspaceDir($a_level, $a_id));
         }
 	}	
-	
-	
-	/**
-	 * Get the file name used for a type or object specific icon
 
-	 * @param 	string	$a_size	size ("big", "small", "tiny" or "svg")
-	 * @return 	string		    file name
-	 */
-	static function _getIconName($a_size)
-	{
-		switch($a_size)
-		{
-			case "svg":		return "icon.svg";
-			case "small": 	return "icon.png"; 
-			case "tiny":	return "icon_s.png";
-			case "big":		
-			default:		return "icon_b.png";
-		}
-	}
-	
 	
 	/**
 	* Get Icon (object, type or plugin specific)
 	* (this function should be called wherever an icon has to be displyed)
-	* 
-	* @param 	string		$a_type     object type ("xxco")
-	* @param 	string		$a_size     size ("big", "small", "tiny" or "svg")
+	*
 	* @param	int			$a_obj_id   object id (optional)
 	* @param	int			$a_type_id  content type id (optional)
 	* @param	string		$a_level    get icon of a specific level ("plugin", "type" or "object")
 	* @return	string		icon path
 	*/
-    static function _getContentIcon(string $a_type, $a_size, $a_obj_id = 0, $a_type_id = 0, $a_level = ""): string
-	{
+    public static function getContentIcon(int $a_obj_id = 0, $a_type_id = 0, $a_level = ""): string
+    {
         global $DIC;
         $fs = $DIC->filesystem()->web();
-        
-		// first try to use an object specific icon
-		if ($a_level == "object" or $a_level == "")
-		{		
-			if ($a_obj_id)
-			{
-				// always try svg version first
-				$name = self::_getIconName("svg");
-				$path = self::_getRelativeWebspaceDir("object", $a_obj_id) . "/" . $name;
-				if ($fs->has($path))
-				{
-					return self::_getWebspaceURL("object", $a_obj_id) . "/" . $name;
-				}
 
-				// then try older versions (big is default)
-				$name = self::_getIconName($a_size);		
-				$path = self::_getRelativeWebspaceDir("object", $a_obj_id) . "/" . $name;						
-				if ($fs->has($path))
-				{
-					return self::_getWebspaceURL("object", $a_obj_id) . "/" . $name;
+        // first try to use an object specific icon
+        if ($a_level == "object" or $a_level == "") {
+            if ($a_obj_id) {
+                $path = self::getRelativeWebspaceDir("object", $a_obj_id) . "/" . self::ICON_NAME;
+                if ($fs->has($path)) {
+                    return self::getWebspaceURL("object", $a_obj_id) . "/" . self::ICON_NAME;
                 }
-			}
-		}
-		
-		// then try to get a content type specific icon
-		if ($a_level == "type" or $a_level == "")
-		{				
-			if ($a_obj_id and !$a_type_id)
-			{
-				$a_type_id = ilObjExternalContentAccess::_lookupTypeId($a_obj_id);	
-			}
-			
-			if ($a_type_id)
-			{
-				// always try svg version first
-				$name = self::_getIconName("svg");
-				$path = self::_getRelativeWebspaceDir("type", $a_type_id) . "/" . $name;
-				if ($fs->has($path))
-				{
-					return self::_getWebspaceURL("type", $a_type_id) . "/" . $name;
-				}
+            }
+            if ($a_level == "object") {
+                // object icon is requested explicit
+                return "";
+            }
+        }
 
-				// then try older versions (big is default)
-				$name = self::_getIconName($a_size);		
-				$path = self::_getRelativeWebspaceDir("type", $a_type_id) . "/" . $name;
-				if ($fs->has($path))
-				{
-                    return self::_getWebspaceURL("type", $a_type_id) . "/" . $name;
-				}
-			}
-		}
-		
-		// finally get the plugin icon
-        return parent::_getIcon($a_type);
+        // then try to get a content type specific icon
+        if ($a_level == "type" or $a_level == "") {
+            if ($a_obj_id and !$a_type_id) {
+                $a_type_id = ilObjExternalContentAccess::_lookupTypeId($a_obj_id);
+            }
+            if ($a_type_id) {
+                $path = self::getRelativeWebspaceDir("type", $a_type_id) . "/" . self::ICON_NAME;
+                if ($fs->has($path)) {
+                    return self::getWebspaceURL("type", $a_type_id) . "/" . self::ICON_NAME;
+                }
+            }
+            if ($a_level == "type") {
+                // type icon is requested explicit
+                return "";
+            }
+        }
+
+        // finally get the plugin icon
+        return self::DEFAULT_ICON_URL;
 	}
 
 	
@@ -269,15 +222,14 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
 	* Save an icon
 	* 
 	* @param 	string		$a_upload_path  temp path to the uploaded file
-	* @param 	string		$a_size         size ("big", "small", "tiny" or "svg")
 	* @param	string		$a_level        level ("type" or "object")
 	* @param	integer		$a_id           type id or object id
 	*/
-	static function _saveIcon($a_upload_path, $a_size, $a_level, $a_id) : void
+	public static function saveIcon($a_upload_path, $a_level, $a_id) : void
 	{
         global $DIC;
 
-        $path = self::_createWebspaceDir($a_level, $a_id);
+        $path = self::createWebspaceDir($a_level, $a_id);
 
         $upload = $DIC->upload();
         if (!$upload->hasBeenProcessed()) {
@@ -297,27 +249,35 @@ class ilExternalContentPlugin extends ilRepositoryObjectPlugin
             throw new ilException($processing_status->getMessage());
         }
 
-        $upload->moveOneFileTo($upload_result, $path, Location::WEB, self::_getIconName($a_size), true);
+        $upload->moveOneFileTo($upload_result, $path, Location::WEB, self::ICON_NAME, true);
 	}
 	
 	
 	/**
 	* Remove an icon
-	* 
-	* @param 	string		$a_size     size ("big", "small", "tiny" or "svg")
+	*
 	* @param	string		$a_level    level ("type" or "object")
 	* @param	integer		$a_id       type id or object id
 	*/ 
-	static function _removeIcon($a_size, $a_level, $a_id)
+	public static function removeIcon($a_level, $a_id)
 	{
         global $DIC;
         
         $fs = $DIC->filesystem()->web();
-        $name = self::_getIconName($a_size);
-        if ($fs->has(self::_getRelativeWebspaceDir($a_level, $a_id) . "/" . $name)) {
-            $fs->delete(self::_getRelativeWebspaceDir($a_level, $a_id) . "/" . $name);
+        $name = self::ICON_NAME;
+        if ($fs->has(self::getRelativeWebspaceDir($a_level, $a_id) . "/" . $name)) {
+            $fs->delete(self::getRelativeWebspaceDir($a_level, $a_id) . "/" . $name);
         }
 	}
+
+    /**
+     * Get a template of the plugin
+     * @param string $a_template
+     */
+    public function getTemplate(string $a_template, bool $a_par1 = true, bool $a_par2 = true): ilTemplate
+    {
+        return new ilTemplate( $a_template, $a_par1, $a_par2, self::PLUGIN_PATH);
+    }
 
 	/**
 	 * decides if this repository plugin can be copied

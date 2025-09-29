@@ -113,7 +113,7 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
             $this->object->setGotoSuffix($_GET['goto_suffix'] ?? '');
 		}
 
-        $this->tpl->setTitleIcon(ilExternalContentPlugin::_getContentIcon('xxco', 'svg', $this->obj_id));
+        $this->tpl->setTitleIcon(ilExternalContentPlugin::getContentIcon($this->obj_id));
         
         switch ($cmd)
         {
@@ -189,7 +189,6 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
             $this->tabs->addTab("edit", $this->lng->txt("settings"), $this->ctrl->getLinkTarget($this, "edit"));
         }
 
-        include_once("Services/Tracking/classes/class.ilObjUserTracking.php");
         if (ilObjUserTracking::_enabledLearningProgress() &&
             ($this->checkPermissionBool("edit_learning_progress") || $this->checkPermissionBool("read_learning_progress")))
         {
@@ -242,7 +241,6 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
                 if ($this->object->getSettings()->getLPMode() == ilExternalContentSettings::LP_ACTIVE && $this->checkPermissionBool("read_learning_progress"))
                 {
 
-                    include_once("Services/Tracking/classes/class.ilObjUserTracking.php");
                     if (ilObjUserTracking::_enabledUserRelatedData())
                     {
                         $this->tabs->addSubTab("trac_objects", $this->lng->txt('trac_objects'), $this->ctrl->getLinkTargetByClass(array('ilObjExternalContentGUI','ilLearningProgressGUI','ilLPListOfObjectsGUI')));
@@ -259,8 +257,8 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
     public function infoScreen() : void
     {
         $this->tabs_gui->activateTab('infoScreen');
+        $this->tpl->setTitleIcon(ilExternalContentPlugin::getContentIcon($this->object->getId()));
 
-        include_once("./Services/InfoScreen/classes/class.ilInfoScreenGUI.php");
         $info = new ilInfoScreenGUI($this);
 
         if (!empty( $this->object->getSettings()->getInstructions())) {
@@ -654,7 +652,8 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
         $type_id = $this->object->getTypeDef()->getTypeId();
         $obj_id = $this->object->getId();
 
-        $svg = ilExternalContentPlugin::_getContentIcon("xxco", "svg", $obj_id, $type_id, "object");
+        $svg = ilExternalContentPlugin::getContentIcon($obj_id, $type_id, "object")
+            . '?' . random_int('100000', 999999);
 
         $form = new ilPropertyFormGUI();
         $form->setFormAction($this->ctrl->getFormAction($this));
@@ -688,10 +687,10 @@ class ilObjExternalContentGUI extends ilObjectPluginGUI
         }
 
 		if(!empty($_POST["svg_icon_delete"])) {
-			ilExternalContentPlugin::_removeIcon("svg", "object", $this->object->getId());
+			ilExternalContentPlugin::removeIcon( "object", $this->object->getId());
 		}
         if (!empty($_FILES["svg_icon"]) && !empty($_FILES["svg_icon"]['tmp_name'])) {
-            ilExternalContentPlugin::_saveIcon($_FILES["svg_icon"]['tmp_name'], "svg", "object", $this->object->getId());
+            ilExternalContentPlugin::saveIcon($_FILES["svg_icon"]['tmp_name'], "object", $this->object->getId());
         }
 
         $this->tpl->setOnScreenMessage('success', $this->txt('icons_saved'), true);

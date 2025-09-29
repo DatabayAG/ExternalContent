@@ -353,7 +353,8 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
     {
         $type_id = $this->type->getTypeId();
 
-        $svg = ilExternalContentPlugin::_getContentIcon("xxco", "svg", 0, $type_id, "type");
+        $svg = ilExternalContentPlugin::getContentIcon(0, $type_id, "type")
+            . '?' . random_int('100000', 999999);
         
         $form = new ilPropertyFormGUI();
         $form->setFormAction($this->ctrl->getFormAction($this));
@@ -387,10 +388,10 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
         }
 
 		if (!empty($_POST["svg_icon_delete"])) {
-			ilExternalContentPlugin::_removeIcon("svg", "type", $type_id);
+			ilExternalContentPlugin::removeIcon("type", $type_id);
 		}
         if (!empty($_FILES["svg_icon"]) && !empty($_FILES["svg_icon"]['tmp_name'])) {
-            ilExternalContentPlugin::_saveIcon($_FILES["svg_icon"]['tmp_name'], "svg", "type", $type_id);
+            ilExternalContentPlugin::saveIcon($_FILES["svg_icon"]['tmp_name'], "type", $type_id);
         }
 
         $this->tpl->setOnScreenMessage('success', $this->plugin_object->txt('icons_saved'), true);
@@ -427,7 +428,7 @@ class ilExternalContentConfigGUI extends ilPluginConfigGUI
         $form->setTitle($this->txt('type_definition'));
 
         $item = new ilCustomInputGUI('');
-        $tpl = new ilTemplate('tpl.edit_xml.html', true, true, "Customizing/global/plugins/Services/Repository/RepositoryObject/ExternalContent/");
+        $tpl = $this->plugin_object->getTemplate("tpl.edit_xml.html");
         $tpl->setVariable("CONTENT", ilLegacyFormElementsUtil::prepareFormOutput($a_xml));
         $item->setHTML($tpl->get());
         $item->setInfo($this->txt('type_definition_info'));

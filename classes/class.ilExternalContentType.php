@@ -544,7 +544,7 @@ class ilExternalContentType
      */
     public function delete()
     {
-        ilExternalContentPlugin::_deleteWebspaceDir("type", $this->getTypeId());
+        ilExternalContentPlugin::deleteWebspaceDir("type", $this->getTypeId());
 
         $query = "DELETE FROM xxco_data_types " .
                 "WHERE type_id = " . $this->db->quote($this->getTypeId(), 'integer');

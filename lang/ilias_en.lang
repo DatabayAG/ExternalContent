@@ -138,9 +138,9 @@ content_types#:#Content Types
 type_title_info#:#This title is shown when a type is selected for a new object.
 type_description_info#:#This description is shown when a type is selected for a new object.
 type_settings#:#Settings
-icons#:#Icons
-icons_failure#:#The icons were not properly uploaded!
-icons_saved#:#The icons were successfully saved.
+icons#:#Icon
+icons_failure#:#The icon was not properly uploaded!
+icons_saved#:#The icon was successfully saved.
 edit_instructions#:#Edit Instructions
 instructions_saved#:#The Instructions were saved.
 xxco_title_info#:#Give the object a title
