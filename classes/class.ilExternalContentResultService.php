@@ -1,8 +1,14 @@
 <?php
+
 /**
  * Copyright (c) 2015 Institut fuer Lern-Innovation, Friedrich-Alexander-Universitaet Erlangen-Nuernberg
  * GPLv2, see LICENSE
  */
+
+use ceLTIc\LTI\OAuth\OAuthRequest;
+use ceLTIc\LTI\OAuth\OAuthServer;
+use ceLTIc\LTI\OAuth\OAuthSignatureMethod_HMAC_SHA1;
+use ceLTIc\LTI\OAuthDataStore;
 
 /**
  * Class for LTI outcome service
@@ -73,7 +79,7 @@ class ilExternalContentResultService
             // get the request as xml
             $xml = simplexml_load_file('php://input');
             $this->message_ref_id = (string) $xml->imsx_POXHeader->imsx_POXRequestHeaderInfo->imsx_messageIdentifier;
-            foreach($xml->imsx_POXBody->children() as $request) {
+            foreach ($xml->imsx_POXBody->children() as $request) {
                 $this->operation = str_replace('Request', '', $request->getName());
                 $result_id = $request->resultRecord->sourcedGUID->sourcedId;
             }
@@ -103,7 +109,7 @@ class ilExternalContentResultService
             }
 
             // Dispatch the operation
-            switch($this->operation) {
+            switch ($this->operation) {
                 case 'readResult':
                     $this->readResult($request);
                     break;
@@ -318,69 +324,33 @@ class ilExternalContentResultService
     }
 
     /**
-     * Check the reqest signature
-     * @return mixed	Exception or true, , not defined because of error in php 7.4
+     * Check the request signature
+     * @return bool|Exception
      */
     private function checkSignature($a_key, $a_secret)
     {
-        $store = new TrivialOAuthDataStore();
+        $store = new ilExternalContentOAuthDataStore();
         $store->add_consumer($this->fields['KEY'], $this->fields['SECRET']);
 
-        $server = new \ILIAS\LTIOAuth\OAuthServer($store);
-        $method = new \ILIAS\LTIOAuth\OAuthSignatureMethod_HMAC_SHA1();
+        $server = new OAuthServer($store);
+        $method = new OAuthSignatureMethod_HMAC_SHA1();
         $server->add_signature_method($method);
 
         // get the correct request url for checking the signature
-        // this must corresond to the lis_outcome_service_url provided with the call of the tool
-        // the variable ILAS_RESULT_URL is used for this
+        // this must correspond to the lis_outcome_service_url provided with the call of the tool
+        // the variable ILIAS_RESULT_URL is used for this
         // see \ilObjExternalContent::getResultUrl
         // The port and scheme might be wrong when HTTP is terminated by a load balancer
         // In this case the http_path in ilias.ini.php should be set correctly
         $result_url = str_replace($this->plugin_relative_path, '', ILIAS_HTTP_PATH);
         $result_url = rtrim($result_url, '/') . '/' . $this->plugin_relative_path . '/result.php?client_id=' . CLIENT_ID;
-        $request = \ILIAS\LTIOAuth\OAuthRequest::from_request(null, $result_url);
-        //$request = \ILIAS\LTIOAuth\OAuthRequest::from_request();
+        $request = OAuthRequest::from_request(null, $result_url);
 
-        // produces 'invalid signature in verify_request
-        // seems not to be needed in ILIAS 8 because from_request does not use get_magic_quotes_gpc() anymore
-        // $request = \ILIAS\LTIOAuth\OAuthRequest::from_request(null, null, $this->getParameters());
         try {
             $server->verify_request($request);
         } catch (Exception $e) {
             return $e;
         }
         return true;
-    }
-
-    /**
-     * Get the Parameters from an OAuthRequest
-     * Extracted from OAuthRequest::from_request to omit the deprecated get_magic_quotes_gpc()
-     * @deprecated seems not to be needed in ILIAS 8 because from_request does not use get_magic_quotes_gpc() anymore
-     * @see OAuthRequest::from_request
-     * @return array
-     */
-    private function getParameters()
-    {
-        // Find request headers
-        $request_headers = \ILIAS\LTIOAuth\OAuthUtil::get_headers();
-
-        // Parse the query-string to find GET parameters
-        $parameters = \ILIAS\LTIOAuth\OAuthUtil::parse_parameters($_SERVER['QUERY_STRING']);
-
-        $ourpost = (array) $_POST;
-
-        // Add POST Parameters if they exist
-        $parameters = array_merge($parameters, $ourpost);
-
-        // We have a Authorization-header with OAuth data. Parse the header
-        // and add those overriding any duplicates from GET or POST
-        if (substr((string) ($request_headers['Authorization'] ?? ''), 0, 6) == "OAuth ") {
-            $header_parameters = \ILIAS\LTIOAuth\OAuthUtil::split_header(
-                $request_headers['Authorization']
-            );
-            $parameters = array_merge($parameters, $header_parameters);
-        }
-
-        return $parameters;
     }
 }
