@@ -11,10 +11,10 @@
  * @version $Id$
  */
 
-chdir("../../../../../../../");
+chdir(__DIR__ . "/../../../../../../../../");
 
 /** @noRector */
-require_once("libs/composer/vendor/autoload.php");
+require_once("vendor/composer/vendor/autoload.php");
 
 // most appropriate context, user and ILIAS_HTTP_PATH is set
 ilContext::init(ilContext::CONTEXT_RSS_AUTH);
