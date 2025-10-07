@@ -9,6 +9,7 @@ use ceLTIc\LTI\OAuth\OAuthRequest;
 use ceLTIc\LTI\OAuth\OAuthServer;
 use ceLTIc\LTI\OAuth\OAuthSignatureMethod_HMAC_SHA1;
 use ceLTIc\LTI\OAuthDataStore;
+use ceLTIc\LTI\OAuth\OAuthUtil;
 
 /**
  * Class for LTI outcome service
@@ -86,7 +87,8 @@ class ilExternalContentResultService
 
             $this->result = ilExternalContentResult::getById($result_id);
             if (empty($this->result)) {
-                $this->respondUnauthorized("sourcedId $result_id not found!");
+                $this->log->error("ExternalContent Result Service: sourcedId $result_id not found!");
+                $this->respondUnauthorized();
                 return;
             }
 
@@ -94,19 +96,14 @@ class ilExternalContentResultService
             $this->readProperties($this->result->obj_id);
             if ($this->properties['availability_type'] == 0
                 or $this->properties['lp_mode'] == 0) {
+                $this->log->error("ExternalContent Result Service: storing results not allowed for obj_id" . $this->result->obj_id);
                 $this->respondUnsupported();
                 return;
             }
 
-            // Verify the signature
+            // Verify the signature (will throw an exception)
             $this->readFields($this->properties['settings_id']);
-            $result = $this->checkSignature($this->fields['KEY'], $this->fields['SECRET']);
-            if ($result instanceof Exception) {
-                $this->log->error($result->getMessage());
-                $this->log->logStack();
-                $this->respondUnauthorized($result->getMessage());
-                return;
-            }
+            $this->checkSignature($this->fields['KEY'], $this->fields['SECRET']);
 
             // Dispatch the operation
             switch ($this->operation) {
@@ -127,9 +124,9 @@ class ilExternalContentResultService
                     break;
             }
         } catch (Exception $exception) {
-            $this->log->error($exception->getMessage());
-            $this->log->logStack();
-            $this->respondBadRequest($exception->getMessage());
+            $this->log->error('ExternalContent Result Service: Incoming request failed: ' . $exception->getMessage());
+            $this->log->debug($exception->getTraceAsString());
+            $this->respondBadRequest();
         }
     }
 
@@ -325,16 +322,38 @@ class ilExternalContentResultService
 
     /**
      * Check the request signature
-     * @return bool|Exception
+     * @throws Exception
      */
-    private function checkSignature($a_key, $a_secret)
+    private function checkSignature($a_key, $a_secret): void
     {
-        $store = new ilExternalContentOAuthDataStore();
-        $store->add_consumer($this->fields['KEY'], $this->fields['SECRET']);
+        $platform = new ilLTIPlatform();
+
+        $platform->setKey($a_key);
+        $platform->setSecret($a_secret);
+
+        // This should be the ID of a registered platform, when ILIAS is the tool
+        // Here we need an ID for the external tool when ILIAS is the platform
+        // This is needed to check and save the nonce of result service calls from the external tool
+        // As a workaround, we use the object id of the consumer object, a nonce will be saved with this consumer_pk
+        $platform->setRecordId($this->result->obj_id);
+
+        $store = new OAuthDataStore($platform);
 
         $server = new OAuthServer($store);
         $method = new OAuthSignatureMethod_HMAC_SHA1();
         $server->add_signature_method($method);
+
+        $server = new OAuthServer($store);
+        $method = new OAuthSignatureMethod_HMAC_SHA1();
+        $server->add_signature_method($method);
+
+        // Extract the parameters here to omit the request body from building the signature
+        // see https://www.imsglobal.org/spec/lti-bo/v1p1
+        // "The service endpoint must accept any well-formed request with properly formed headers that pass security checks"
+        $request_headers = OAuthUtil::get_headers();
+        if (isset($request_headers['Authorization']) && str_starts_with($request_headers['Authorization'], 'OAuth ')) {
+            $parameters = OAuthUtil::split_header($request_headers['Authorization']);
+        }
 
         // get the correct request url for checking the signature
         // this must correspond to the lis_outcome_service_url provided with the call of the tool
@@ -344,13 +363,9 @@ class ilExternalContentResultService
         // In this case the http_path in ilias.ini.php should be set correctly
         $result_url = str_replace($this->plugin_relative_path, '', ILIAS_HTTP_PATH);
         $result_url = rtrim($result_url, '/') . '/' . $this->plugin_relative_path . '/result.php?client_id=' . CLIENT_ID;
-        $request = OAuthRequest::from_request(null, $result_url);
+        $request = OAuthRequest::from_request(null, $result_url, $parameters ?? []);
 
-        try {
-            $server->verify_request($request);
-        } catch (Exception $e) {
-            return $e;
-        }
-        return true;
+        // Don't catch an exception, give the caller a chance to handle it
+        $server->verify_request($request);
     }
 }
