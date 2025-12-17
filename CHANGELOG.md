@@ -1,5 +1,10 @@
 # Change Log
 
+## Version 1.10.0 for ILIAs 10 (2025-12-17)
+* Update for ILIAS 10
+* Remove signature methods PLAINTEXT and RSA_SHA1
+* Remove support of PNG icons
+
 ## Version 1.9.0 for ILIAS 9 (2024-09-19)
 * Update for ILIAS 9
 * Add noopener and noreferrer to lauch forms in LTI type models
