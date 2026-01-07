@@ -1,5 +1,8 @@
 # Change Log
 
+## Version 1.9.1 for ILIAS 9 (2026-01-07)
+* Fix signature check in result service
+
 ## Version 1.9.0 for ILIAS 9 (2024-09-19)
 * Update for ILIAS 9
 * Add noopener and noreferrer to lauch forms in LTI type models
