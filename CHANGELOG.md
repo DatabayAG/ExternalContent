@@ -1,5 +1,8 @@
 # Change Log
 
+## Version 1.9.2 for ILIAS 9 (2026-01-26)
+* Fix array access in ilObjExternalContentAccess
+
 ## Version 1.9.1 for ILIAS 9 (2026-01-07)
 * Fix signature check in result service
 

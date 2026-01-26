@@ -60,7 +60,7 @@ class ilObjExternalContentAccess extends ilObjectPluginAccess
 	{
 		$row = self::fetchSettings($a_obj_id);
  
-		switch($row["availability_type"])
+		switch($row["availability_type"] ?? null)
 		{
 			case self::ACTIVATION_UNLIMITED:
 				return true;
@@ -75,12 +75,12 @@ class ilObjExternalContentAccess extends ilObjectPluginAccess
 	/**
 	 * Get the type
 	 * @param int $a_obj_id
-	 * @return int
+	 * @return ?int
 	 */
 	static function _lookupTypeId($a_obj_id)
 	{
 		$row = self::fetchSettings($a_obj_id);
-        return $row['type_id'];
+        return $row['type_id'] ?? null;
 	}
 	
 	
